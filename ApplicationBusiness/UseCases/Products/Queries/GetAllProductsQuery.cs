@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using MiVivero.Models.ViewModels;
+using MiVivero.ApplicationBusiness.ViewModels;
 
 namespace MiVivero.ApplicationBusiness.UseCases.Products.Queries
 {

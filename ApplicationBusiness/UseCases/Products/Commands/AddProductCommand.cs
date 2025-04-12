@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using MiVivero.Models.DTOs;
+using MiVivero.ApplicationBusiness.DTOs;
 
 namespace MiVivero.ApplicationBusiness.UseCases.Products.Commands
 {

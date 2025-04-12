@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
 using MiVivero.ApplicationBusiness.Interfaces;
-using MiVivero.ApplicationBusiness.UseCases.Categories.Queries;
 using MiVivero.ApplicationBusiness.UseCases.Products.Queries;
+using MiVivero.ApplicationBusiness.ViewModels;
 using MiVivero.Entities;
-using MiVivero.Models.ViewModels;
 
 namespace MiVivero.ApplicationBusiness.UseCases.Products.Handlers
 {

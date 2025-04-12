@@ -6,11 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ApplicationBusiness\MiVivero.ApplicationBusiness.csproj" />
-    <ProjectReference Include="..\MiVivero.Data\MiVivero.Data.csproj" />
-    <ProjectReference Include="..\MiVivero.Entities\MiVivero.Entities.csproj" />
-    <ProjectReference Include="..\MiVivero.Models\MiVivero.Models.csproj" />
-  </ItemGroup>
-
 </Project>

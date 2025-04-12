@@ -1,4 +1,4 @@
-﻿namespace MiVivero.Models.DTOs
+﻿namespace MiVivero.ApplicationBusiness.DTOs
 {
     public class CategoryPostDto
     {

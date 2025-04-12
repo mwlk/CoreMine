@@ -15,9 +15,6 @@ namespace MiVivero.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //modelBuilder.Entity<Product>().ToTable("Products");
-            //modelBuilder.Entity<Category>().ToTable("Categories");
-
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         }
     }

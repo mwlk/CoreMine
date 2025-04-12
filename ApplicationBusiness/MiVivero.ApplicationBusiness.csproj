@@ -13,7 +13,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MiVivero.Entities\MiVivero.Entities.csproj" />
-    <ProjectReference Include="..\MiVivero.Infrastructure\MiVivero.Infraestructure.csproj" />
     <ProjectReference Include="..\MiVivero.Models\MiVivero.Models.csproj" />
   </ItemGroup>
 

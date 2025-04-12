@@ -21,7 +21,6 @@
     <ProjectReference Include="..\ApplicationBusiness\MiVivero.ApplicationBusiness.csproj" />
     <ProjectReference Include="..\MiVivero.Data\MiVivero.Data.csproj" />
     <ProjectReference Include="..\MiVivero.Infrastructure\MiVivero.Infraestructure.csproj" />
-    <ProjectReference Include="..\MiVivero.Repository\MiVivero.Repository.csproj" />
   </ItemGroup>
 
 </Project>

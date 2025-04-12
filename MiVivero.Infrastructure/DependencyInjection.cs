@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using MiVivero.Infrastructure.Mappings;
+using MiVivero.Entities;
+using MiVivero.ApplicationBusiness.Interfaces;
+using MiVivero.Infrastructure.Repositories;
 
 namespace MiVivero.Infrastructure
 {
@@ -7,7 +9,7 @@ namespace MiVivero.Infrastructure
     {
         public static IServiceCollection AddInfraestructure(this IServiceCollection services)
         {
-            services.AddAutoMapper(typeof(ProductProfile).Assembly);
+            services.AddTransient<IRepository<Product>, ProductsRepository>();
 
             return services;
         }

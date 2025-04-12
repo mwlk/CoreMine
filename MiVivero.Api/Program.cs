@@ -1,11 +1,10 @@
-using Scalar.AspNetCore;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+using MiVivero.ApplicationBusiness;
 using MiVivero.Data;
 using MiVivero.Data.Seed;
-using Microsoft.EntityFrameworkCore;
-using MediatR;
-using MiVivero.ApplicationBusiness;
-using MiVivero.Repository;
 using MiVivero.Infrastructure;
+using Scalar.AspNetCore;
 
 internal class Program
 {
@@ -21,12 +20,10 @@ internal class Program
         // Configurar Connection String
         builder.Services.AddPersistence(builder.Configuration);
 
-        builder.Services.AddRepositories();
-
-        // Configurar MediatR
+        // Configurar MediatR y AutoMapper
         builder.Services.AddApplicationBusiness();
 
-        // Configurar AutoMapper
+        // Configurar Repositories
         builder.Services.AddInfraestructure();
         #endregion
 

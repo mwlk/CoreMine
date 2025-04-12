@@ -3,7 +3,7 @@ using MiVivero.ApplicationBusiness.Interfaces;
 using MiVivero.Data;
 using MiVivero.Entities;
 
-namespace MiVivero.Repository
+namespace MiVivero.Infrastructure.Repositories
 {
     public class ProductsRepository : IRepository<Product>
     {
@@ -40,7 +40,7 @@ namespace MiVivero.Repository
             {
                 product.Name = entityToEdit.Name;
 
-                _context.Entry(product).State = EntityState.Modified;
+                _context.Entry(product).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
             }
 
             await _context.SaveChangesAsync(cancellationToken);
@@ -48,7 +48,10 @@ namespace MiVivero.Repository
 
         public async Task<IEnumerable<Product>> GetAllAsync(CancellationToken cancellationToken)
         {
-            var query = _context.Products.AsQueryable();
+            var query = _context.Products
+                .Include(p => p.Category)
+                .ThenInclude(q => q.Parent)
+                .AsQueryable();
 
             return await query.ToListAsync(cancellationToken);
         }

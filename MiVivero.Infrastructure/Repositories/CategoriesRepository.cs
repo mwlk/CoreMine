@@ -1,7 +1,7 @@
-﻿using MiVivero.ApplicationBusiness.Interfaces;
-using MiVivero.Entities;
+﻿using MiVivero.Entities;
+using MiVivero.ApplicationBusiness.Interfaces;
 
-namespace MiVivero.Repository
+namespace MiVivero.Infrastructure.Repositories
 {
     public class CategoriesRepository : IRepository<Category>
     {

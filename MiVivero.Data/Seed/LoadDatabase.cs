@@ -28,35 +28,35 @@ namespace MiVivero.Data.Seed
 
                 var plantas_arboles = new Category
                 {
-                    Code = "11",
+                    Code = "1",
                     Name = "Árboles",
                     Parent = plantas
                 };
 
                 var plantas_arbustos = new Category
                 {
-                    Code = "12",
+                    Code = "2",
                     Name = "Arbustos",
                     Parent = plantas
                 };
 
                 var plantas_flores = new Category
                 {
-                    Code = "13",
+                    Code = "3",
                     Name = "Flores",
                     Parent = plantas
                 };
 
                 var herramientas_jardineria = new Category
                 {
-                    Code = "21",
+                    Code = "1",
                     Name = "Jardineria",
                     Parent = herramientas
                 };
 
                 var herramientas_riego = new Category
                 {
-                    Code = "22",
+                    Code = "2",
                     Name = "Riego",
                     Parent = herramientas
                 };
@@ -73,25 +73,25 @@ namespace MiVivero.Data.Seed
                 var flores_1 = new Product
                 {
                     Name = "Rosa",
-                    Category = context.Categories.First(c => c.Code == "13") 
+                    Category = context.Categories.First(c => c.Code == "3" && c.Name == "Flores") 
                 };
 
                 var arboles_1 = new Product
                 {
                     Name = "Abeto",
-                    Category = context.Categories.First(c => c.Code == "11") 
+                    Category = context.Categories.First(c => c.Code == "1" && c.Name == "Árboles") 
                 };
 
                 var jardineria_1 = new Product
                 {
                     Name = "Tijeras de Jardinería",
-                    Category = context.Categories.First(c => c.Code == "21") 
+                    Category = context.Categories.First(c => c.Code == "1" && c.Name == "Jardineria") 
                 };
 
                 var sustratos_1 = new Product
                 {
                     Name = "Sustrato Orgánico",
-                    Category = context.Categories.First(c => c.Code == "3") // Sustratos
+                    Category = context.Categories.First(c => c.Code == "3" && c.Name == "Sustratos") 
                 };
 
                 context.Products.AddRange(flores_1, arboles_1, jardineria_1, sustratos_1);

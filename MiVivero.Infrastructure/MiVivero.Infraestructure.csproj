@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ApplicationBusiness\MiVivero.ApplicationBusiness.csproj" />
+    <ProjectReference Include="..\MiVivero.ApplicationBusiness\MiVivero.ApplicationBusiness.csproj" />
     <ProjectReference Include="..\MiVivero.Data\MiVivero.Data.csproj" />
     <ProjectReference Include="..\MiVivero.Entities\MiVivero.Entities.csproj" />
   </ItemGroup>

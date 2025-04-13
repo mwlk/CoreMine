@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using MiVivero.Entities;
-using MiVivero.ApplicationBusiness.DTOs;
-using MiVivero.ApplicationBusiness.ViewModels;
+using MiVivero.Models.DTOs;
+using MiVivero.Models.ViewModels;
 
 namespace MiVivero.ApplicationBusiness.Mappings
 {

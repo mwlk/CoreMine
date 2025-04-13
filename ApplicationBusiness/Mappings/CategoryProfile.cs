@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using MiVivero.ApplicationBusiness.DTOs;
-using MiVivero.ApplicationBusiness.ViewModels;
+using MiVivero.Models.DTOs;
+using MiVivero.Models.ViewModels;
 using MiVivero.Entities;
 
 namespace MiVivero.ApplicationBusiness.Mappings

@@ -1,13 +1,41 @@
 ﻿@page "/products"
+@using MiVivero.Models.ViewModels
+@using MudBlazor
 @inject HttpClient HttpClient
 
-<h3>Productos</h3>
+<MudPaper Class="pa-4">
+    <MudText Typo="Typo.h5">Productos</MudText>
+
+    <MudProgressCircular Indeterminate="true" Class="my-2" Color="Color.Primary" Style="@(loading ? "" : "display:none")" />
+
+    <MudTable Items="products" Dense="true" Hover="true" Striped="true" Bordered="true">
+        <HeaderContent>
+            <MudTh>Id</MudTh>
+            <MudTh>Nombre</MudTh>
+            <MudTh>Categoría</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Nombre">@context.Id</MudTd>
+            <MudTd DataLabel="Precio">@context.Name</MudTd>
+            <MudTd DataLabel="Categoría">@context.Categories.Select(p => string.Concat(p.Code, '-', p.Name)).ToList()</MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
 
 @code{
+    private List<ProductViewModel>? products;
+    private bool loading = false;
+
     protected override async Task OnInitializedAsync()
     {
-        var data = await HttpClient.GetFromJsonAsync<List<Models.ViewModels.ProductViewModel>>("/products");
+        loading = true;
 
-        Console.WriteLine(data);
+        await GetProductsAsync();
+        loading = false;
+    }
+
+    private async Task GetProductsAsync()
+    {
+        products = await HttpClient.GetFromJsonAsync<List<Models.ViewModels.ProductViewModel>>("/products");
     }
 }

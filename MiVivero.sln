@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiVivero.Data", "MiVivero.D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiVivero.Infraestructure", "MiVivero.Infrastructure\MiVivero.Infraestructure.csproj", "{6CDDBD09-02D8-4509-80E0-638A5C86C903}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiVivero.Models", "MiVivero.Models\MiVivero.Models.csproj", "{0BF09A12-BCB3-0D8C-4474-F2E9FD88E942}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,18 @@ Global
 		{6CDDBD09-02D8-4509-80E0-638A5C86C903}.Release|x64.Build.0 = Release|Any CPU
 		{6CDDBD09-02D8-4509-80E0-638A5C86C903}.Release|x86.ActiveCfg = Release|Any CPU
 		{6CDDBD09-02D8-4509-80E0-638A5C86C903}.Release|x86.Build.0 = Release|Any CPU
+		{0BF09A12-BCB3-0D8C-4474-F2E9FD88E942}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BF09A12-BCB3-0D8C-4474-F2E9FD88E942}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BF09A12-BCB3-0D8C-4474-F2E9FD88E942}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0BF09A12-BCB3-0D8C-4474-F2E9FD88E942}.Debug|x64.Build.0 = Debug|Any CPU
+		{0BF09A12-BCB3-0D8C-4474-F2E9FD88E942}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0BF09A12-BCB3-0D8C-4474-F2E9FD88E942}.Debug|x86.Build.0 = Debug|Any CPU
+		{0BF09A12-BCB3-0D8C-4474-F2E9FD88E942}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BF09A12-BCB3-0D8C-4474-F2E9FD88E942}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BF09A12-BCB3-0D8C-4474-F2E9FD88E942}.Release|x64.ActiveCfg = Release|Any CPU
+		{0BF09A12-BCB3-0D8C-4474-F2E9FD88E942}.Release|x64.Build.0 = Release|Any CPU
+		{0BF09A12-BCB3-0D8C-4474-F2E9FD88E942}.Release|x86.ActiveCfg = Release|Any CPU
+		{0BF09A12-BCB3-0D8C-4474-F2E9FD88E942}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

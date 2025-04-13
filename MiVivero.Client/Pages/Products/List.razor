@@ -1,0 +1,13 @@
+﻿@page "/products"
+@inject HttpClient HttpClient
+
+<h3>Productos</h3>
+
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+        var data = await HttpClient.GetFromJsonAsync<List<Models.ViewModels.ProductViewModel>>("/products");
+
+        Console.WriteLine(data);
+    }
+}

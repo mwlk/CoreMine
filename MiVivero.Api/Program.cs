@@ -1,9 +1,11 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MiVivero.ApplicationBusiness;
+using MiVivero.ApplicationBusiness.UseCases.Products.Queries;
 using MiVivero.Data;
 using MiVivero.Data.Seed;
 using MiVivero.Infrastructure;
+using MiVivero.Models.ViewModels;
 using Scalar.AspNetCore;
 
 internal class Program
@@ -48,31 +50,14 @@ internal class Program
 
         app.UseHttpsRedirection();
 
-        var summaries = new[]
-        {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-        app.MapGet("/weatherforecast", () =>
-        {
-            var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-                .ToArray();
-            return forecast;
-        })
-        .WithName("GetWeatherForecast");
-
         app.MapGet("/products", async (IMediator mediator, CancellationToken cancellationToken) =>
         {
-            var query = new MiVivero.ApplicationBusiness.UseCases.Products.Queries.GetAllProductsQuery();
+            var query = new GetAllProductsQuery();
             var products = await mediator.Send(query, cancellationToken);
             return Results.Ok(products);
-        }).WithName("GetProducts");
+        })
+            .Produces<List<ProductViewModel>>(StatusCodes.Status200OK)
+            .WithName("GetProducts");
 
         app.UseCors("AllowBlazorClientOrigin");
 
@@ -95,7 +80,3 @@ internal class Program
 
 #endregion
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

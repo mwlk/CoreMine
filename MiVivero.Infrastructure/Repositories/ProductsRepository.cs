@@ -40,7 +40,7 @@ namespace MiVivero.Infrastructure.Repositories
             {
                 product.Name = entityToEdit.Name;
 
-                _context.Entry(product).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                _context.Entry(product).State = EntityState.Modified;
             }
 
             await _context.SaveChangesAsync(cancellationToken);

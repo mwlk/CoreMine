@@ -27,7 +27,7 @@ namespace MiVivero.ApplicationBusiness.UseCases.Categories.Handlers
                 Name = request.Name
             };
 
-            var categories = await _categoriesRepository.GetWithParentsAsync(filter, cancellationToken);
+            var categories = await _categoriesRepository.GetByFilterAsync(filter, cancellationToken);
 
             var categoryMap = categories.ToDictionary(c => c.Id);
 

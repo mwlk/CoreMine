@@ -38,6 +38,7 @@ namespace MiVivero.Infrastructure.Repositories
         public async Task<IEnumerable<Category>> GetByFilterAsync(CategoryFilter filter, CancellationToken cancellationToken)
         {
             var query = _context.Categories
+                .Include(c => c.Parent)
                 .AsNoTracking()
                 .AsQueryable();
 
@@ -58,5 +59,7 @@ namespace MiVivero.Infrastructure.Repositories
         {
             throw new NotImplementedException();
         }
+
+        
     }
 }

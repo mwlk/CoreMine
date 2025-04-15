@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MiVivero.ApplicationBusiness.Interfaces;
 using MiVivero.Data;
 using MiVivero.Entities;
+using MiVivero.ApplicationBusiness.Interfaces;
+using MiVivero.Models.Filters;
 
 namespace MiVivero.Infrastructure.Repositories
 {
-    public class ProductsRepository : IRepository<Product>
+    public class ProductsRepository : IProductsRepository
     {
         private readonly AppDbContext _context;
 
@@ -52,6 +53,33 @@ namespace MiVivero.Infrastructure.Repositories
                 .Include(p => p.Category)
                 .ThenInclude(q => q.Parent)
                 .AsQueryable();
+
+            return await query.ToListAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<Product>> GetByFilterAsync(ProductFilter filter, CancellationToken cancellationToken)
+        {
+            var query = _context.Products
+               .Include(p => p.Category)
+               .ThenInclude(c => c.Parent)
+               .AsQueryable();
+
+            if (filter.Id.HasValue)
+            {
+                query = query.Where(p => p.Id == filter.Id);
+            }
+
+
+            if (!string.IsNullOrWhiteSpace(filter.Name))
+            {
+                query = query.Where(p => p.Name.Contains(filter.Name));
+            }
+
+            if (filter.CategoryIds.Any())
+            {
+                query = query.Where(p => filter.CategoryIds.Contains(p.CategoryId));
+
+            }
 
             return await query.ToListAsync(cancellationToken);
         }

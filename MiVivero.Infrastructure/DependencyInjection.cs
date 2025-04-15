@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using MiVivero.Entities;
 using MiVivero.ApplicationBusiness.Interfaces;
+using MiVivero.Entities;
 using MiVivero.Infrastructure.Repositories;
 
 namespace MiVivero.Infrastructure
@@ -9,6 +9,7 @@ namespace MiVivero.Infrastructure
     {
         public static IServiceCollection AddInfraestructure(this IServiceCollection services)
         {
+            services.AddTransient<IProductsRepository, ProductsRepository>();
             services.AddTransient<IRepository<Product>, ProductsRepository>();
 
             return services;

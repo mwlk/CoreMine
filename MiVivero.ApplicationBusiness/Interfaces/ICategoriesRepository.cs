@@ -6,5 +6,6 @@ namespace MiVivero.ApplicationBusiness.Interfaces
     public interface ICategoriesRepository : IRepository<Category>
     {
         Task<IEnumerable<Category>> GetByFilterAsync(CategoryFilter filter, CancellationToken cancellationToken);
+        Task<List<Category>> GetWithParentsAsync(CategoryFilter filter, CancellationToken cancellationToken);
     }
 }

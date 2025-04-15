@@ -12,6 +12,9 @@ namespace MiVivero.Infrastructure
             services.AddTransient<IProductsRepository, ProductsRepository>();
             services.AddTransient<IRepository<Product>, ProductsRepository>();
 
+            services.AddTransient<ICategoriesRepository, CategoriesRepository>();
+            services.AddTransient<IRepository<Category>, CategoriesRepository>();
+
             return services;
         }
     }

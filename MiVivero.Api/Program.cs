@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using MiVivero.Api.Endpoints;
 using MiVivero.ApplicationBusiness;
 using MiVivero.ApplicationBusiness.UseCases.Products.Queries;
 using MiVivero.Data;
@@ -50,14 +51,16 @@ internal class Program
 
         app.UseHttpsRedirection();
 
-        app.MapGet("/products", async (IMediator mediator, CancellationToken cancellationToken) =>
-        {
-            var query = new GetAllProductsQuery();
-            var products = await mediator.Send(query, cancellationToken);
-            return Results.Ok(products);
-        })
-            .Produces<List<ProductViewModel>>(StatusCodes.Status200OK)
-            .WithName("GetProducts");
+        app.RegisterEndpoints();
+
+        //app.MapGet("/products", async (IMediator mediator, CancellationToken cancellationToken) =>
+        //{
+        //    var query = new GetProductsQuery();
+        //    var products = await mediator.Send(query, cancellationToken);
+        //    return Results.Ok(products);
+        //})
+        //    .Produces<List<ProductViewModel>>(StatusCodes.Status200OK)
+        //    .WithName("GetProducts");
 
         app.UseCors("AllowBlazorClientOrigin");
 

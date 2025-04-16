@@ -1,4 +1,5 @@
 ﻿@page "/products"
+@using MiVivero.Models.Common
 @using MiVivero.Models.ViewModels
 @using MudBlazor
 @inject HttpClient HttpClient
@@ -26,12 +27,10 @@
             <MudTd DataLabel="Id">@context.Id</MudTd>
             <MudTd DataLabel="Código">@context.Code</MudTd>
             <MudTd DataLabel="Nombre">@context.Name</MudTd>
-            <MudTd DataLabel="Categoría">
-                @string.Join(" > ", @context.Categories.Select(c => $"{c.Code}-{c.Name}"))
-            </MudTd>
+            <MudTd DataLabel="Categoría">@context.FullCategoryPath</MudTd>
         </RowTemplate>
         <PagerContent>
-            <MudTablePager />
+            <MudTablePager PageSize="@pageSize" Page="@currentPage" TotalItems="@totalCount" OnPageChanged="OnPageChanged" />
         </PagerContent>
     </MudTable>
 </MudPaper>
@@ -40,6 +39,9 @@
     private List<ProductViewModel>? products;
     private bool loading = false;
     private string searchString = string.Empty;
+    private int totalCount = 0;
+    private int currentPage = 1;
+    private int pageSize = 10;
 
     protected override async Task OnInitializedAsync()
     {
@@ -50,13 +52,26 @@
 
     private async Task GetProductsAsync()
     {
-        products = await HttpClient.GetFromJsonAsync<List<ProductViewModel>>("api/products");
+        var response = await HttpClient.GetFromJsonAsync<PagedResult<ProductViewModel>>($"api/products?pageSize={pageSize}&pageNumber={currentPage}");
+
+        if (response != null)
+        {
+            products = response.Items.ToList();
+            totalCount = response.TotalCount;
+        }
     }
 
-    // Filtrar productos con base en el searchString
     private IEnumerable<ProductViewModel> FilteredProducts =>
         string.IsNullOrWhiteSpace(searchString) ? products ?? new List<ProductViewModel>() :
         products!.Where(p =>
             (p.Name?.Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false) ||
             (p.Code?.Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false));
+
+    private async Task OnPageChanged(int page)
+    {
+        currentPage = page;
+        loading = true;
+        await GetProductsAsync();
+        loading = false;
+    }
 }

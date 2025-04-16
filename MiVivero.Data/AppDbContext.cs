@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MiVivero.Data.ReadModels;
 using MiVivero.Entities;
 
 namespace MiVivero.Data
@@ -10,12 +11,18 @@ namespace MiVivero.Data
 
         }
 
-        public DbSet<Product> Products { get; set; }   
+        public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+            modelBuilder
+                .Entity<ProductWithCategoryReadModel>()
+                .HasNoKey()
+                .ToView("vw_ProductsWithFullCategoryInfo");
+
         }
     }
 }

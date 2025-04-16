@@ -5,6 +5,6 @@
         public int Id { get; set; }
         public string Name { get; set; }
         public string Code { get; set; }
-        public List<CategoryViewModel> Categories { get; set; } = new List<CategoryViewModel>();
+        public string FullCategoryPath { get; set; }
     }
 }

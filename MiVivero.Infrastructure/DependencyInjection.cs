@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MiVivero.ApplicationBusiness.Interfaces;
+using MiVivero.ApplicationBusiness.Interfaces.ReadOnly;
 using MiVivero.Entities;
-using MiVivero.Infraestructure.Repositories;
+using MiVivero.Infraestructure.Repositories.ReadOnly;
 using MiVivero.Infrastructure.Repositories;
 
 namespace MiVivero.Infrastructure
@@ -16,6 +17,7 @@ namespace MiVivero.Infrastructure
 
             services.AddTransient<ICategoriesRepository, CategoriesRepository>();
             services.AddTransient<IRepository<Category>, CategoriesRepository>();
+            services.AddTransient<IReadOnlyCategoriesRepository, ReadOnlyCategoriesRepository>();
 
             return services;
         }

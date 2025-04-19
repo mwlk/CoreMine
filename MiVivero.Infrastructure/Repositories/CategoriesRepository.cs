@@ -1,8 +1,7 @@
-﻿using MiVivero.Entities;
+﻿using Microsoft.EntityFrameworkCore;
 using MiVivero.ApplicationBusiness.Interfaces;
-using MiVivero.Models.Filters;
 using MiVivero.Data;
-using Microsoft.EntityFrameworkCore;
+using MiVivero.Entities;
 
 namespace MiVivero.Infrastructure.Repositories
 {
@@ -33,26 +32,6 @@ namespace MiVivero.Infrastructure.Repositories
         public Task<IEnumerable<Category>> GetAllAsync(CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
-        }
-
-        public async Task<IEnumerable<Category>> GetByFilterAsync(CategoryFilter filter, CancellationToken cancellationToken)
-        {
-            var query = _context.Categories
-                .Include(c => c.Parent)
-                .AsNoTracking()
-                .AsQueryable();
-
-            if (filter.Id.HasValue)
-            {
-                query = query.Where(p => p.Id == filter.Id.Value);
-            }
-
-            if (!string.IsNullOrWhiteSpace(filter.Name))
-            {
-                query = query.Where(p => p.Name.Contains(filter.Name));
-            }
-
-            return await query.ToListAsync(cancellationToken);
         }
 
         public Task<Category> GetByIdAsync(int id, CancellationToken cancellationToken)

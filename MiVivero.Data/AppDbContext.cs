@@ -22,6 +22,12 @@ namespace MiVivero.Data
                 .Entity<ProductWithCategoryReadModel>()
                 .HasNoKey()
                 .ToView("vw_ProductsWithFullCategoryInfo");
+
+            modelBuilder.Entity<CategoryWithHierarchyReadModel>(e =>
+            {
+                e.HasNoKey();
+                e.ToView("vw_CategoriesWithHierarchy");
+            });
         }
     }
 }

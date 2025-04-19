@@ -1,7 +1,8 @@
-﻿using System.Text.Json.Serialization;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace MiVivero.Data.ReadModels
 {
+    [Keyless]
     public class ProductWithCategoryReadModel
     {
         public int ProductId { get; set; }

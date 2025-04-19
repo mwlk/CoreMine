@@ -1,5 +1,7 @@
-﻿using MiVivero.ApplicationBusiness.Interfaces.ReadOnly;
+﻿using Microsoft.EntityFrameworkCore;
+using MiVivero.ApplicationBusiness.Interfaces.ReadOnly;
 using MiVivero.Data;
+using MiVivero.Data.ReadModels;
 using MiVivero.Entities;
 
 namespace MiVivero.Infraestructure.Repositories.ReadOnly
@@ -13,9 +15,11 @@ namespace MiVivero.Infraestructure.Repositories.ReadOnly
             _context = context;
         }
 
-        public IQueryable<Category> GetQueryable()
+        public IQueryable<CategoryWithHierarchyReadModel> GetQueryable()
         {
-            return _context.Categories.AsQueryable();
+            return _context.Set<CategoryWithHierarchyReadModel>()
+                .AsNoTracking()
+                .AsQueryable();
         }
     }
 }

@@ -8,6 +8,7 @@ namespace MiVivero.ApplicationBusiness.UseCases.Products.Queries
     {
         public int? Id { get; set; }
         public string? Name { get; set; }
+        public List<int>? CategoryIds { get; set; }
         public int? PageSize { get; set; }
         public int? PageNumber { get; set; }
     }

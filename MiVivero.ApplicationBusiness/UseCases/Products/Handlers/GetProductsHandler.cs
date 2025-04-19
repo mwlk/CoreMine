@@ -1,64 +1,60 @@
 ﻿using AutoMapper;
 using MediatR;
-using MiVivero.ApplicationBusiness.UseCases.Products.Queries;
-using MiVivero.Models.ViewModels;
-using MiVivero.Models.Filters;
-using MiVivero.ApplicationBusiness.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using MiVivero.ApplicationBusiness.Interfaces.ReadOnly;
+using MiVivero.ApplicationBusiness.UseCases.Products.Queries;
 using MiVivero.Models.Common;
-using System.Linq;
+using MiVivero.Models.ViewModels;
 
 namespace MiVivero.ApplicationBusiness.UseCases.Products.Handlers
 {
     public class GetProductsHandler : IRequestHandler<GetProductsQuery, PagedResult<ProductViewModel>>
     {
-        private readonly IMapper _mapper;
         private readonly IReadOnlyProductsRepository _repository;
 
-        public GetProductsHandler(IMapper mapper, IReadOnlyProductsRepository repository)
+        public GetProductsHandler(IReadOnlyProductsRepository repository)
         {
-            _mapper = mapper;
             _repository = repository;
         }
 
-        public async Task<PagedResult<ProductViewModel>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResult<ProductViewModel>> Handle(
+        GetProductsQuery request,
+        CancellationToken cancellationToken)
         {
-            var filter = new ProductFilter
+            // Convertir lista de int a CSV para pasar al SQL
+            var ancestorIdsCsv = request.CategoryIds is { Count: > 0 }
+                ? string.Join(',', request.CategoryIds)
+                : "";
+            var ancestorCount = request.CategoryIds?.Count ?? 0;
+
+            // Cálculo de skip/take
+            int pageSize = request.PageSize > 0 ? request.PageSize.Value : 10;
+            int pageNumber = request.PageNumber > 0 ? request.PageNumber.Value : 1;
+            int skip = (pageNumber - 1) * pageSize;
+
+            // Llamada al repositorio
+            var (total, rows) = await _repository
+                .GetProductsByHierarchyAsync(
+                    request.Name,
+                    ancestorIdsCsv,
+                    ancestorCount,
+                    skip,
+                    pageSize,
+                    cancellationToken);
+
+            // Mapeo a ViewModel
+            var items = rows.Select(x => new ProductViewModel
             {
-                Id = request.Id,
-                Name = request.Name,
-            };
-
-            var query = _repository
-                .GetQueryable();
-
-            if (filter.Id.HasValue)
-            {
-                query = query.Where(p => p.ProductId == filter.Id);
-            }
-
-            if (!string.IsNullOrWhiteSpace(filter.Name))
-            {
-                query = query.Where(p => p.ProductName.Contains(filter.Name));
-            }
-
-            var count = await query.CountAsync(cancellationToken);
-
-            int pageSize = request.PageSize.HasValue && request.PageSize.Value > 0 ? request.PageSize.Value : 10;
-            int pageNumber = request.PageNumber.HasValue && request.PageNumber.Value > 0 ? request.PageNumber.Value : 1;
-
-            var paginated = await query
-                .Skip((pageNumber - 1) * pageSize)
-                .Take(pageSize)
-                .OrderBy(p => p.ProductId)
-                .ToListAsync(cancellationToken);
-
-            var result = _mapper.Map<IEnumerable<ProductViewModel>>(paginated);
+                Id = x.ProductId,
+                Name = x.ProductName,
+                CategoryName = x.FullCategoryPath,
+                FullCategoryCode = x.FullCategoryCode
+            }).ToList();
 
             return new PagedResult<ProductViewModel>
             {
-                TotalCount = count,
-                Items = result
+                TotalCount = total,
+                Items = items
             };
         }
     }

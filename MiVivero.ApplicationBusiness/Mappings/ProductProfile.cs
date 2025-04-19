@@ -15,7 +15,6 @@ namespace MiVivero.ApplicationBusiness.Mappings
             CreateMap<ProductWithCategoryReadModel, ProductViewModel>()
                 .ForMember(dest => dest.Id, orig => orig.MapFrom(ent => ent.ProductId))
                 .ForMember(dest => dest.Name, orig => orig.MapFrom(ent => ent.ProductName))
-                .ForMember(dest => dest.Code, orig => orig.MapFrom(ent => ent.FullCode))
                ;
         }
     }

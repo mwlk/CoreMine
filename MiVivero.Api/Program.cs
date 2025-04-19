@@ -40,6 +40,8 @@ internal class Program
         });
         #endregion
 
+        builder.Services.AddControllers(); 
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -53,27 +55,22 @@ internal class Program
 
         app.RegisterEndpoints();
 
-        //app.MapGet("/products", async (IMediator mediator, CancellationToken cancellationToken) =>
-        //{
-        //    var query = new GetProductsQuery();
-        //    var products = await mediator.Send(query, cancellationToken);
-        //    return Results.Ok(products);
-        //})
-        //    .Produces<List<ProductViewModel>>(StatusCodes.Status200OK)
-        //    .WithName("GetProducts");
+       
 
         app.UseCors("AllowBlazorClientOrigin");
 
-        // Ejecutar el seeding antes de correr la app
+        
         using (var scope = app.Services.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-            // Aplica migraciones automáticamente
+            
             await context.Database.MigrateAsync();
 
             await LoadDatabase.InsertData(context);
         }
+
+        app.MapControllers(); 
 
         await app.RunAsync();
     }

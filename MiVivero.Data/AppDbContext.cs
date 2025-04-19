@@ -22,7 +22,6 @@ namespace MiVivero.Data
                 .Entity<ProductWithCategoryReadModel>()
                 .HasNoKey()
                 .ToView("vw_ProductsWithFullCategoryInfo");
-
         }
     }
 }

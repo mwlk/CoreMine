@@ -25,11 +25,25 @@ namespace MiVivero.ApplicationBusiness.UseCases.Categories.Handlers
 
             // Filtro opcional por ID
             if (request.Id.HasValue)
+            {
                 query = query.Where(c => c.Id == request.Id.Value);
+            }
 
             // Filtro opcional por nombre parcial
             if (!string.IsNullOrWhiteSpace(request.Name))
+            {
                 query = query.Where(c => c.Name.Contains(request.Name));
+            }
+
+            if (request.ParentId.HasValue)
+            {
+                query = query.Where(p => p.ParentId == request.ParentId);
+            }
+
+            if (request.IsParent.HasValue)
+            {
+                query = query.Where(p => !p.ParentId.HasValue == request.IsParent.Value);
+            }
 
             // Total antes de paginar
             var total = await query.CountAsync(cancellationToken);

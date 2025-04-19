@@ -1,77 +1,81 @@
 ﻿@page "/products"
 @using MiVivero.Models.Common
 @using MiVivero.Models.ViewModels
-@using MudBlazor
 @inject HttpClient HttpClient
 
 <MudPaper Class="pa-4">
     <MudText Typo="Typo.h5">Productos</MudText>
 
-    <MudProgressCircular Indeterminate="true" Class="my-2" Color="Color.Primary" Style="@(loading ? "" : "display:none")" />
+    <MudTextField @bind-Value="searchString"
+                  Placeholder="Buscar..."
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  Class="mb-4"
+                  Immediate="true"
+                  OnBlur="ReloadData"
+                  OnKeyUp="@(e => { if (e.Key == "Enter") ReloadData(); })" />
 
-    <MudTextField @bind-Value="searchString" Placeholder="Buscar..." Adornment="Adornment.Start"
-                  AdornmentIcon="@Icons.Material.Filled.Search" Class="mb-4" />
-
-    <MudTable T="ProductViewModel" Items="@FilteredProducts" Dense="true" Hover="true" Striped="true" Bordered="true"
-              SortLabel="Ordenar por" Breakpoint="Breakpoint.Sm">
+    <MudTable T="ProductViewModel"
+              ServerData="LoadServerData"
+              RowsPerPageOptions="new int[] { 2, 10, 25, 50, 100 }"
+              @bind-CurrentPage="@currentPage"
+              @bind-RowsPerPage="@rowsPerPage"
+              Bordered="true"
+              Hover="true"
+              Dense="true"
+              Striped="true">
         <ToolBarContent>
             <MudText Typo="Typo.h6">Listado de Productos</MudText>
         </ToolBarContent>
+
         <HeaderContent>
-            <MudTh SortBy="(ProductViewModel x) => x.Id">Id</MudTh>
-            <MudTh SortBy="(ProductViewModel x) => x.FullCategoryCode">Código</MudTh>
-            <MudTh SortBy="(ProductViewModel x) => x.Name">Nombre</MudTh>
-            <MudTh>Categoria</MudTh>
+            <MudTh>Id</MudTh>
+            <MudTh>Código</MudTh>
+            <MudTh>Nombre</MudTh>
+            <MudTh>Categoría</MudTh>
         </HeaderContent>
+
         <RowTemplate>
             <MudTd DataLabel="Id">@context.Id</MudTd>
             <MudTd DataLabel="Código">@context.FullCategoryCode</MudTd>
             <MudTd DataLabel="Nombre">@context.Name</MudTd>
             <MudTd DataLabel="Categoría">@context.CategoryName</MudTd>
         </RowTemplate>
+
         <PagerContent>
-            <MudTablePager PageSize="@pageSize" Page="@currentPage" TotalItems="@totalCount" OnPageChanged="OnPageChanged" />
+            <MudTablePager PageSizeOptions="new int[] { 2, 10, 25, 50, 100 }" />
         </PagerContent>
     </MudTable>
 </MudPaper>
 
 @code {
-    private List<ProductViewModel>? products;
-    private bool loading = false;
+    private int currentPage = 0;
+    private int rowsPerPage = 2;
     private string searchString = string.Empty;
-    private int totalCount = 0;
-    private int currentPage = 1;
-    private int pageSize = 10;
 
-    protected override async Task OnInitializedAsync()
+    private async Task<TableData<ProductViewModel>> LoadServerData(TableState state, CancellationToken cancellationToken)
     {
-        loading = true;
-        await GetProductsAsync();
-        loading = false;
+        currentPage = state.Page;
+        rowsPerPage = state.PageSize;
+
+        var pageNumber = currentPage + 1;
+        var url = $"api/products?pageNumber={pageNumber}&pageSize={rowsPerPage}";
+
+        if (!string.IsNullOrWhiteSpace(searchString))
+            url += $"&Name={Uri.EscapeDataString(searchString)}";
+
+        var response = await HttpClient.GetFromJsonAsync<PagedResult<ProductViewModel>>(url, cancellationToken);
+
+        return new TableData<ProductViewModel>
+            {
+                TotalItems = response?.TotalCount ?? 0,
+                Items = response?.Items ?? new List<ProductViewModel>()
+            };
     }
 
-    private async Task GetProductsAsync()
+    private async Task ReloadData()
     {
-        var response = await HttpClient.GetFromJsonAsync<PagedResult<ProductViewModel>>($"api/products?pageSize={pageSize}&pageNumber={currentPage}");
-
-        if (response != null)
-        {
-            products = response.Items.ToList();
-            totalCount = response.TotalCount;
-        }
-    }
-
-    private IEnumerable<ProductViewModel> FilteredProducts =>
-        string.IsNullOrWhiteSpace(searchString) ? products ?? new List<ProductViewModel>() :
-        products!.Where(p =>
-            (p.Name?.Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false) ||
-            (p.FullCategoryCode?.Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false));
-
-    private async Task OnPageChanged(int page)
-    {
-        currentPage = page;
-        loading = true;
-        await GetProductsAsync();
-        loading = false;
+        await Task.Delay(1); // da tiempo a terminar binding del campo
+        currentPage = 0;
     }
 }

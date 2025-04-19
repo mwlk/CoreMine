@@ -19,15 +19,15 @@
         </ToolBarContent>
         <HeaderContent>
             <MudTh SortBy="(ProductViewModel x) => x.Id">Id</MudTh>
-            <MudTh SortBy="(ProductViewModel x) => x.Code">Código</MudTh>
+            <MudTh SortBy="(ProductViewModel x) => x.FullCategoryCode">Código</MudTh>
             <MudTh SortBy="(ProductViewModel x) => x.Name">Nombre</MudTh>
             <MudTh>Categoria</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="Código">@context.Code</MudTd>
+            <MudTd DataLabel="Código">@context.FullCategoryCode</MudTd>
             <MudTd DataLabel="Nombre">@context.Name</MudTd>
-            <MudTd DataLabel="Categoría">@context.FullCategoryPath</MudTd>
+            <MudTd DataLabel="Categoría">@context.CategoryName</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager PageSize="@pageSize" Page="@currentPage" TotalItems="@totalCount" OnPageChanged="OnPageChanged" />
@@ -65,7 +65,7 @@
         string.IsNullOrWhiteSpace(searchString) ? products ?? new List<ProductViewModel>() :
         products!.Where(p =>
             (p.Name?.Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false) ||
-            (p.Code?.Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false));
+            (p.FullCategoryCode?.Contains(searchString, StringComparison.OrdinalIgnoreCase) ?? false));
 
     private async Task OnPageChanged(int page)
     {

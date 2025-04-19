@@ -13,49 +13,50 @@ namespace MiVivero.ApplicationBusiness.UseCases.Categories.Handlers
     public class GetCategoriesHandler : IRequestHandler<GetCategoriesQuery, PagedResult<CategoryViewModel>>
     {
         private readonly IReadOnlyCategoriesRepository _categoriesRepository;
-        private readonly IMapper _mapper;
 
-        public GetCategoriesHandler(IReadOnlyCategoriesRepository categoriesRepository, IMapper mapper)
+        public GetCategoriesHandler(IReadOnlyCategoriesRepository categoriesRepository)
         {
             _categoriesRepository = categoriesRepository;
-            _mapper = mapper;
         }
 
         public async Task<PagedResult<CategoryViewModel>> Handle(GetCategoriesQuery request, CancellationToken cancellationToken)
         {
-            var query =  _categoriesRepository.GetQueryable();
+            var query = _categoriesRepository.GetQueryable();
 
-           
-
+            // Filtro opcional por ID
             if (request.Id.HasValue)
-            {
-                query = query.Where(p => p.Id == request.Id.Value);
-            }
+                query = query.Where(c => c.Id == request.Id.Value);
 
+            // Filtro opcional por nombre parcial
             if (!string.IsNullOrWhiteSpace(request.Name))
-            {
-                query = query.Where(p => request.Name.Contains(p.Name));
-            }
+                query = query.Where(c => c.Name.Contains(request.Name));
 
+            // Total antes de paginar
+            var total = await query.CountAsync(cancellationToken);
 
+            // Paginación
+            int pageSize = request.PageSize > 0 ? request.PageSize.Value : 10;
+            int pageNumber = request.PageNumber > 0 ? request.PageNumber.Value : 1;
 
-            var count = await query.CountAsync(cancellationToken);
-
-            int pageSize = request.PageSize.HasValue && request.PageSize.Value > 0 ? request.PageSize.Value : 10;
-            int pageNumber = request.PageNumber.HasValue && request.PageNumber.Value > 0 ? request.PageNumber.Value : 1;
-
-            var paginated = await query
+            var page = await query
+                .OrderBy(c => c.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .OrderBy(p => p.Id)
                 .ToListAsync(cancellationToken);
 
-            var result = _mapper.Map<IEnumerable<CategoryViewModel>>(paginated);
+            // Mapeo a tu ViewModel
+            var items = page.Select(c => new CategoryViewModel
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Code = c.Code,
+                FullCode = c.FullCode
+            }).ToList();
 
             return new PagedResult<CategoryViewModel>
             {
-                TotalCount = count,
-                Items = result
+                TotalCount = total,
+                Items = items
             };
         }
     }

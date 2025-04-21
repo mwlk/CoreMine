@@ -1,0 +1,170 @@
+﻿@page "/categories/new"
+@using MiVivero.Client.Models.UI
+@using MiVivero.Models.Common
+@using MiVivero.Models.ViewModels
+@inject HttpClient HttpClient
+
+<MudPaper Class="p-4">
+    <MudStack Spacing="2">
+        <MudText Typo="Typo.h6">Seleccionar Categoría</MudText>
+
+        @for (int i = 0; i < categoryLevels.Count; i++)
+        {
+            var index = i; // 👈 Esto evita el error del out-of-range
+
+            var level = categoryLevels[index];
+
+            <MudSelect T="int?" Label="Categoría"
+            Value="categoryLevels[index].SelectedCategoryId"
+            ValueChanged="@(v => OnCategorySelected(index, v))"
+            Dense="true">
+                <MudSelectItem T="int?" Value="null">-- Seleccionar --</MudSelectItem>
+                @foreach (var option in categoryLevels[index].Options)
+                {
+                    <MudSelectItem T="int?" Value="option.Id">@option.Name</MudSelectItem>
+                }
+            </MudSelect>
+        }
+
+
+        @if (isLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+
+        @if (!hasMoreLevels && categoryLevels.Any() && categoryLevels.Last().SelectedCategoryId != null)
+        {
+            <MudText Typo="Typo.body1" Color="Color.Success">
+                Categoría seleccionada: @GetSelectedCategoryPath()
+            </MudText>
+
+            <MudTextField @bind-Value="categoryCode" Label="Código de la categoría" Variant="Variant.Outlined" />
+            <MudTextField @bind-Value="categoryName" Label="Nombre de la categoría" Variant="Variant.Outlined" />
+
+            <MudButton OnClick="SaveCategory" Color="Color.Primary" Variant="Variant.Filled">
+                Guardar categoría
+            </MudButton>
+        }
+    </MudStack>
+</MudPaper>
+
+@code {
+    private List<SelectableCategoryLevel> categoryLevels = new();
+    private bool isLoading = false;
+    private bool hasMoreLevels = false;
+
+    private string categoryCode = string.Empty;
+    private string categoryName = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var rootCategories = await HttpClient.GetFromJsonAsync<PagedResult<CategoryViewModel>>("api/categories?isParent=true");
+
+        if (rootCategories?.Items != null)
+        {
+            categoryLevels.Add(new SelectableCategoryLevel
+            {
+                Options = rootCategories.Items.ToList(),
+                SelectedCategoryId = null
+            });
+        }
+    }
+
+    private async Task OnCategorySelected(int levelIndex, int? selectedCategoryId)
+    {
+        isLoading = true;
+
+        // Validamos índice para evitar excepción
+        if (levelIndex < 0 || levelIndex >= categoryLevels.Count)
+        {
+            isLoading = false;
+            return;
+        }
+
+        // Cortamos los niveles siguientes
+        categoryLevels = categoryLevels.Take(levelIndex + 1).ToList();
+
+        // Guardamos la selección en el nivel actual
+        categoryLevels[levelIndex].SelectedCategoryId = selectedCategoryId;
+
+        // Si se deselecciona, paramos
+        if (selectedCategoryId is null)
+        {
+            hasMoreLevels = false;
+            isLoading = false;
+            return;
+        }
+
+        // Traemos hijos
+        var children = await HttpClient.GetFromJsonAsync<PagedResult<CategoryViewModel>>(
+            $"api/categories?parentId={selectedCategoryId}");
+
+        if (children?.Items?.Any() == true)
+        {
+            categoryLevels.Add(new SelectableCategoryLevel
+            {
+                Options = children.Items.ToList(),
+                SelectedCategoryId = null
+            });
+            hasMoreLevels = true;
+        }
+        else
+        {
+            hasMoreLevels = false;
+        }
+
+        isLoading = false;
+    }
+
+    private string GetSelectedCategoryPath()
+    {
+        var names = new List<string>();
+
+        foreach (var level in categoryLevels)
+        {
+            var selected = level.Options.FirstOrDefault(x => x.Id == level.SelectedCategoryId);
+            if (selected != null)
+                names.Add(selected.Name);
+        }
+
+        return string.Join(" > ", names);
+    }
+
+    private async Task SaveCategory()
+    {
+        var selectedCategoryId = categoryLevels.LastOrDefault()?.SelectedCategoryId;
+
+        if (selectedCategoryId == null)
+        {
+            // Mostrás algún mensaje si querés
+            return;
+        }
+
+        var request = new
+        {
+            Code = categoryCode,
+            Name = categoryName,
+            ParentId = selectedCategoryId
+        };
+
+        var response = await HttpClient.PostAsJsonAsync("api/categories", request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            // Éxito - podrías limpiar los campos o redirigir
+            categoryCode = string.Empty;
+            categoryName = string.Empty;
+            await OnInitializedAsync(); // refrescar todo si querés
+        }
+        else
+        {
+            // Error - podrías mostrar algo
+        }
+    }
+
+    // public class SelectableCategoryLevel
+    // {
+    //     public List<CategoryViewModel> Options { get; set; } = new();
+    //     public int? SelectedCategoryId { get; set; }
+    // }
+}

@@ -2,9 +2,11 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MiVivero.Api.Endpoints;
 using MiVivero.ApplicationBusiness;
+using MiVivero.ApplicationBusiness.Interfaces;
 using MiVivero.ApplicationBusiness.UseCases.Products.Queries;
 using MiVivero.Data;
 using MiVivero.Data.Seed;
+using MiVivero.Infraestructure;
 using MiVivero.Infrastructure;
 using MiVivero.Models.ViewModels;
 using Scalar.AspNetCore;
@@ -28,6 +30,8 @@ internal class Program
 
         // Configurar Repositories
         builder.Services.AddInfraestructure();
+
+        builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
         #endregion
 
         #region CORS

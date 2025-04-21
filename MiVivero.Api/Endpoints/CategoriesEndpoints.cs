@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MiVivero.ApplicationBusiness.UseCases.Categories.Commands;
 using MiVivero.ApplicationBusiness.UseCases.Categories.Queries;
 using MiVivero.Models.ViewModels;
 
@@ -17,6 +18,18 @@ namespace MiVivero.Api.Endpoints
                 return Results.Ok(result);
             })
                 .Produces<List<CategoryViewModel>>(StatusCodes.Status200OK);
+
+            // POST: api/categories
+            group.MapPost("/", async (
+                CreateCategoryCommand command,
+                ISender mediator,
+                CancellationToken cancellationToken) =>
+            {
+                var result = await mediator.Send(command, cancellationToken);
+                //return Results.Created($"/api/categories/{result.Id}", result);
+                return Results.Ok(result);
+            })
+                .Produces<int>(StatusCodes.Status200OK);
         }
     }
 }

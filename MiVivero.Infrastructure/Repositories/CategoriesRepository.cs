@@ -14,9 +14,9 @@ namespace MiVivero.Infrastructure.Repositories
             _context = context;
         }
 
-        public Task AddAsync(Category entityToAdd, CancellationToken cancellationToken)
+        public async Task AddAsync(Category entityToAdd, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await _context.Categories.AddAsync(entityToAdd, cancellationToken);
         }
 
         public Task DeleteAsync(int id, CancellationToken cancellationToken)

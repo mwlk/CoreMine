@@ -3,6 +3,18 @@
 @using MiVivero.Models.Common
 @using MiVivero.Models.ViewModels
 @inject HttpClient HttpClient
+@inject ISnackbar Snackbar;
+@inject NavigationManager NavManager
+
+
+<MudItem Class="pb-4">
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.ChevronLeft"
+               OnClick="@(() => NavManager.NavigateTo("/categories"))">
+               Volver
+    </MudButton>
+</MudItem>
 
 <MudPaper Class="p-4">
     <MudStack Spacing="2">
@@ -10,7 +22,7 @@
 
         @for (int i = 0; i < categoryLevels.Count; i++)
         {
-            var index = i; // 👈 Esto evita el error del out-of-range
+            var index = i; 
 
             var level = categoryLevels[index];
 
@@ -74,20 +86,16 @@
     {
         isLoading = true;
 
-        // Validamos índice para evitar excepción
         if (levelIndex < 0 || levelIndex >= categoryLevels.Count)
         {
             isLoading = false;
             return;
         }
 
-        // Cortamos los niveles siguientes
         categoryLevels = categoryLevels.Take(levelIndex + 1).ToList();
 
-        // Guardamos la selección en el nivel actual
         categoryLevels[levelIndex].SelectedCategoryId = selectedCategoryId;
 
-        // Si se deselecciona, paramos
         if (selectedCategoryId is null)
         {
             hasMoreLevels = false;
@@ -95,7 +103,6 @@
             return;
         }
 
-        // Traemos hijos
         var children = await HttpClient.GetFromJsonAsync<PagedResult<CategoryViewModel>>(
             $"api/categories?parentId={selectedCategoryId}");
 
@@ -136,7 +143,6 @@
 
         if (selectedCategoryId == null)
         {
-            // Mostrás algún mensaje si querés
             return;
         }
 
@@ -151,20 +157,20 @@
 
         if (response.IsSuccessStatusCode)
         {
-            // Éxito - podrías limpiar los campos o redirigir
+            Snackbar.Add("Se ha guardado la categoría con éxito.", Severity.Success);
+
             categoryCode = string.Empty;
             categoryName = string.Empty;
-            await OnInitializedAsync(); // refrescar todo si querés
+
+            categoryLevels = new();
+            await OnInitializedAsync(); 
+
         }
         else
         {
-            // Error - podrías mostrar algo
+            Snackbar.Add("Error al guardar la categoría.", Severity.Error);
         }
     }
 
-    // public class SelectableCategoryLevel
-    // {
-    //     public List<CategoryViewModel> Options { get; set; } = new();
-    //     public int? SelectedCategoryId { get; set; }
-    // }
+  
 }

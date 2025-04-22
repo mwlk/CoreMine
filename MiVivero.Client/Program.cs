@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MiVivero.Client;
-using MudBlazor.Services;
+using MiVivero.Client.Extensions;
+using MiVivero.Client.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-builder.Services.AddMudServices();
+MudBlazorConfig.ConfigureMudBlazor(builder.Services);
+builder.Services.AddSingleton<ThemeService>();
 
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");

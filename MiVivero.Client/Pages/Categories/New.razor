@@ -44,7 +44,7 @@
             <MudProgressCircular Indeterminate="true" />
         }
 
-        @if (!hasMoreLevels && categoryLevels.Any() && categoryLevels.Last().SelectedCategoryId != null)
+        @if (!hasMoreLevels && categoryLevels.Any() || categoryLevels.LastOrDefault()?.SelectedCategoryId != null)
         {
             <MudText Typo="Typo.body1" Color="Color.Success">
                 Categoría seleccionada: @GetSelectedCategoryPath()
@@ -141,10 +141,11 @@
     {
         var selectedCategoryId = categoryLevels.LastOrDefault()?.SelectedCategoryId;
 
-        if (selectedCategoryId == null)
-        {
-            return;
-        }
+        // agregar confirm popup de categoria root
+        // if (selectedCategoryId == null)
+        // {
+        //     return;
+        // }
 
         var request = new
         {

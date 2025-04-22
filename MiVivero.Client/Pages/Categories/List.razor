@@ -2,9 +2,23 @@
 @using MiVivero.Models.Common
 @using MiVivero.Models.ViewModels
 @inject HttpClient HttpClient
+@inject NavigationManager NavManager
 
 <MudPaper Class="pa-4">
-    <MudText Typo="Typo.h5">Categorías</MudText>
+
+    <MudGrid AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-4">
+        <MudItem>
+            <MudText Typo="Typo.h5" Class="font-weight-bold">Categorías</MudText>
+        </MudItem>
+        <MudItem>
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Add"
+                       OnClick="@(() => NavManager.NavigateTo("/categories/new"))">
+                       Agregar
+            </MudButton>
+        </MudItem>
+    </MudGrid>
 
     <MudTextField @bind-Value="searchString"
                   Placeholder="Buscar..."
@@ -17,7 +31,7 @@
 
     <MudTable T="CategoryViewModel"
               ServerData="LoadServerData"
-              RowsPerPageOptions="new int[] { 2, 10, 25, 50, 100 }"
+              RowsPerPageOptions="new int[] { 5, 10, 25, 50, 100 }"
               @bind-CurrentPage="@currentPage"
               @bind-RowsPerPage="@rowsPerPage"
               Bordered="true"
@@ -41,14 +55,14 @@
         </RowTemplate>
 
         <PagerContent>
-            <MudTablePager PageSizeOptions="new int[] { 2, 10, 25, 50,100 }" />
+            <MudTablePager PageSizeOptions="new int[] { 5, 10, 25, 50, 100 }" />
         </PagerContent>
     </MudTable>
 </MudPaper>
 
 @code {
     private int currentPage = 0;
-    private int rowsPerPage = 2;
+    private int rowsPerPage = 5;
     private string searchString = string.Empty;
 
     private async Task<TableData<CategoryViewModel>> LoadServerData(TableState state, CancellationToken cancellationToken)
@@ -73,7 +87,6 @@
 
     private async Task ReloadData()
     {
-        await Task.Delay(1); // da tiempo a terminar binding del campo
-        currentPage = 0;
+        await Task.Delay(1); // permite
     }
 }

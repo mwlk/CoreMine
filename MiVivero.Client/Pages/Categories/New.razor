@@ -20,94 +20,117 @@
     </MudButton>
 </MudItem>
 
-<MudPaper Class="p-4">
-    <MudStack Spacing="2">
-        <MudText Typo="Typo.h6">Seleccionar Categoría</MudText>
 
-        @for (int i = 0; i < categoryLevels.Count; i++)
-        {
-            var index = i;
+<MudGrid>
+    <MudItem xs="12" md="6" Class="mx-auto">
+        <MudPaper Class="p-4">
+            <MudStack Spacing="2">
+                <MudText Typo="Typo.h6">Seleccionar Categoría</MudText>
 
-            var level = categoryLevels[index];
-
-            <MudSelect T="int?" Label="Categoría"
-                       Value="categoryLevels[index].SelectedCategoryId"
-                       ValueChanged="@(v => OnCategorySelected(index, v))"
-                       Dense="true">
-                <MudSelectItem T="int?" Value="null">-- Seleccionar --</MudSelectItem>
-                @foreach (var option in categoryLevels[index].Options)
+                @for (int i = 0; i < categoryLevels.Count; i++)
                 {
-                    <MudSelectItem T="int?" Value="option.Id">@option.Name</MudSelectItem>
+                    var index = i;
+
+                    var level = categoryLevels[index];
+
+                    <MudSelect T="int?" Label="Categoría"
+                               Value="categoryLevels[index].SelectedCategoryId"
+                               ValueChanged="@(v => OnCategorySelected(index, v))"
+                               Dense="true"
+                               Clearable="true">
+                        <MudSelectItem T="int?" Value="null">-- Seleccionar --</MudSelectItem>
+                        @foreach (var option in categoryLevels[index].Options)
+                        {
+                            <MudSelectItem T="int?" Value="option.Id">@option.Name</MudSelectItem>
+                        }
+                    </MudSelect>
                 }
-            </MudSelect>
-        }
 
 
-        @if (isLoading)
-        {
-            <MudProgressCircular Indeterminate="true" />
-        }
+                @if (isLoading)
+                {
+                    <MudProgressCircular Indeterminate="true" />
+                }
 
-        @if (!categoryLevels.Any()
-        || (categoryLevels.Count == 1 && categoryLevels[0].SelectedCategoryId == null)
-        || categoryLevels.LastOrDefault()?.SelectedCategoryId != null
-        || hasMoreLevels)
-        {
-            <EditForm Model="categoryModel" OnValidSubmit="SaveCategory">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
+                @if (!categoryLevels.Any()
+                || (categoryLevels.Count == 1 && categoryLevels[0].SelectedCategoryId == null)
+                || categoryLevels.LastOrDefault()?.SelectedCategoryId != null
+                || hasMoreLevels)
+                {
+                    <EditForm Model="categoryModel" OnValidSubmit="SaveCategory">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
 
-                <MudCard>
-                    <MudCardContent>
-                        @if (categoryLevels.Any())
-                        {
-                            <MudText Typo="Typo.body1" Color="Color.Success">
-                                Categoría seleccionada: @GetSelectedCategoryPath()
-                            </MudText>
-                        }
-                        else
-                        {
-                            <MudText Typo="Typo.body1" Color="Color.Info">
-                                Creando categoría raíz
-                            </MudText>
-                        }
+                        <MudCard>
+                            <MudCardContent>
+                                @if (categoryLevels.Any())
+                                {
+                                    <MudText Typo="Typo.body1" Color="Color.Success">
+                                        Categoría seleccionada: @GetSelectedCategoryPath()
+                                    </MudText>
+                                }
+                                else
+                                {
+                                    <MudText Typo="Typo.body1" Color="Color.Info">
+                                        Creando categoría raíz
+                                    </MudText>
+                                }
 
-                        <MudTextField @bind-Value="categoryModel.Code"
-                                      Label="Código de la categoría"
-                                      Variant="Variant.Outlined"
-                                      For="@(() => categoryModel.Code)"
-                                      Immediate="true"
-                                      Required="true"
-                                      RequiredError="El código es obligatorio"
-                                      @ref="codeFieldRef" />
+                                <MudTextField @bind-Value="categoryModel.Code"
+                                              Label="Código"
+                                              Variant="Variant.Outlined"
+                                              For="@(() => categoryModel.Code)"
+                                              Immediate="true"
+                                              Required="true"
+                                              RequiredError="El código es obligatorio"
+                                              @ref="codeFieldRef" />
 
-                        <MudTextField @bind-Value="categoryModel.Name"
-                                      Label="Nombre de la categoría"
-                                      Variant="Variant.Outlined"
-                                      For="@(() => categoryModel.Name)"
-                                      Immediate="true"
-                                      Required="true"
-                                      RequiredError="El nombre es obligatorio" />
-                    </MudCardContent>
+                                <MudTextField @bind-Value="categoryModel.Name"
+                                              Label="Nombre"
+                                              Variant="Variant.Outlined"
+                                              For="@(() => categoryModel.Name)"
+                                              Immediate="true"
+                                              Required="true"
+                                              RequiredError="El nombre es obligatorio" />
+                            </MudCardContent>
 
-                    <MudCardActions>
-                        <MudButton Color="Color.Primary"
-                                   Variant="Variant.Filled"
-                                   Disabled="@(!formIsValid)"
-                                   ButtonType="ButtonType.Submit">
-                            Guardar categoría
-                        </MudButton>
-                    </MudCardActions>
-                </MudCard>
-            </EditForm>
-        }
+                            <MudCardActions>
+                                <MudButton Color="Color.Primary"
+                                           Variant="Variant.Filled"
+                                           Disabled="@(!formIsValid)"
+                                           ButtonType="ButtonType.Submit">
+                                    Guardar categoría
+                                </MudButton>
+                            </MudCardActions>
+                        </MudCard>
+                    </EditForm>
+                }
+            </MudStack>
+        </MudPaper>
+    </MudItem>
 
-
-    </MudStack>
-</MudPaper>
-
-
-
+    <MudItem xs="12" md="6" Class="mx-auto">
+        <MudTreeView T="string" Hover="true" Dense="true">
+            @if (categoryLevels.Any(l => l.SelectedCategoryId.HasValue))
+            {
+                <MudTreeView T="string" Hover="true" Dense="true">
+                    @if (categoryLevels.Any(l => l.SelectedCategoryId.HasValue))
+                    {
+                        @RenderCategoryTreeRecursive(categoryLevels, 0)
+                    }
+                    else
+                    {
+                        <MudTreeViewItem Text="Sin categoría seleccionada" />
+                    }
+                </MudTreeView>
+            }
+            else
+            {
+                <MudTreeViewItem Text="Sin categoría seleccionada" />
+            }
+        </MudTreeView>
+    </MudItem>
+</MudGrid>
 
 @code {
     private CategoryNewFormModel categoryModel = new();
@@ -124,6 +147,7 @@
 
     [Parameter]
     public bool hasMoreLevels { get; set; }
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -142,6 +166,8 @@
     private async Task OnCategorySelected(int levelIndex, int? selectedCategoryId)
     {
         isLoading = true;
+
+        categoryModel = new();
 
         if (levelIndex < 0 || levelIndex >= categoryLevels.Count)
         {
@@ -183,6 +209,7 @@
         isLoading = false;
     }
 
+   
 
     private async Task SaveCategory()
     {
@@ -253,4 +280,22 @@
             await codeFieldRef.FocusAsync();
         }
     }
+
+    RenderFragment RenderCategoryTreeRecursive(List<SelectableCategoryLevel> levels, int index) => builder =>
+       {
+           if (index >= levels.Count)
+               return;
+
+           var level = levels[index];
+           var selected = level.Options.FirstOrDefault(o => o.Id == level.SelectedCategoryId);
+
+           if (selected != null)
+           {
+               builder.OpenComponent<MudTreeViewItem<string>>(0);
+               builder.AddAttribute(1, "Text", $"{selected.Code} - {selected.Name}");
+               builder.AddAttribute(2, "Expanded", true);
+               builder.AddAttribute(3, "ChildContent", RenderCategoryTreeRecursive(levels, index + 1));
+               builder.CloseComponent();
+           }
+       };
 }

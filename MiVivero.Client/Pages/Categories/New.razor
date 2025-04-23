@@ -52,10 +52,9 @@
                     <MudProgressCircular Indeterminate="true" />
                 }
 
-                @if (!categoryLevels.Any()
-                || (categoryLevels.Count == 1 && categoryLevels[0].SelectedCategoryId == null)
-                || categoryLevels.LastOrDefault()?.SelectedCategoryId != null
-                || hasMoreLevels)
+                @if ((categoryLevels.Count == 1
+                && categoryLevels[0].SelectedCategoryId == null)
+                || categoryLevels.Any(l => l.SelectedCategoryId != null))
                 {
                     <EditForm Model="categoryModel" OnValidSubmit="SaveCategory">
                         <DataAnnotationsValidator />
@@ -167,30 +166,32 @@
     {
         isLoading = true;
 
-        categoryModel = new();
-
-        if (levelIndex < 0 || levelIndex >= categoryLevels.Count)
+        // 1) Si deselecciono (selectedCategoryId == null), elimino SOLO los niveles posteriores
+        if (selectedCategoryId == null)
         {
-            isLoading = false;
-            return;
-        }
+            // Quito cualquier nivel que venga después de este
+            if (categoryLevels.Count > levelIndex + 1)
+                categoryLevels.RemoveRange(levelIndex + 1, categoryLevels.Count - (levelIndex + 1));
 
-        // Limitar los niveles visibles
-        categoryLevels = categoryLevels.Take(levelIndex + 1).ToList();
+            // Marco este nivel como “sin selección”
+            categoryLevels[levelIndex].SelectedCategoryId = null;
 
-        categoryLevels[levelIndex].SelectedCategoryId = selectedCategoryId;
-
-        // Si la categoría seleccionada es null, no se cargan más niveles
-        if (selectedCategoryId is null)
-        {
             hasMoreLevels = false;
             isLoading = false;
             return;
         }
 
-        // Obtener los hijos de la categoría seleccionada
-        var children = await HttpClient.GetFromJsonAsync<PagedResult<CategoryViewModel>>(
-            $"api/categories?parentId={selectedCategoryId}");
+        // 2) Si selecciono una categoría válida:
+        // — Actualizo este nivel
+        categoryLevels[levelIndex].SelectedCategoryId = selectedCategoryId;
+
+        // — Quito niveles posteriores que ya no aplican
+        if (categoryLevels.Count > levelIndex + 1)
+            categoryLevels.RemoveRange(levelIndex + 1, categoryLevels.Count - (levelIndex + 1));
+
+        // — Cargo los hijos de la categoría seleccionada
+        var children = await HttpClient
+            .GetFromJsonAsync<PagedResult<CategoryViewModel>>($"api/categories?parentId={selectedCategoryId}");
 
         if (children?.Items?.Any() == true)
         {
@@ -209,7 +210,6 @@
         isLoading = false;
     }
 
-   
 
     private async Task SaveCategory()
     {

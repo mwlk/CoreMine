@@ -1,0 +1,48 @@
+## Build results
+bin/
+obj/
+out/
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## OS generated files
+.DS_Store
+Thumbs.db
+
+## Visual Studio
+.vscode/
+.vs/
+
+## Rider
+.idea/
+
+## ASP.NET Core
+wwwroot/
+
+## Logs
+*.log
+
+## NuGet
+*.nupkg
+packages/
+
+# DotCover
+*.dotCover
+
+# Backup & Report Files
+*_i.c
+*_p.c
+*.dbmdl
+*.bak
+
+# EF Core Migrations Snapshots
+*MigrationsSnapshot.cs
+
+# Others
+.env
+*.sqlite
+*.db

@@ -1,3 +1,0 @@
-﻿Add-Migration DESCRIBE_YOUR_MIGRATION -Project MiVivero.Data -StartupProject MiVivero.Api
-
-# change Default Projecto to: MiVivero.Api before run command

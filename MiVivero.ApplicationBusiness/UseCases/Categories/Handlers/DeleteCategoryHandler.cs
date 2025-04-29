@@ -1,6 +1,0 @@
-﻿namespace MiVivero.ApplicationBusiness.UseCases.Categories.Handlers
-{
-    public class DeleteCategoryHandler
-    {
-    }
-}

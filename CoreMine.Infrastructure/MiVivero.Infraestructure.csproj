@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CoreMine.ApplicationBusiness\CoreMine.ApplicationBusiness.csproj" />
+    <ProjectReference Include="..\CoreMine.Data\CoreMine.Data.csproj" />
+    <ProjectReference Include="..\CoreMine.Entities\CoreMine.Entities.csproj" />
+    <ProjectReference Include="..\CoreMine.Models\CoreMine.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
+
+</Project>

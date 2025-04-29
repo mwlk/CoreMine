@@ -1,0 +1,3 @@
+﻿Add-Migration DESCRIBE_YOUR_MIGRATION -Project CoreMine.Data -StartupProject CoreMine.Api
+
+# change Default Projecto to: CoreMine.Api before run command

@@ -1,29 +1,22 @@
-﻿@using MudBlazor
-
-<MudPaper Class="mud-theme-background mud-elevation-0 py-4 px-3" Style="height: 100%;">
-
+﻿
+<div class="p-4" style="height: 100%; background-color: var(--bs-body-bg);">
     <div class="d-flex align-items-center mb-4">
-        <MudIcon Icon="@Icons.Material.Filled.LocalFlorist" Color="Color.Primary" Size="Size.Large" />
-        <MudText Typo="Typo.h6" Class="ml-2 font-weight-bold">Mi Vivero</MudText>
+        <i class="material-icons text-primary" style="font-size: 36px;">local_florist</i>
+        <span class="ms-2 fw-bold h6 mb-0">Mi Vivero</span>
     </div>
 
-    <MudNavMenu Dense="false">
-
-        <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">
-            Inicio
-        </MudNavLink>
-
-        <MudNavLink Href="/categories" Icon="@Icons.Material.Filled.Category">
-            Categorías
-        </MudNavLink>
-
-        <MudNavLink Href="/products" Icon="@Icons.Material.Filled.ShoppingCart">
-            Productos
-        </MudNavLink>
-
-    </MudNavMenu>
-
-</MudPaper>
+    <nav class="nav flex-column">
+        <a class="nav-link d-flex align-items-center" href="/">
+            <i class="material-icons me-2">home</i> Inicio
+        </a>
+        <a class="nav-link d-flex align-items-center" href="/categories">
+            <i class="material-icons me-2">category</i> Categorías
+        </a>
+        <a class="nav-link d-flex align-items-center" href="/products">
+            <i class="material-icons me-2">shopping_cart</i> Productos
+        </a>
+    </nav>
+</div>
 
 @code {
     private bool collapseNavMenu = true;

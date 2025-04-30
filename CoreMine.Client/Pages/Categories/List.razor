@@ -4,89 +4,109 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavManager
 
-<MudPaper Class="pa-4">
+<h3>Categorías</h3>
 
-    <MudGrid AlignItems="AlignItems.Center" Justify="Justify.SpaceBetween" Class="mb-4">
-        <MudItem>
-            <MudText Typo="Typo.h5" Class="font-weight-bold">Categorías</MudText>
-        </MudItem>
-        <MudItem>
-            <MudButton Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.Add"
-                       OnClick="@(() => NavManager.NavigateTo("/categories/new"))">
-                       Agregar
-            </MudButton>
-        </MudItem>
-    </MudGrid>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <button class="btn btn-primary" @onclick="@(() => NavManager.NavigateTo("/categories/new"))">
+        Agregar
+    </button>
+</div>
 
-    <MudTextField @bind-Value="searchString"
-                  Placeholder="Buscar..."
-                  Adornment="Adornment.Start"
-                  AdornmentIcon="@Icons.Material.Filled.Search"
-                  Class="mb-4"
-                  Immediate="true"
-                  OnBlur="ReloadData"
-                  OnKeyUp="@(e => { if (e.Key == "Enter") ReloadData(); })" />
+<div class="mb-3">
+    <input class="form-control"
+           @bind="searchString"
+           @bind:event="oninput"
+           placeholder="Buscar..."
+           @onkeydown="HandleKeyDown" />
+</div>
 
-    <MudTable T="CategoryViewModel"
-              ServerData="LoadServerData"
-              RowsPerPageOptions="new int[] { 5, 10, 25, 50, 100 }"
-              @bind-CurrentPage="@currentPage"
-              @bind-RowsPerPage="@rowsPerPage"
-              Bordered="true"
-              Hover="true"
-              Dense="true"
-              Striped="true">
-        <ToolBarContent>
-            <MudText Typo="Typo.h6">Listado de Categorías</MudText>
-        </ToolBarContent>
+<table class="table table-striped table-hover table-bordered">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Código</th>
+            <th>Nombre</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (items is not null && items.Count > 0)
+        {
+            @foreach (var item in items)
+            {
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.FullCode</td>
+                    <td>@item.Name</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3" class="text-center">No hay datos disponibles.</td>
+            </tr>
+        }
+    </tbody>
+</table>
 
-        <HeaderContent>
-            <MudTh>Id</MudTh>
-            <MudTh>Código</MudTh>
-            <MudTh>Nombre</MudTh>
-        </HeaderContent>
-
-        <RowTemplate>
-            <MudTd DataLabel="Id">@context.Id</MudTd>
-            <MudTd DataLabel="Código">@context.FullCode</MudTd>
-            <MudTd DataLabel="Nombre">@context.Name</MudTd>
-        </RowTemplate>
-
-        <PagerContent>
-            <MudTablePager PageSizeOptions="new int[] { 5, 10, 25, 50, 100 }" />
-        </PagerContent>
-    </MudTable>
-</MudPaper>
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <button class="btn btn-secondary" @onclick="PreviousPage" disabled="@(!CanGoPrevious)">Anterior</button>
+    <span>Página @currentPage de @totalPages</span>
+    <button class="btn btn-secondary" @onclick="NextPage" disabled="@(!CanGoNext)">Siguiente</button>
+</div>
 
 @code {
-    private int currentPage = 0;
+    private int currentPage = 1;
     private int rowsPerPage = 5;
+    private int totalPages = 1;
     private string searchString = string.Empty;
+    private List<CategoryViewModel> items = new();
 
-    private async Task<TableData<CategoryViewModel>> LoadServerData(TableState state, CancellationToken cancellationToken)
+    protected override async Task OnInitializedAsync()
     {
-        currentPage = state.Page;
-        rowsPerPage = state.PageSize;
+        await LoadData();
+    }
 
-        var pageNumber = currentPage + 1;
-        var url = $"api/categories?pageNumber={pageNumber}&pageSize={rowsPerPage}";
-
+    private async Task LoadData()
+    {
+        var url = $"api/categories?pageNumber={currentPage}&pageSize={rowsPerPage}";
         if (!string.IsNullOrWhiteSpace(searchString))
             url += $"&Name={Uri.EscapeDataString(searchString)}";
 
-        var response = await HttpClient.GetFromJsonAsync<PagedResult<CategoryViewModel>>(url, cancellationToken);
+        var response = await HttpClient.GetFromJsonAsync<PagedResult<CategoryViewModel>>(url);
 
-        return new TableData<CategoryViewModel>
-            {
-                TotalItems = response?.TotalCount ?? 0,
-                Items = response?.Items ?? new List<CategoryViewModel>()
-            };
+        items = response?.Items?.ToList() ?? new List<CategoryViewModel>();
+        var totalItems = response?.TotalCount ?? 0;
+        totalPages = (int)Math.Ceiling(totalItems / (double)rowsPerPage);
     }
 
-    private async Task ReloadData()
+    private async Task HandleKeyDown(KeyboardEventArgs e)
     {
-        await Task.Delay(1); // permite
+        if (e.Key == "Enter")
+        {
+            currentPage = 1;
+            await LoadData();
+        }
     }
+
+    private async Task PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            await LoadData();
+        }
+    }
+
+    private async Task NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            await LoadData();
+        }
+    }
+
+    private bool CanGoPrevious => currentPage > 1;
+    private bool CanGoNext => currentPage < totalPages;
 }

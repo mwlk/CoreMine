@@ -1,99 +1,65 @@
 ﻿@inherits LayoutComponentBase
 @using CoreMine.Client.Services
-@using MudBlazor
 @inject ThemeService ThemeService
 
-<MudThemeProvider Theme="@_currentTheme" @bind-IsDarkMode="_darkMode" />
+<div class="@($"d-flex flex-column min-vh-100 {(darkMode ? "bg-dark text-white" : "bg-light text-dark")}")">
 
-@* Para tooltips, menu context, etc *@
-<MudDialogProvider />
-<MudSnackbarProvider />
-<MudPopoverProvider />
-
-<MudDrawerContainer>
-
-    <MudDrawer @bind-Open="_drawerOpen"
-               Elevation="1"
-               Variant="DrawerVariant.Responsive"
-               Breakpoint="Breakpoint.Md"
-               Anchor="Anchor.Start"
-               Class="mud-width-200">
-        <NavMenu />
-    </MudDrawer>
-
-    <MudMainContent>
-
-        <MudAppBar Elevation="1" Color="Color.Primary">
-            <MudIconButton Icon="@Icons.Material.Filled.Menu"
-                           Color="Color.Inherit"
-                           Edge="Edge.Start"
-                           OnClick="() => _drawerOpen = !_drawerOpen" />
-            <MudText Typo="Typo.h6" Class="mud-white-text">Mi Vivero</MudText>
-            <MudSpacer />
-            <MudIconButton Icon="@(_darkMode
-                                 ? Icons.Material.Filled.LightMode
-                                 : Icons.Material.Filled.DarkMode)"
-                           Color="Color.Inherit"
-                           OnClick="ToggleDarkMode" />
-        </MudAppBar>
-
-        <div class="page-content px-4"
-             Style=$"background-color: {(_darkMode
-             ? _currentTheme.PaletteDark.Background
-             : _currentTheme.PaletteLight.Background)}">
-            @Body
+    <header class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <button class="btn btn-outline-light me-2" @onclick="ToggleDrawer">☰</button>
+            <a class="navbar-brand" href="#">CoreMine</a>
+            <div class="ms-auto">
+                <button class="btn btn-outline-light" @onclick="ToggleDarkMode">
+                    @(darkMode ? "🌞" : "🌙")
+                </button>
+            </div>
         </div>
+    </header>
 
-    </MudMainContent>
+    <div class="d-flex flex-grow-1">
 
-</MudDrawerContainer>
+        @if (drawerOpen)
+        {
+            <nav class="bg-secondary p-3" style="width: 200px;">
+                <NavMenu />
+            </nav>
+        }
 
+        <main class="flex-grow-1 p-4" style="background-color:@(darkMode ? "#121212" : "#fafafa")">
+            @Body
+        </main>
+
+    </div>
+</div>
 
 @code {
-    private MudTheme _currentTheme = new MudTheme
-        {
-            PaletteLight = new PaletteLight
-            {
-                Primary = "#1976D2",
-                Secondary = "#FF4081",
-                AppbarBackground = "#2196F3",
-                AppbarText = "#FFFFFF",
-                DrawerBackground = "#FFFFFF",
-                DrawerText = "rgba(0,0,0,0.87)",
-                Surface = "#F5F5F5",
-                Background = "#FAFAFA",
-                TextPrimary = "rgba(0,0,0,0.87)",
-                TextSecondary = "rgba(0,0,0,0.60)"
-            },
-            PaletteDark = new PaletteDark
-            {
-                Primary = "#90CAF9",
-                Background = "#121212",
-                Surface = "#1E1E1E",
-                AppbarBackground = "#1F1F1F",
-                DrawerBackground = "#1F1F1F",
-                TextPrimary = "#FFFFFF",
-                TextSecondary = "rgba(255,255,255,0.7)"
-            }
-        };
-    private bool _darkMode;
-    private bool _drawerOpen = true;
+    private bool darkMode;
+    private bool drawerOpen = true;
 
     protected override void OnInitialized()
     {
-        _darkMode = ThemeService.IsDarkMode;
+        darkMode = ThemeService.IsDarkMode;
         ThemeService.OnThemeChanged += ChangeTheme;
     }
 
     private void ToggleDarkMode()
-      => ThemeService.ToggleTheme();
+    {
+        ThemeService.ToggleTheme();
+    }
+
+    private void ToggleDrawer()
+    {
+        drawerOpen = !drawerOpen;
+    }
 
     private void ChangeTheme()
     {
-        _darkMode = ThemeService.IsDarkMode;
+        darkMode = ThemeService.IsDarkMode;
         StateHasChanged();
     }
 
     public void Dispose()
-      => ThemeService.OnThemeChanged -= ChangeTheme;
+    {
+        ThemeService.OnThemeChanged -= ChangeTheme;
+    }
 }

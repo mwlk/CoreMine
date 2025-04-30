@@ -1,22 +1,16 @@
-﻿
-<div class="p-4" style="height: 100%; background-color: var(--bs-body-bg);">
-    <div class="d-flex align-items-center mb-4">
-        <i class="material-icons text-primary" style="font-size: 36px;">local_florist</i>
-        <span class="ms-2 fw-bold h6 mb-0">Mi Vivero</span>
-    </div>
+﻿@inject NavigationManager NavigationManager
 
-    <nav class="nav flex-column">
-        <a class="nav-link d-flex align-items-center" href="/">
-            <i class="material-icons me-2">home</i> Inicio
-        </a>
-        <a class="nav-link d-flex align-items-center" href="/categories">
-            <i class="material-icons me-2">category</i> Categorías
-        </a>
-        <a class="nav-link d-flex align-items-center" href="/products">
-            <i class="material-icons me-2">shopping_cart</i> Productos
-        </a>
-    </nav>
+<!-- NavMenu Radzen Version -->
+<div style="flex:1; display:flex; flex-direction:column; height:100%;">
+    <RadzenPanelMenu Style="flex:1; overflow:auto;">
+        <RadzenPanelMenuItem Text="Mi Vivero" Icon="local_florist" Path="/">
+            <RadzenPanelMenuItem Text="Inicio" Icon="home" Path="/" />
+            <RadzenPanelMenuItem Text="Categorías" Icon="category" Path="/categories" />
+            <RadzenPanelMenuItem Text="Productos" Icon="shopping_cart" Path="/products" />
+        </RadzenPanelMenuItem>
+    </RadzenPanelMenu>
 </div>
+
 
 @code {
     private bool collapseNavMenu = true;

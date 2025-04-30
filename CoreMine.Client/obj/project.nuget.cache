@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "6B6zfQZp8EI=",
+  "dgSpecHash": "c5uFd4rorcs=",
   "success": true,
   "projectFilePath": "D:\\repo\\CoreMine\\CoreMine.Client\\CoreMine.Client.csproj",
   "expectedPackageFiles": [
@@ -12,6 +12,9 @@
     "C:\\Users\\mirko\\.nuget\\packages\\microsoft.aspnetcore.components.webassembly\\9.0.4\\microsoft.aspnetcore.components.webassembly.9.0.4.nupkg.sha512",
     "C:\\Users\\mirko\\.nuget\\packages\\microsoft.aspnetcore.components.webassembly.devserver\\9.0.4\\microsoft.aspnetcore.components.webassembly.devserver.9.0.4.nupkg.sha512",
     "C:\\Users\\mirko\\.nuget\\packages\\microsoft.aspnetcore.metadata\\9.0.4\\microsoft.aspnetcore.metadata.9.0.4.nupkg.sha512",
+    "C:\\Users\\mirko\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\3.3.4\\microsoft.codeanalysis.analyzers.3.3.4.nupkg.sha512",
+    "C:\\Users\\mirko\\.nuget\\packages\\microsoft.codeanalysis.common\\4.8.0\\microsoft.codeanalysis.common.4.8.0.nupkg.sha512",
+    "C:\\Users\\mirko\\.nuget\\packages\\microsoft.codeanalysis.csharp\\4.8.0\\microsoft.codeanalysis.csharp.4.8.0.nupkg.sha512",
     "C:\\Users\\mirko\\.nuget\\packages\\microsoft.extensions.configuration\\9.0.4\\microsoft.extensions.configuration.9.0.4.nupkg.sha512",
     "C:\\Users\\mirko\\.nuget\\packages\\microsoft.extensions.configuration.abstractions\\9.0.4\\microsoft.extensions.configuration.abstractions.9.0.4.nupkg.sha512",
     "C:\\Users\\mirko\\.nuget\\packages\\microsoft.extensions.configuration.binder\\9.0.4\\microsoft.extensions.configuration.binder.9.0.4.nupkg.sha512",
@@ -34,6 +37,10 @@
     "C:\\Users\\mirko\\.nuget\\packages\\microsoft.jsinterop.webassembly\\9.0.4\\microsoft.jsinterop.webassembly.9.0.4.nupkg.sha512",
     "C:\\Users\\mirko\\.nuget\\packages\\microsoft.net.illink.tasks\\9.0.4\\microsoft.net.illink.tasks.9.0.4.nupkg.sha512",
     "C:\\Users\\mirko\\.nuget\\packages\\microsoft.net.sdk.webassembly.pack\\9.0.4\\microsoft.net.sdk.webassembly.pack.9.0.4.nupkg.sha512",
+    "C:\\Users\\mirko\\.nuget\\packages\\radzen.blazor\\6.6.4\\radzen.blazor.6.6.4.nupkg.sha512",
+    "C:\\Users\\mirko\\.nuget\\packages\\system.collections.immutable\\7.0.0\\system.collections.immutable.7.0.0.nupkg.sha512",
+    "C:\\Users\\mirko\\.nuget\\packages\\system.reflection.metadata\\7.0.0\\system.reflection.metadata.7.0.0.nupkg.sha512",
+    "C:\\Users\\mirko\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "C:\\Users\\mirko\\.nuget\\packages\\microsoft.netcore.app.runtime.mono.browser-wasm\\9.0.4\\microsoft.netcore.app.runtime.mono.browser-wasm.9.0.4.nupkg.sha512"
   ],
   "logs": []

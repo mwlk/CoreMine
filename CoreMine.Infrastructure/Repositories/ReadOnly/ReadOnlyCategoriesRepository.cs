@@ -3,6 +3,7 @@ using CoreMine.ApplicationBusiness.Interfaces.ReadOnly;
 using CoreMine.Data;
 using CoreMine.Data.ReadModels;
 using CoreMine.Entities;
+using CoreMine.Models.ViewModels;
 
 namespace CoreMine.Infraestructure.Repositories.ReadOnly
 {
@@ -15,11 +16,11 @@ namespace CoreMine.Infraestructure.Repositories.ReadOnly
             _context = context;
         }
 
-        public IQueryable<CategoryWithHierarchyReadModel> GetQueryable()
+        public IQueryable<Category> GetQueryable()
         {
-            return _context.Set<CategoryWithHierarchyReadModel>()
-                .AsNoTracking()
-                .AsQueryable();
+            var query = _context.Categories.AsQueryable().AsNoTracking();
+
+            return query;
         }
     }
 }

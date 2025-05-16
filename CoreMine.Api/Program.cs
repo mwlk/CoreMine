@@ -1,15 +1,12 @@
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using CoreMine.Api.Endpoints;
 using CoreMine.ApplicationBusiness;
-using CoreMine.ApplicationBusiness.Interfaces;
-using CoreMine.ApplicationBusiness.UseCases.Products.Queries;
 using CoreMine.Data;
 using CoreMine.Data.Seed;
 using CoreMine.Infraestructure;
 using CoreMine.Infrastructure;
-using CoreMine.Models.ViewModels;
 using Scalar.AspNetCore;
+using CoreMine.ApplicationBusiness.Interfaces.Shared;
 
 internal class Program
 {

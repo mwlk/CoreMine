@@ -1,10 +1,6 @@
-﻿using MediatR;
-using CoreMine.Models.Common;
-using CoreMine.Models.ViewModels;
-
-namespace CoreMine.ApplicationBusiness.UseCases.Products.Queries
+﻿namespace CoreMine.ApplicationBusiness.UseCases.Products.Queries
 {
-    public class GetProductsQuery: IRequest<PagedResult<ProductViewModel>>
+    public class GetProductsQuery
     {
         public int? Id { get; set; }
         public string? Name { get; set; }

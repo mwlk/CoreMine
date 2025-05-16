@@ -1,10 +1,6 @@
-﻿using MediatR;
-using CoreMine.Models.Common;
-using CoreMine.Models.ViewModels;
-
-namespace CoreMine.ApplicationBusiness.UseCases.Categories.Queries
+﻿namespace CoreMine.ApplicationBusiness.UseCases.Categories.Queries
 {
-    public class GetCategoriesQuery : IRequest<PagedResult<CategoryViewModel>>
+    public class GetCategoriesQuery 
     {
         public int? Id { get; set; }
         public string? Name { get; set; }

@@ -4,6 +4,7 @@ using CoreMine.ApplicationBusiness.Interfaces.ReadOnly;
 using CoreMine.Entities;
 using CoreMine.Infraestructure.Repositories.ReadOnly;
 using CoreMine.Infrastructure.Repositories;
+using CoreMine.ApplicationBusiness.Interfaces.Shared;
 
 namespace CoreMine.Infrastructure
 {

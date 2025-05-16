@@ -1,8 +1,6 @@
-﻿using MediatR;
-
-namespace CoreMine.ApplicationBusiness.UseCases.Categories.Commands
+﻿namespace CoreMine.ApplicationBusiness.UseCases.Categories.Commands
 {
-    public class CreateCategoryCommand : IRequest<int>
+    public class CreateCategoryCommand 
     {
         public string Name { get; set; }
         public string Code { get; set; }

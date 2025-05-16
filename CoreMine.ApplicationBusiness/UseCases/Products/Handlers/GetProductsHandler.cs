@@ -1,14 +1,11 @@
-﻿using AutoMapper;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using CoreMine.ApplicationBusiness.Interfaces.ReadOnly;
+﻿using CoreMine.ApplicationBusiness.Interfaces.ReadOnly;
 using CoreMine.ApplicationBusiness.UseCases.Products.Queries;
 using CoreMine.Models.Common;
 using CoreMine.Models.ViewModels;
 
 namespace CoreMine.ApplicationBusiness.UseCases.Products.Handlers
 {
-    public class GetProductsHandler : IRequestHandler<GetProductsQuery, PagedResult<ProductViewModel>>
+    public class GetProductsHandler 
     {
         private readonly IReadOnlyProductsRepository _repository;
 

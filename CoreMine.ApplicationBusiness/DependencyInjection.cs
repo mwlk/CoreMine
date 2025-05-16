@@ -1,5 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CoreMine.ApplicationBusiness.Interfaces.Shared;
 using CoreMine.ApplicationBusiness.Mappings;
+using CoreMine.ApplicationBusiness.UseCases.Categories.Commands;
+using CoreMine.ApplicationBusiness.UseCases.Categories.Handlers;
+using CoreMine.ApplicationBusiness.UseCases.Categories.Queries;
+using CoreMine.Models.Common;
+using CoreMine.Models.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace CoreMine.ApplicationBusiness
@@ -10,12 +16,28 @@ namespace CoreMine.ApplicationBusiness
         {
             services.AddAutoMapper(typeof(ProductProfile).Assembly);
 
-            services.AddMediatR(cfg =>
-            {
-                cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
-            });
+            Register(services, typeof(ICommandHandler<,>));
+            Register(services, typeof(IQueryHandler<,>));
 
             return services;
+        }
+
+        private static void Register(IServiceCollection services, Type openGenericHandlerType)
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+
+            var handlers = assembly
+                .GetTypes()
+                .Where(p => !p.IsAbstract && !p.IsInterface)
+                .SelectMany(q => q.GetInterfaces()
+                                .Where(r => r.IsGenericType && r.GetGenericTypeDefinition() == openGenericHandlerType)
+                                .Select(s => new { Interface = s, Implementation = q }))
+                .ToList();
+
+            foreach (var handler in handlers)
+            {
+                services.AddScoped(handler.Interface, handler.Implementation);
+            }
         }
     }
 }

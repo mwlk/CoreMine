@@ -1,4 +1,4 @@
-﻿namespace CoreMine.ApplicationBusiness.Interfaces
+﻿namespace CoreMine.ApplicationBusiness.Interfaces.Shared
 {
     public interface IUnitOfWork
     {

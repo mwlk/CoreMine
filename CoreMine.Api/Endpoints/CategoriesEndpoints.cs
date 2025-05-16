@@ -1,6 +1,7 @@
-﻿using MediatR;
+﻿using CoreMine.ApplicationBusiness.Interfaces.Shared;
 using CoreMine.ApplicationBusiness.UseCases.Categories.Commands;
 using CoreMine.ApplicationBusiness.UseCases.Categories.Queries;
+using CoreMine.Models.Common;
 using CoreMine.Models.ViewModels;
 
 namespace CoreMine.Api.Endpoints
@@ -12,24 +13,29 @@ namespace CoreMine.Api.Endpoints
             var group = app.MapGroup("/api/categories")
                 .WithTags("Categories");
 
-            group.MapGet("/", async (IMediator mediator, [AsParameters] GetCategoriesQuery query) =>
+            group.MapGet("/", async (
+                [AsParameters] GetCategoriesQuery query,
+                IQueryHandler<GetCategoriesQuery, PagedResult<CategoryViewModel>> handler,
+                CancellationToken cancellationToken) =>
             {
-                var result = await mediator.Send(query);
+                var result = await handler.HandleAsync(query, cancellationToken);
                 return Results.Ok(result);
             })
-                .Produces<List<CategoryViewModel>>(StatusCodes.Status200OK);
+                .Produces<PagedResult<CategoryViewModel>>(StatusCodes.Status200OK);
+
 
             // POST: api/categories
             group.MapPost("/", async (
                 CreateCategoryCommand command,
-                ISender mediator,
+                ICommandHandler<CreateCategoryCommand, int> handler,
                 CancellationToken cancellationToken) =>
             {
-                var result = await mediator.Send(command, cancellationToken);
-                //return Results.Created($"/api/categories/{result.Id}", result);
+                var result = await handler.HandleAsync(command, cancellationToken);
                 return Results.Ok(result);
             })
                 .Produces<int>(StatusCodes.Status200OK);
+
+
         }
     }
 }

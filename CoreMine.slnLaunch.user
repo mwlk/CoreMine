@@ -1,16 +1,14 @@
 [
   {
-    "Name": "New Profile",
+    "Name": "Full Stack",
     "Projects": [
       {
-        "Path": "MiVivero.Api\\MiVivero.Api.csproj",
-        "Action": "Start",
-        "DebugTarget": "https"
+        "Path": "CoreMine.Api\\CoreMine.Api.csproj",
+        "Action": "Start"
       },
       {
-        "Path": "MiVivero.Client\\MiVivero.Client.csproj",
-        "Action": "Start",
-        "DebugTarget": "https"
+        "Path": "CoreMine.Client\\CoreMine.Client.csproj",
+        "Action": "Start"
       }
     ]
   }

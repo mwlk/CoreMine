@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
-using CoreMine.ApplicationBusiness.Interfaces;
 using CoreMine.Data;
+using CoreMine.ApplicationBusiness.Interfaces.Shared;
 
 namespace CoreMine.Infraestructure
 {

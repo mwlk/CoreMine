@@ -1,12 +1,11 @@
 ﻿using AutoMapper;
-using MediatR;
-using CoreMine.ApplicationBusiness.Interfaces;
+using CoreMine.ApplicationBusiness.Interfaces.Shared;
 using CoreMine.ApplicationBusiness.UseCases.Products.Commands;
 using CoreMine.Entities;
 
 namespace CoreMine.ApplicationBusiness.UseCases.Products.Handlers
 {
-    public class AddProductHandler : IRequestHandler<AddProductCommand, Unit>
+    public class AddProductHandler 
     {
         private readonly IRepository<Product> _productRepository;
         private readonly IMapper _mapper;
@@ -17,18 +16,18 @@ namespace CoreMine.ApplicationBusiness.UseCases.Products.Handlers
             _mapper = mapper;
         }
 
-        public async Task<Unit> Handle(AddProductCommand request, CancellationToken cancellationToken)
-        {
-            if (request.ProductToAdd == null)
-            {
-                throw new NotImplementedException();
-            }
+        //public async Task<Unit> Handle(AddProductCommand request, CancellationToken cancellationToken)
+        //{
+        //    if (request.ProductToAdd == null)
+        //    {
+        //        throw new NotImplementedException();
+        //    }
 
-            var productEntity = _mapper.Map<Product>(request.ProductToAdd);
+        //    var productEntity = _mapper.Map<Product>(request.ProductToAdd);
 
-            await _productRepository.AddAsync(productEntity, cancellationToken);
+        //    await _productRepository.AddAsync(productEntity, cancellationToken);
 
-            return Unit.Value;
-        }
+        //    return Unit.Value;
+        //}
     }
 }

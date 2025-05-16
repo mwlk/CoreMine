@@ -1,16 +1,14 @@
-﻿using AutoMapper;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
-using CoreMine.ApplicationBusiness.Interfaces;
+﻿using Azure.Core;
 using CoreMine.ApplicationBusiness.Interfaces.ReadOnly;
+using CoreMine.ApplicationBusiness.Interfaces.Shared;
 using CoreMine.ApplicationBusiness.UseCases.Categories.Queries;
-using CoreMine.Entities;
 using CoreMine.Models.Common;
 using CoreMine.Models.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace CoreMine.ApplicationBusiness.UseCases.Categories.Handlers
 {
-    public class GetCategoriesHandler : IRequestHandler<GetCategoriesQuery, PagedResult<CategoryViewModel>>
+    public class GetCategoriesHandler: IQueryHandler<GetCategoriesQuery, PagedResult<CategoryViewModel>>
     {
         private readonly IReadOnlyCategoriesRepository _categoriesRepository;
 
@@ -19,52 +17,52 @@ namespace CoreMine.ApplicationBusiness.UseCases.Categories.Handlers
             _categoriesRepository = categoriesRepository;
         }
 
-        public async Task<PagedResult<CategoryViewModel>> Handle(GetCategoriesQuery request, CancellationToken cancellationToken)
+        public async Task<PagedResult<CategoryViewModel>> HandleAsync(GetCategoriesQuery query, CancellationToken cancellationToken)
         {
-            var query = _categoriesRepository.GetQueryable();
+            var categoriesQuery = _categoriesRepository.GetQueryable();
 
             // Filtro opcional por ID
-            if (request.Id.HasValue)
+            if (query.Id.HasValue)
             {
-                query = query.Where(c => c.Id == request.Id.Value);
+                categoriesQuery = categoriesQuery.Where(c => c.Id == query.Id.Value);
             }
 
             // Filtro opcional por nombre parcial
-            if (!string.IsNullOrWhiteSpace(request.Name))
+            if (!string.IsNullOrWhiteSpace(query.Name))
             {
-                query = query.Where(c => c.Name.Contains(request.Name));
+                categoriesQuery = categoriesQuery.Where(c => c.Name.Contains(query.Name));
             }
 
-            if (request.ParentId.HasValue)
+            if (query.ParentId.HasValue)
             {
-                query = query.Where(p => p.ParentId == request.ParentId);
+                categoriesQuery = categoriesQuery.Where(p => p.ParentId == query.ParentId);
             }
 
-            if (request.IsParent.HasValue)
+            if (query.IsParent.HasValue)
             {
-                query = query.Where(p => !p.ParentId.HasValue == request.IsParent.Value);
+                categoriesQuery = categoriesQuery.Where(p => !p.ParentId.HasValue == query.IsParent.Value);
             }
 
             // Total antes de paginar
-            var total = await query.CountAsync(cancellationToken);
+            var total = await categoriesQuery.CountAsync(cancellationToken);
 
             // Paginación
-            int pageSize = request.PageSize > 0 ? request.PageSize.Value : 10;
-            int pageNumber = request.PageNumber > 0 ? request.PageNumber.Value : 1;
+            int pageSize = query.PageSize > 0 ? query.PageSize.Value : 10;
+            int pageNumber = query.PageNumber > 0 ? query.PageNumber.Value : 1;
 
-            var page = await query
+            var page = await categoriesQuery
                 .OrderBy(c => c.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync(cancellationToken);
 
-            // Mapeo a tu ViewModel
+            // Mapeo a ViewModel
             var items = page.Select(c => new CategoryViewModel
             {
                 Id = c.Id,
                 Name = c.Name,
                 Code = c.Code,
-                FullCode = c.FullCode
+                FullCode = "-" // Podés cambiar esto por lógica real
             }).ToList();
 
             return new PagedResult<CategoryViewModel>
@@ -73,6 +71,7 @@ namespace CoreMine.ApplicationBusiness.UseCases.Categories.Handlers
                 Items = items
             };
         }
+
     }
 
 }

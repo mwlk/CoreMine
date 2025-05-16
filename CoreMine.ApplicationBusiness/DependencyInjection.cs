@@ -1,10 +1,5 @@
 ﻿using CoreMine.ApplicationBusiness.Interfaces.Shared;
 using CoreMine.ApplicationBusiness.Mappings;
-using CoreMine.ApplicationBusiness.UseCases.Categories.Commands;
-using CoreMine.ApplicationBusiness.UseCases.Categories.Handlers;
-using CoreMine.ApplicationBusiness.UseCases.Categories.Queries;
-using CoreMine.Models.Common;
-using CoreMine.Models.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 

@@ -8,5 +8,11 @@ namespace CoreMine.Entities
         public string Contact { get; set; } = null!;
         public string Phone { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
+        public virtual ICollection<Product> Products { get; set; }
+
+        public Supplier()
+        {
+            Products = new HashSet<Product>();
+        }
     }
 }

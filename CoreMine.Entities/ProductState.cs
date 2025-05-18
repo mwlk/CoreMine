@@ -2,7 +2,7 @@
 
 namespace CoreMine.Entities
 {
-    public class ProductState : NameableEntity
+    public class ProductState : BaseEntity
     {
         public int ProductId { get; set; }
         public Product Product { get; set; } = null!;

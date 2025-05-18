@@ -7,10 +7,10 @@ namespace CoreMine.ApplicationBusiness.UseCases.Categories.Handlers
 {
     public class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryCommand, int>
     {
-        private readonly ICategoriesRepository repository;
+        private readonly IProductCategoriesRepository repository;
         private readonly IUnitOfWork unitOfWork;
 
-        public CreateCategoryCommandHandler(ICategoriesRepository repository, IUnitOfWork unitOfWork)
+        public CreateCategoryCommandHandler(IProductCategoriesRepository repository, IUnitOfWork unitOfWork)
         {
             this.repository = repository;
             this.unitOfWork = unitOfWork;
@@ -25,8 +25,9 @@ namespace CoreMine.ApplicationBusiness.UseCases.Categories.Handlers
                 ParentId = command.ParentId,
             };
 
+            await unitOfWork.BeginTransactionAsync(cancellationToken);
             await repository.AddAsync(newCategory, cancellationToken);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
+            await unitOfWork.CommitTransactionAsync(cancellationToken);
 
             return newCategory.Id;
         }

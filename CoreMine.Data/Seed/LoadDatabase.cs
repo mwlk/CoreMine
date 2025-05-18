@@ -8,53 +8,53 @@ namespace CoreMine.Data.Seed
         {
             if (!context.Categories!.Any())
             {
-                var plantas = new Category
+                var plantas = new ProductCategory
                 {
                     Code = "1",
                     Name = "Plantas",
                 };
 
-                var herramientas = new Category
+                var herramientas = new ProductCategory
                 {
                     Code = "2",
                     Name = "Herramientas"
                 };
 
-                var sustratos = new Category
+                var sustratos = new ProductCategory
                 {
                     Code = "3",
                     Name = "Sustratos"
                 };
 
-                var plantas_arboles = new Category
+                var plantas_arboles = new ProductCategory
                 {
                     Code = "1",
                     Name = "Árboles",
                     Parent = plantas
                 };
 
-                var plantas_arbustos = new Category
+                var plantas_arbustos = new ProductCategory
                 {
                     Code = "2",
                     Name = "Arbustos",
                     Parent = plantas
                 };
 
-                var plantas_flores = new Category
+                var plantas_flores = new ProductCategory
                 {
                     Code = "3",
                     Name = "Flores",
                     Parent = plantas
                 };
 
-                var herramientas_jardineria = new Category
+                var herramientas_jardineria = new ProductCategory
                 {
                     Code = "1",
                     Name = "Jardineria",
                     Parent = herramientas
                 };
 
-                var herramientas_riego = new Category
+                var herramientas_riego = new ProductCategory
                 {
                     Code = "2",
                     Name = "Riego",

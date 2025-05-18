@@ -4,6 +4,7 @@ using CoreMine.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoreMine.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250518183754_fix-removeNameProperty")]
+    partial class fixremoveNameProperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,38 +48,6 @@ namespace CoreMine.Data.Migrations
                     b.ToTable("Locations", (string)null);
                 });
 
-            modelBuilder.Entity("CoreMine.Entities.Machine", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AcquisitionDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id");
-
-                    b.ToTable("Machines", (string)null);
-                });
-
             modelBuilder.Entity("CoreMine.Entities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -92,6 +63,7 @@ namespace CoreMine.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
@@ -203,90 +175,6 @@ namespace CoreMine.Data.Migrations
                     b.ToTable("ProductStateTypes", (string)null);
                 });
 
-            modelBuilder.Entity("CoreMine.Entities.Repair", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("MachineId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Observations")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id");
-
-                    b.HasIndex("MachineId");
-
-                    b.ToTable("Repairs", (string)null);
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.RepairProduct", b =>
-                {
-                    b.Property<int>("RepairId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("QuantityUsed")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("RepairId", "ProductId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("RepairProducts", (string)null);
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.Stock", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id");
-
-                    b.HasIndex("LocationId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("Stocks", (string)null);
-                });
-
             modelBuilder.Entity("CoreMine.Entities.StockLevel", b =>
                 {
                     b.Property<int>("Id")
@@ -319,69 +207,6 @@ namespace CoreMine.Data.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("StockLevels", (string)null);
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.StockMovement", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime");
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Observations")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("StockMovementTypeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id");
-
-                    b.HasIndex("LocationId");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("StockMovementTypeId");
-
-                    b.ToTable("StockMovements", (string)null);
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.StockMovementType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsPositive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("StockMovementTypes", (string)null);
                 });
 
             modelBuilder.Entity("CoreMine.Entities.Supplier", b =>
@@ -454,7 +279,7 @@ namespace CoreMine.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("CoreMine.Entities.Supplier", "Supplier")
-                        .WithMany("Products")
+                        .WithMany()
                         .HasForeignKey("SupplierId");
 
                     b.HasOne("CoreMine.Entities.UnitOfMeasure", "UnitOfMeasure")
@@ -499,55 +324,6 @@ namespace CoreMine.Data.Migrations
                     b.Navigation("ProductStateType");
                 });
 
-            modelBuilder.Entity("CoreMine.Entities.Repair", b =>
-                {
-                    b.HasOne("CoreMine.Entities.Machine", "Machine")
-                        .WithMany("Repairs")
-                        .HasForeignKey("MachineId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Machine");
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.RepairProduct", b =>
-                {
-                    b.HasOne("CoreMine.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CoreMine.Entities.Repair", "Repair")
-                        .WithMany("RepairProducts")
-                        .HasForeignKey("RepairId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("Repair");
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.Stock", b =>
-                {
-                    b.HasOne("CoreMine.Entities.Location", "Location")
-                        .WithMany("Stocks")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CoreMine.Entities.Product", "Product")
-                        .WithMany("Stocks")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Location");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("CoreMine.Entities.StockLevel", b =>
                 {
                     b.HasOne("CoreMine.Entities.Location", "Location")
@@ -567,45 +343,9 @@ namespace CoreMine.Data.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("CoreMine.Entities.StockMovement", b =>
-                {
-                    b.HasOne("CoreMine.Entities.Location", "Location")
-                        .WithMany("StockMovements")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CoreMine.Entities.Product", "Product")
-                        .WithMany("StockMovements")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CoreMine.Entities.StockMovementType", "StockMovementType")
-                        .WithMany("StockMovements")
-                        .HasForeignKey("StockMovementTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Location");
-
-                    b.Navigation("Product");
-
-                    b.Navigation("StockMovementType");
-                });
-
             modelBuilder.Entity("CoreMine.Entities.Location", b =>
                 {
                     b.Navigation("StockLevels");
-
-                    b.Navigation("StockMovements");
-
-                    b.Navigation("Stocks");
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.Machine", b =>
-                {
-                    b.Navigation("Repairs");
                 });
 
             modelBuilder.Entity("CoreMine.Entities.Product", b =>
@@ -613,10 +353,6 @@ namespace CoreMine.Data.Migrations
                     b.Navigation("ProductStates");
 
                     b.Navigation("StockLevels");
-
-                    b.Navigation("StockMovements");
-
-                    b.Navigation("Stocks");
                 });
 
             modelBuilder.Entity("CoreMine.Entities.ProductCategory", b =>
@@ -627,21 +363,6 @@ namespace CoreMine.Data.Migrations
             modelBuilder.Entity("CoreMine.Entities.ProductStateType", b =>
                 {
                     b.Navigation("ProductStates");
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.Repair", b =>
-                {
-                    b.Navigation("RepairProducts");
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.StockMovementType", b =>
-                {
-                    b.Navigation("StockMovements");
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.Supplier", b =>
-                {
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

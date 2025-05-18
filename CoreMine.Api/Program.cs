@@ -56,15 +56,12 @@ internal class Program
 
         app.RegisterEndpoints();
 
-       
-
         app.UseCors("AllowBlazorClientOrigin");
 
         
         using (var scope = app.Services.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-
             
             await context.Database.MigrateAsync();
 

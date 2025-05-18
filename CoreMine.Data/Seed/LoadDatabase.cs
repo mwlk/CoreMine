@@ -6,99 +6,105 @@ namespace CoreMine.Data.Seed
     {
         public static async Task InsertData(AppDbContext context)
         {
-            if (!context.Categories!.Any())
+            if (!context.ProductCategories.Any())
             {
-                var plantas = new ProductCategory
+                var categorias = new List<ProductCategory>
                 {
-                    Code = "1",
-                    Name = "Plantas",
+                    new ProductCategory { Code = "1", Name = "Herramientas" },
+                    new ProductCategory { Code = "2", Name = "Lubricantes" },
+                    new ProductCategory { Code = "3", Name = "Repuestos" },
+                    new ProductCategory { Code = "4", Name = "Equipos de Seguridad" }
                 };
 
-                var herramientas = new ProductCategory
+                var herramientas = categorias.First(c => c.Name == "Herramientas");
+                var lubricantes = categorias.First(c => c.Name == "Lubricantes");
+                var repuestos = categorias.First(c => c.Name == "Repuestos");
+
+                categorias.AddRange(new[]
                 {
-                    Code = "2",
-                    Name = "Herramientas"
+                    new ProductCategory { Code = "1", Name = "Manuales", Parent = herramientas },
+                    new ProductCategory { Code = "2", Name = "Eléctricas", Parent = herramientas },
+                    new ProductCategory { Code = "1", Name = "Aceites", Parent = lubricantes },
+                    new ProductCategory { Code = "2", Name = "Grasas", Parent = lubricantes },
+                    new ProductCategory { Code = "1", Name = "Motor", Parent = repuestos },
+                    new ProductCategory { Code = "2", Name = "Hidráulica", Parent = repuestos },
+                    new ProductCategory { Code = "3", Name = "Eléctrico", Parent = repuestos }
+                });
+
+                context.ProductCategories.AddRange(categorias);
+            }
+
+            if (!context.UnitOfMeasures.Any())
+            {
+                var unidades = new List<UnitOfMeasure>
+                {
+                    new UnitOfMeasure { Symbol = "u", Name = "Unidad" },
+                    new UnitOfMeasure { Symbol = "kg", Name = "Kilogramo" },
+                    new UnitOfMeasure { Symbol = "l", Name = "Litro" },
+                    new UnitOfMeasure { Symbol = "m", Name = "Metro" }
                 };
 
-                var sustratos = new ProductCategory
+                context.UnitOfMeasures.AddRange(unidades);
+            }
+
+            if (!context.Products.Any())
+            {
+                var productCategories = context.ProductCategories.ToList();
+                var unitOfMeasures = context.UnitOfMeasures.ToList();
+
+                var products = new List<Product>
                 {
-                    Code = "3",
-                    Name = "Sustratos"
+                    new Product { Name = "Aceite SAE 15W-40", Category = productCategories.First(c => c.Name == "Aceites"), UnitOfMeasure = unitOfMeasures.First(p => p.Name == "Litro") },
+                    new Product { Name = "Grasa multiuso EP-2", Category = productCategories.First(c => c.Name == "Grasas"), UnitOfMeasure = unitOfMeasures.First(p => p.Name == "Litro") },
+                    new Product { Name = "Llave Inglesa 12\"", Category = productCategories.First(c => c.Name == "Manuales"), UnitOfMeasure = unitOfMeasures.First(p => p.Name == "Unidad") },
+                    new Product { Name = "Taladro Percutor 800W", Category = productCategories.First(c => c.Name == "Eléctricas"),UnitOfMeasure = unitOfMeasures.First(p => p.Name == "Unidad") },
+                    new Product { Name = "Filtro de Aceite Komatsu", Category = productCategories.First(c => c.Name == "Motor"), UnitOfMeasure = unitOfMeasures.First(p => p.Name == "Unidad") },
+                    new Product { Name = "Manguera Hidráulica Alta Presión", Category = productCategories.First(c => c.Name == "Hidráulica"), UnitOfMeasure = unitOfMeasures.First(p => p.Name == "Unidad") },
+                    new Product { Name = "Guantes de Nitrilo Reforzados", Category = productCategories.First(c => c.Name == "Equipos de Seguridad"), UnitOfMeasure = unitOfMeasures.First(p => p.Name == "Unidad") }
                 };
 
-                var plantas_arboles = new ProductCategory
+                context.Products.AddRange(products);
+            }
+
+            if (!context.ProductStateTypes.Any())
+            {
+                var states = new List<ProductStateType>
                 {
-                    Code = "1",
-                    Name = "Árboles",
-                    Parent = plantas
+                    new ProductStateType { Name = "Operacional" },
+                    new ProductStateType { Name = "En Mantenimiento" },
+                    new ProductStateType { Name = "Fuera de Servicio" }
                 };
 
-                var plantas_arbustos = new ProductCategory
-                {
-                    Code = "2",
-                    Name = "Arbustos",
-                    Parent = plantas
-                };
-
-                var plantas_flores = new ProductCategory
-                {
-                    Code = "3",
-                    Name = "Flores",
-                    Parent = plantas
-                };
-
-                var herramientas_jardineria = new ProductCategory
-                {
-                    Code = "1",
-                    Name = "Jardineria",
-                    Parent = herramientas
-                };
-
-                var herramientas_riego = new ProductCategory
-                {
-                    Code = "2",
-                    Name = "Riego",
-                    Parent = herramientas
-                };
-
-                context.Categories.AddRange(plantas, herramientas, sustratos, 
-                    plantas_arboles, plantas_arbustos, plantas_flores,
-                    herramientas_jardineria, herramientas_riego);
-
+                context.ProductStateTypes.AddRange(states);
                 await context.SaveChangesAsync();
             }
 
-            if (!context.Products!.Any())
+            if (!context.StockMovementTypes.Any())
             {
-                var flores_1 = new Product
+                var movementTypes = new List<StockMovementType>
                 {
-                    Name = "Rosa",
-                    Category = context.Categories.First(c => c.Code == "3" && c.Name == "Flores") 
+                    new StockMovementType { Name = "Compra", IsPositive = true },
+                    new StockMovementType { Name = "Devolución", IsPositive = true },
+                    new StockMovementType { Name = "Usado para Reparación", IsPositive = false },
+                    new StockMovementType { Name = "Pérdida", IsPositive = false },
+                    new StockMovementType { Name = "Ajuste (+)", IsPositive = true },
+                    new StockMovementType { Name = "Ajuste (-)", IsPositive = false }
                 };
 
-                var arboles_1 = new Product
+                context.StockMovementTypes.AddRange(movementTypes);
+            }
+
+            if (!context.Locations.Any())
+            {
+                var locations = new List<Location>
                 {
-                    Name = "Abeto",
-                    Category = context.Categories.First(c => c.Code == "1" && c.Name == "Árboles") 
+                    new Location { Name = "Taller Principal", Description = "Taller de la planta" }
                 };
 
-                var jardineria_1 = new Product
-                {
-                    Name = "Tijeras de Jardinería",
-                    Category = context.Categories.First(c => c.Code == "1" && c.Name == "Jardineria") 
-                };
-
-                var sustratos_1 = new Product
-                {
-                    Name = "Sustrato Orgánico",
-                    Category = context.Categories.First(c => c.Code == "3" && c.Name == "Sustratos") 
-                };
-
-                context.Products.AddRange(flores_1, arboles_1, jardineria_1, sustratos_1);
+                context.Locations.AddRange(locations);
             }
 
             await context.SaveChangesAsync();
-
         }
     }
 }

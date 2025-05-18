@@ -10,9 +10,10 @@ namespace CoreMine.Api.Endpoints
     {
         public static void MapCategoriesEndpoints(this IEndpointRouteBuilder app)
         {
-            var group = app.MapGroup("/api/categories")
-                .WithTags("Categories");
+            var group = app.MapGroup("/api/productCategories")
+                .WithTags("ProductCategories");
 
+            // GET: api/productCategories
             group.MapGet("/", async (
                 [AsParameters] GetCategoriesQuery query,
                 IQueryHandler<GetCategoriesQuery, PagedResult<CategoryViewModel>> handler,

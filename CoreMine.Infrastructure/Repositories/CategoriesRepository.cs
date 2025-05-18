@@ -14,7 +14,7 @@ namespace CoreMine.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task AddAsync(Category entityToAdd, CancellationToken cancellationToken)
+        public async Task AddAsync(ProductCategory entityToAdd, CancellationToken cancellationToken)
         {
             await _context.Categories.AddAsync(entityToAdd, cancellationToken);
         }
@@ -24,17 +24,17 @@ namespace CoreMine.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public Task EditAsync(Category entityToEdit, CancellationToken cancellationToken)
+        public Task EditAsync(ProductCategory entityToEdit, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Category>> GetAllAsync(CancellationToken cancellationToken)
+        public Task<IEnumerable<ProductCategory>> GetAllAsync(CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Category> GetByIdAsync(int id, CancellationToken cancellationToken)
+        public Task<ProductCategory> GetByIdAsync(int id, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

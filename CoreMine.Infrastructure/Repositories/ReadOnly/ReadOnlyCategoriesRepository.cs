@@ -16,7 +16,7 @@ namespace CoreMine.Infraestructure.Repositories.ReadOnly
             _context = context;
         }
 
-        public IQueryable<Category> GetQueryable()
+        public IQueryable<ProductCategory> GetQueryable()
         {
             var query = _context.Categories.AsQueryable().AsNoTracking();
 

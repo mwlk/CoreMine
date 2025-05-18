@@ -4,6 +4,7 @@ using CoreMine.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoreMine.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250518063341_feature-addProductStates")]
+    partial class featureaddProductStates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -177,40 +180,6 @@ namespace CoreMine.Data.Migrations
                     b.ToTable("ProductStateTypes", (string)null);
                 });
 
-            modelBuilder.Entity("CoreMine.Entities.StockLevel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DefinedAt")
-                        .HasColumnType("datetime");
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("MaxQuantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("MinQuantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id");
-
-                    b.HasIndex("LocationId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("StockLevels", (string)null);
-                });
-
             modelBuilder.Entity("CoreMine.Entities.Supplier", b =>
                 {
                     b.Property<int>("Id")
@@ -326,35 +295,9 @@ namespace CoreMine.Data.Migrations
                     b.Navigation("ProductStateType");
                 });
 
-            modelBuilder.Entity("CoreMine.Entities.StockLevel", b =>
-                {
-                    b.HasOne("CoreMine.Entities.Location", "Location")
-                        .WithMany("StockLevels")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CoreMine.Entities.Product", "Product")
-                        .WithMany("StockLevels")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Location");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.Location", b =>
-                {
-                    b.Navigation("StockLevels");
-                });
-
             modelBuilder.Entity("CoreMine.Entities.Product", b =>
                 {
                     b.Navigation("ProductStates");
-
-                    b.Navigation("StockLevels");
                 });
 
             modelBuilder.Entity("CoreMine.Entities.ProductCategory", b =>

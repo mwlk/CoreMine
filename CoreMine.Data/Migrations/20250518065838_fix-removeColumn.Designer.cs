@@ -4,6 +4,7 @@ using CoreMine.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoreMine.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250518065838_fix-removeColumn")]
+    partial class fixremoveColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -335,7 +338,7 @@ namespace CoreMine.Data.Migrations
                         .IsRequired();
 
                     b.HasOne("CoreMine.Entities.Product", "Product")
-                        .WithMany("StockLevels")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -353,8 +356,6 @@ namespace CoreMine.Data.Migrations
             modelBuilder.Entity("CoreMine.Entities.Product", b =>
                 {
                     b.Navigation("ProductStates");
-
-                    b.Navigation("StockLevels");
                 });
 
             modelBuilder.Entity("CoreMine.Entities.ProductCategory", b =>

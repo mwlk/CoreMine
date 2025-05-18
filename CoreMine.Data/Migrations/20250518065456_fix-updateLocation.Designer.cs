@@ -4,6 +4,7 @@ using CoreMine.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoreMine.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250518065456_fix-updateLocation")]
+    partial class fixupdateLocation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -191,6 +194,9 @@ namespace CoreMine.Data.Migrations
                     b.Property<int>("LocationId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("LocationId1")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("MaxQuantity")
                         .HasColumnType("decimal(18,2)");
 
@@ -205,6 +211,8 @@ namespace CoreMine.Data.Migrations
                     b.HasIndex("Id");
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("LocationId1");
 
                     b.HasIndex("ProductId");
 
@@ -329,13 +337,17 @@ namespace CoreMine.Data.Migrations
             modelBuilder.Entity("CoreMine.Entities.StockLevel", b =>
                 {
                     b.HasOne("CoreMine.Entities.Location", "Location")
-                        .WithMany("StockLevels")
+                        .WithMany()
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CoreMine.Entities.Product", "Product")
+                    b.HasOne("CoreMine.Entities.Location", null)
                         .WithMany("StockLevels")
+                        .HasForeignKey("LocationId1");
+
+                    b.HasOne("CoreMine.Entities.Product", "Product")
+                        .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -353,8 +365,6 @@ namespace CoreMine.Data.Migrations
             modelBuilder.Entity("CoreMine.Entities.Product", b =>
                 {
                     b.Navigation("ProductStates");
-
-                    b.Navigation("StockLevels");
                 });
 
             modelBuilder.Entity("CoreMine.Entities.ProductCategory", b =>

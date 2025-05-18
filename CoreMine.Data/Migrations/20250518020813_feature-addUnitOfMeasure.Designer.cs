@@ -4,6 +4,7 @@ using CoreMine.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoreMine.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250518020813_feature-addUnitOfMeasure")]
+    partial class featureaddUnitOfMeasure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,9 +78,6 @@ namespace CoreMine.Data.Migrations
                     b.Property<int?>("SupplierId")
                         .HasColumnType("int");
 
-                    b.Property<int>("UnitOfMeasureId")
-                        .HasColumnType("int");
-
                     b.Property<double>("UnitPrice")
                         .HasPrecision(18, 4)
                         .HasColumnType("float(18)");
@@ -86,11 +86,7 @@ namespace CoreMine.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("Id");
-
                     b.HasIndex("SupplierId");
-
-                    b.HasIndex("UnitOfMeasureId");
 
                     b.ToTable("Products", (string)null);
                 });
@@ -121,94 +117,6 @@ namespace CoreMine.Data.Migrations
                     b.HasIndex("ParentId");
 
                     b.ToTable("ProductCategories", (string)null);
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.ProductState", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Observations")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductStateTypeId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("ProductStateTypeId");
-
-                    b.ToTable("ProductStates", (string)null);
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.ProductStateType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProductStateTypes", (string)null);
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.StockLevel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DefinedAt")
-                        .HasColumnType("datetime");
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("MaxQuantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("MinQuantity")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id");
-
-                    b.HasIndex("LocationId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("StockLevels", (string)null);
                 });
 
             modelBuilder.Entity("CoreMine.Entities.Supplier", b =>
@@ -243,8 +151,6 @@ namespace CoreMine.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("Id");
 
                     b.ToTable("Suppliers", (string)null);
                 });
@@ -284,17 +190,9 @@ namespace CoreMine.Data.Migrations
                         .WithMany()
                         .HasForeignKey("SupplierId");
 
-                    b.HasOne("CoreMine.Entities.UnitOfMeasure", "UnitOfMeasure")
-                        .WithMany()
-                        .HasForeignKey("UnitOfMeasureId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Category");
 
                     b.Navigation("Supplier");
-
-                    b.Navigation("UnitOfMeasure");
                 });
 
             modelBuilder.Entity("CoreMine.Entities.ProductCategory", b =>
@@ -307,64 +205,9 @@ namespace CoreMine.Data.Migrations
                     b.Navigation("Parent");
                 });
 
-            modelBuilder.Entity("CoreMine.Entities.ProductState", b =>
-                {
-                    b.HasOne("CoreMine.Entities.Product", "Product")
-                        .WithMany("ProductStates")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CoreMine.Entities.ProductStateType", "ProductStateType")
-                        .WithMany("ProductStates")
-                        .HasForeignKey("ProductStateTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("ProductStateType");
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.StockLevel", b =>
-                {
-                    b.HasOne("CoreMine.Entities.Location", "Location")
-                        .WithMany("StockLevels")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("CoreMine.Entities.Product", "Product")
-                        .WithMany("StockLevels")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Location");
-
-                    b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.Location", b =>
-                {
-                    b.Navigation("StockLevels");
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.Product", b =>
-                {
-                    b.Navigation("ProductStates");
-
-                    b.Navigation("StockLevels");
-                });
-
             modelBuilder.Entity("CoreMine.Entities.ProductCategory", b =>
                 {
                     b.Navigation("ChildCategories");
-                });
-
-            modelBuilder.Entity("CoreMine.Entities.ProductStateType", b =>
-                {
-                    b.Navigation("ProductStates");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,7 +12,7 @@ namespace CoreMine.Data
         }
 
         public DbSet<Product> Products { get; set; }
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<ProductCategory> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -22,6 +22,8 @@ namespace CoreMine.ApplicationBusiness.UseCases.Machines.Handlers
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            command.Validate();
+
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             var entitytToAdd = new Machine

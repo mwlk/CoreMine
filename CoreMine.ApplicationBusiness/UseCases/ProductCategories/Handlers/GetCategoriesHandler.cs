@@ -19,6 +19,8 @@ namespace CoreMine.ApplicationBusiness.UseCases.Categories.Handlers
 
         public async Task<PagedResult<CategoryViewModel>> HandleAsync(GetCategoriesQuery query, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var categoriesQuery = _categoriesRepository.GetQueryable();
 
             // Filtro opcional por ID

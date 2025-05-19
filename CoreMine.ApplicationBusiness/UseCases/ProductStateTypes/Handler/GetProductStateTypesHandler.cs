@@ -19,6 +19,8 @@ namespace CoreMine.ApplicationBusiness.UseCases.ProductStateTypes.Handler
 
         public async Task<PagedResult<ProductStateTypeViewModel>> HandleAsync(GetProductStateTypeQuery query, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             int pageSize = query.PageSize > 0 ? query.PageSize.Value : 10;
             int pageNumber = query.PageNumber > 0 ? query.PageNumber.Value : 1;
 

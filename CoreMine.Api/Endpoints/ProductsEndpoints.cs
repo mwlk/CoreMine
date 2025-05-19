@@ -1,4 +1,6 @@
-﻿using CoreMine.ApplicationBusiness.UseCases.Products.Queries;
+﻿using CoreMine.ApplicationBusiness.Interfaces.Shared;
+using CoreMine.ApplicationBusiness.UseCases.Products.Queries;
+using CoreMine.Models.Common;
 using CoreMine.Models.ViewModels;
 
 namespace CoreMine.Api.Endpoints
@@ -10,12 +12,14 @@ namespace CoreMine.Api.Endpoints
             var group = app.MapGroup("/api/products")
                 .WithTags("Products");
 
-            //group.MapGet("/", async (IMediator mediator, [AsParameters] GetProductsQuery query) =>
-            //{
-            //    var result = await mediator.Send(query);
-            //    return Results.Ok(result);
-            //})
-            //    .Produces<List<ProductViewModel>>(StatusCodes.Status200OK);
+            group.MapGet("/", async ([AsParameters] GetProductsQuery query,
+                IQueryHandler<GetProductsQuery, PagedResult<ProductViewModel>> handler,
+                CancellationToken cancellationToken) =>
+            {
+                var result = await handler.HandleAsync(query, cancellationToken);
+                return Results.Ok(result);
+            })
+                .Produces<List<ProductViewModel>>(StatusCodes.Status200OK);
         }
     }
 }

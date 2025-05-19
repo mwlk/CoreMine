@@ -8,6 +8,7 @@
             app.MapProductStateTypesEndpoints();
             app.MapUnitOfMeasuresEndpoints();
             app.MapStockMovementTypesEndpoints();
+            app.MapProductsEndpoints();
         }
     }
 }

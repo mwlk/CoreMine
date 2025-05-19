@@ -1,18 +1,20 @@
-using Microsoft.EntityFrameworkCore;
 using CoreMine.Api.Endpoints;
+using CoreMine.Api.Middlewares.Extensions;
 using CoreMine.ApplicationBusiness;
+using CoreMine.ApplicationBusiness.Interfaces.Shared;
 using CoreMine.Data;
 using CoreMine.Data.Seed;
 using CoreMine.Infraestructure;
 using CoreMine.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
-using CoreMine.ApplicationBusiness.Interfaces.Shared;
 
 internal class Program
 {
     private static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
 
         // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
         builder.Services.AddOpenApi();
@@ -52,6 +54,8 @@ internal class Program
             app.MapScalarApiReference();
         }
 
+        app.UseExceptionMiddleware();
+
         app.UseHttpsRedirection();
 
         app.RegisterEndpoints();
@@ -74,7 +78,4 @@ internal class Program
     }
 }
 
-#region CORS
-
-#endregion
 

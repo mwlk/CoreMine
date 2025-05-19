@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -21,10 +21,6 @@
     <ProjectReference Include="..\CoreMine.Data\CoreMine.Data.csproj" />
     <ProjectReference Include="..\CoreMine.Infrastructure\CoreMine.Infraestructure.csproj" />
     <ProjectReference Include="..\CoreMine.Models\CoreMine.Models.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

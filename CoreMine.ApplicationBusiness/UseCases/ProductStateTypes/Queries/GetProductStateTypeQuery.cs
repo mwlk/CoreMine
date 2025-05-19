@@ -1,10 +1,10 @@
-﻿namespace CoreMine.ApplicationBusiness.UseCases.ProductStateTypes.Queries
+﻿using CoreMine.ApplicationBusiness.Common.Queries;
+
+namespace CoreMine.ApplicationBusiness.UseCases.ProductStateTypes.Queries
 {
-    public class GetProductStateTypeQuery
+    public class GetProductStateTypeQuery : PaginatedQuery
     {
         public int? Id { get; set; }
         public string? Name { get; set; }
-        public int? PageSize { get; set; }
-        public int? PageNumber { get; set; }
     }
 }

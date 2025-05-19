@@ -16,4 +16,8 @@
     <ProjectReference Include="..\CoreMine.Models\CoreMine.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UseCases\Machines\Queries\" />
+  </ItemGroup>
+
 </Project>

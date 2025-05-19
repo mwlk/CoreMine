@@ -9,6 +9,7 @@
             app.MapUnitOfMeasuresEndpoints();
             app.MapStockMovementTypesEndpoints();
             app.MapProductsEndpoints();
+            app.MapMachinesEndpoints();
         }
     }
 }

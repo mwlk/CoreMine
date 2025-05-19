@@ -4,6 +4,6 @@ namespace CoreMine.ApplicationBusiness.Interfaces.ReadOnly
 {
     public interface IReadOnlyStockMovementTypesRepository
     {
-        IQueryable<StockMovementType> GetQuaryable();
+        IQueryable<StockMovementType> GetQueryable();
     }
 }

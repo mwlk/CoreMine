@@ -14,7 +14,7 @@ namespace CoreMine.Infraestructure.Repositories.ReadOnly
             _context = context;
         }
 
-        public IQueryable<StockMovementType> GetQuaryable()
+        public IQueryable<StockMovementType> GetQueryable()
         {
             return _context.StockMovementTypes
                 .AsQueryable()

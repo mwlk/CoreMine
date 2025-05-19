@@ -4,6 +4,7 @@ using CoreMine.ApplicationBusiness.Interfaces.ReadOnly;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using CoreMine.Entities;
 
 namespace CoreMine.Infraestructure.Repositories.ReadOnly
 {
@@ -19,6 +20,13 @@ namespace CoreMine.Infraestructure.Repositories.ReadOnly
         public Task<(int TotalCount, List<ProductWithCategoryReadModel> Rows)> GetProductsByHierarchyAsync(string? name, string ancestorIdsCsv, int ancestorCount, int skip, int take, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
+        }
+
+        public IQueryable<Product> GetQueryable()
+        {
+            return _context.Products
+                .AsQueryable()
+                .AsNoTracking();
         }
 
         //public async Task<(int TotalCount, List<ProductWithCategoryReadModel> Rows)> GetProductsByHierarchyAsync(string? name, string ancestorIdsCsv, int ancestorCount, int skip, int take, CancellationToken cancellationToken)

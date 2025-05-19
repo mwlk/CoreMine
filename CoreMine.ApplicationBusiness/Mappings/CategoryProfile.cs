@@ -9,9 +9,9 @@ namespace CoreMine.ApplicationBusiness.Mappings
     {
         public CategoryProfile()
         {
-            CreateMap<Category, CategoryViewModel>();
+            CreateMap<ProductCategory, CategoryViewModel>();
 
-            CreateMap<CategoryPostDto, Category>();
+            CreateMap<CategoryPostDto, ProductCategory>();
         }
     }
 }

@@ -5,6 +5,8 @@
         public static void RegisterEndpoints(this IEndpointRouteBuilder app)
         {
             app.MapCategoriesEndpoints();
+
+            app.MapProductStateTypesEndpoints();
         }
     }
 }

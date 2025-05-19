@@ -12,22 +12,23 @@ namespace CoreMine.Data
         }
 
         public DbSet<Product> Products { get; set; }
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<ProductCategory> ProductCategories { get; set; }
+        public DbSet<ProductState> ProductStates { get; set; }
+        public DbSet<ProductStateType> ProductStateTypes { get; set; }
+        public DbSet<Stock> Stocks { get; set; }
+        public DbSet<StockLevel> StockLevels { get; set; }
+        public DbSet<StockMovement> StockMovements { get; set; }
+        public DbSet<StockMovementType> StockMovementTypes { get; set; }
+        public DbSet<Location> Locations { get; set; }
+        public DbSet<UnitOfMeasure> UnitOfMeasures { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Machine> Machines { get; set; }
+        public DbSet<Repair> Repairs { get; set; }
+        public DbSet<RepairProduct> RepairProducts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-
-            //modelBuilder
-            //    .Entity<ProductWithCategoryReadModel>()
-            //    .HasNoKey()
-            //    .ToView("vw_ProductsWithFullCategoryInfo");
-
-            //modelBuilder.Entity<CategoryWithHierarchyReadModel>(e =>
-            //{
-            //    e.HasNoKey();
-            //    e.ToView("vw_CategoriesWithHierarchy");
-            //});
         }
     }
 }

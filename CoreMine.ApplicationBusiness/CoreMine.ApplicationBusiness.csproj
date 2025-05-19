@@ -16,8 +16,4 @@
     <ProjectReference Include="..\CoreMine.Models\CoreMine.Models.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="UseCases\Categories\Handlers\Interfaces\" />
-  </ItemGroup>
-
 </Project>

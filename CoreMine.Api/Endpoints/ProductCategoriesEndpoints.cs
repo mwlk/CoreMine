@@ -8,7 +8,7 @@ namespace CoreMine.Api.Endpoints
 {
     public static partial class EndpointRegister
     {
-        public static void MapCategoriesEndpoints(this IEndpointRouteBuilder app)
+        public static void MapProductCategoriesEndpoints(this IEndpointRouteBuilder app)
         {
             var group = app.MapGroup("/api/productCategories")
                 .WithTags("ProductCategories");

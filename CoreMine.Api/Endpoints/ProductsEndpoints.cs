@@ -19,7 +19,9 @@ namespace CoreMine.Api.Endpoints
                 var result = await handler.HandleAsync(query, cancellationToken);
                 return Results.Ok(result);
             })
-                .Produces<List<ProductViewModel>>(StatusCodes.Status200OK);
+                .Produces<List<ProductViewModel>>(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status400BadRequest)
+                .WithDescription("Listado de repuestos");
         }
     }
 }

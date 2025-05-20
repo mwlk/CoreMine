@@ -22,7 +22,9 @@ namespace CoreMine.Api.Endpoints
                 var result = await handler.HandleAsync(query, cancellationToken);
                 return Results.Ok(result);
             })
-                .Produces<PagedResult<CategoryViewModel>>(StatusCodes.Status200OK);
+                .Produces<PagedResult<CategoryViewModel>>(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status400BadRequest)
+                .WithDescription("Listado de categorias de repuestos");
 
 
             // POST: api/categories
@@ -32,9 +34,11 @@ namespace CoreMine.Api.Endpoints
                 CancellationToken cancellationToken) =>
             {
                 var result = await handler.HandleAsync(command, cancellationToken);
-                return Results.Ok(result);
+                return Results.Created("", result);
             })
-                .Produces<int>(StatusCodes.Status200OK);
+                .Produces<int>(StatusCodes.Status201Created)
+                .Produces(StatusCodes.Status400BadRequest)
+                .WithDescription("Alta de nueva categoria para repuestos");
 
 
         }

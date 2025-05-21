@@ -32,6 +32,7 @@ namespace CoreMine.Data.Seed
                 });
 
                 context.ProductCategories.AddRange(categorias);
+                await context.SaveChangesAsync();
             }
 
             if (!context.UnitOfMeasures.Any())
@@ -45,6 +46,7 @@ namespace CoreMine.Data.Seed
                 };
 
                 context.UnitOfMeasures.AddRange(unidades);
+                await context.SaveChangesAsync();
             }
 
             if (!context.Products.Any())

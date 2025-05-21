@@ -25,10 +25,17 @@ namespace CoreMine.Data
         public DbSet<Machine> Machines { get; set; }
         public DbSet<Repair> Repairs { get; set; }
         public DbSet<RepairProduct> RepairProducts { get; set; }
+        //sql view
+        public DbSet<RepairWithProductsReadModel> RepairsWithProducts => Set<RepairWithProductsReadModel>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+            // sql view for repairs
+            modelBuilder.Entity<RepairWithProductsReadModel>()
+               .HasNoKey()
+               .ToView("vw_RepairsWithProducts");
         }
     }
 }

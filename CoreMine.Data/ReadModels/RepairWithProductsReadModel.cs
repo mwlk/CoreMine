@@ -9,7 +9,7 @@
         public string? Observations { get; set; }
 
         public int MachineId { get; set; }
-        public string MachineDescription { get; set; } = default!;
+        public string? MachineDescription { get; set; }
         public string MachineCode { get; set; } = default!;
         public bool MachineIsActive { get; set; }
 

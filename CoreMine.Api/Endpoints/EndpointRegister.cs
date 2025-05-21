@@ -4,6 +4,7 @@
     {
         public static void RegisterEndpoints(this IEndpointRouteBuilder app)
         {
+            app.MapLocationsEndpoints();
             app.MapMachinesEndpoints();
             app.MapProductCategoriesEndpoints();
             app.MapProductsEndpoints();

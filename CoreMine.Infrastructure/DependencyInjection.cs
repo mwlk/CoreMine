@@ -21,10 +21,12 @@ namespace CoreMine.Infrastructure
             services.AddTransient<IProductCategoriesRepository, ProductCategoriesRepository>();
             services.AddTransient<IRepository<ProductCategory>, ProductCategoriesRepository>();
             services.AddTransient<IReadOnlyCategoriesRepository, ReadOnlyCategoriesRepository>();
+
             services.AddTransient<IReadOnlyProductStateTypesRepository, ReadOnlyProductStateTypesRepository>();
             services.AddTransient<IReadOnlyUnitOfMeasuresRepository, ReadOnlyUnitOfMeasuresRepository>();
             services.AddTransient<IReadOnlyStockMovementTypesRepository, ReadOnlyStockMovementTypesRepository>();
             services.AddTransient<IReadOnlyMachinesRepository, ReadOnlyMachinesRepository>();
+            services.AddTransient<IReadOnlyLocationsRepository, ReadOnlyLocationsRepository>();
 
             services.AddTransient<IMachinesRepository, MachinesRepository>();
 

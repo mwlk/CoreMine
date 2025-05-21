@@ -3,6 +3,7 @@ using CoreMine.ApplicationBusiness.UseCases.Machines.Commands;
 using CoreMine.ApplicationBusiness.UseCases.Machines.Queries;
 using CoreMine.Models.Common;
 using CoreMine.Models.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CoreMine.Api.Endpoints
 {
@@ -16,7 +17,7 @@ namespace CoreMine.Api.Endpoints
 
             // POST: api/machines
             group.MapPost("/", async (
-                CreateMachineCommand command,
+                [FromBody] CreateMachineCommand command,
                 ICommandHandler<CreateMachineCommand, int> handler,
                 CancellationToken cancellationToken) =>
             {

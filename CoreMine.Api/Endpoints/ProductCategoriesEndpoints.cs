@@ -3,6 +3,7 @@ using CoreMine.ApplicationBusiness.UseCases.Categories.Commands;
 using CoreMine.ApplicationBusiness.UseCases.Categories.Queries;
 using CoreMine.Models.Common;
 using CoreMine.Models.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CoreMine.Api.Endpoints
 {
@@ -29,7 +30,7 @@ namespace CoreMine.Api.Endpoints
 
             // POST: api/categories
             group.MapPost("/", async (
-                CreateCategoryCommand command,
+                [FromBody] CreateCategoryCommand command,
                 ICommandHandler<CreateCategoryCommand, int> handler,
                 CancellationToken cancellationToken) =>
             {

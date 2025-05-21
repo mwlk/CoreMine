@@ -26,19 +26,28 @@ namespace CoreMine.ApplicationBusiness.UseCases.Machines.Handlers
 
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-            var entitytToAdd = new Machine
+            try
             {
-                Code = command.Code,
-                Description = command.Description,
-                AcquisitionDate = _dateTimeProvider.UtcNow,
-                IsActive = true
-            };
+                var entitytToAdd = new Machine
+                {
+                    Code = command.Code,
+                    Description = command.Description,
+                    AcquisitionDate = _dateTimeProvider.UtcNow,
+                    IsActive = true
+                };
 
-            await _repository.AddAsync(entitytToAdd, cancellationToken);
+                await _repository.AddAsync(entitytToAdd, cancellationToken);
 
-            await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            return entitytToAdd.Id;
+                return entitytToAdd.Id;
+            }
+            catch (Exception)
+            {
+                await _unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
         }
     }
 }

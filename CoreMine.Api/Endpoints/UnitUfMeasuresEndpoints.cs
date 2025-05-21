@@ -22,7 +22,7 @@ namespace CoreMine.Api.Endpoints
                 return Results.Ok(result);
             })
                 .Produces<PagedResult<UnitOfMeasureViewModel>>(StatusCodes.Status200OK)
-                .Produces(StatusCodes.Status400BadRequest)
+                .Produces(StatusCodes.Status404NotFound)
                 .WithDescription("Listado de unidades de medidas");
         }
     }

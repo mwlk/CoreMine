@@ -5,6 +5,8 @@ using CoreMine.Entities;
 using CoreMine.Infraestructure.Repositories.ReadOnly;
 using CoreMine.Infrastructure.Repositories;
 using CoreMine.ApplicationBusiness.Interfaces.Shared;
+using CoreMine.Infraestructure.Repositories;
+using CoreMine.Infraestructure;
 
 namespace CoreMine.Infrastructure
 {
@@ -22,6 +24,11 @@ namespace CoreMine.Infrastructure
             services.AddTransient<IReadOnlyProductStateTypesRepository, ReadOnlyProductStateTypesRepository>();
             services.AddTransient<IReadOnlyUnitOfMeasuresRepository, ReadOnlyUnitOfMeasuresRepository>();
             services.AddTransient<IReadOnlyStockMovementTypesRepository, ReadOnlyStockMovementTypesRepository>();
+            services.AddTransient<IReadOnlyMachinesRepository, ReadOnlyMachinesRepository>();
+
+            services.AddTransient<IMachinesRepository, MachinesRepository>();
+
+            services.AddScoped<IDateTimeProvider, DateTimeProvider>();
 
             return services;
         }

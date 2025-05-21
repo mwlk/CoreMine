@@ -1661,7 +1661,6 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v9.0",
         "dependencies": {
-          "AutoMapper": "14.0.0",
           "CoreMine.Data": "1.0.0",
           "CoreMine.Entities": "1.0.0",
           "CoreMine.Models": "1.0.0"

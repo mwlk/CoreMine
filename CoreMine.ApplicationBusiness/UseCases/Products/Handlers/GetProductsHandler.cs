@@ -1,11 +1,13 @@
-﻿using CoreMine.ApplicationBusiness.Interfaces.ReadOnly;
+﻿using CoreMine.ApplicationBusiness.Common.Pagination;
+using CoreMine.ApplicationBusiness.Interfaces.ReadOnly;
+using CoreMine.ApplicationBusiness.Interfaces.Shared;
 using CoreMine.ApplicationBusiness.UseCases.Products.Queries;
 using CoreMine.Models.Common;
 using CoreMine.Models.ViewModels;
 
 namespace CoreMine.ApplicationBusiness.UseCases.Products.Handlers
 {
-    public class GetProductsHandler 
+    public class GetProductsHandler : IQueryHandler<GetProductsQuery, PagedResult<ProductViewModel>>
     {
         private readonly IReadOnlyProductsRepository _repository;
 
@@ -14,45 +16,35 @@ namespace CoreMine.ApplicationBusiness.UseCases.Products.Handlers
             _repository = repository;
         }
 
-        public async Task<PagedResult<ProductViewModel>> Handle(
-        GetProductsQuery request,
-        CancellationToken cancellationToken)
+        public async Task<PagedResult<ProductViewModel>> HandleAsync(GetProductsQuery query, CancellationToken cancellationToken)
         {
-            // Convertir lista de int a CSV para pasar al SQL
-            var ancestorIdsCsv = request.CategoryIds is { Count: > 0 }
-                ? string.Join(',', request.CategoryIds)
-                : "";
-            var ancestorCount = request.CategoryIds?.Count ?? 0;
+            cancellationToken.ThrowIfCancellationRequested();
 
-            // Cálculo de skip/take
-            int pageSize = request.PageSize > 0 ? request.PageSize.Value : 10;
-            int pageNumber = request.PageNumber > 0 ? request.PageNumber.Value : 1;
-            int skip = (pageNumber - 1) * pageSize;
+            int pageSize = query.PageSize > 0 ? query.PageSize.Value : 10;
+            int pageNumber = query.PageNumber > 0 ? query.PageNumber.Value : 1;
 
-            // Llamada al repositorio
-            var (total, rows) = await _repository
-                .GetProductsByHierarchyAsync(
-                    request.Name,
-                    ancestorIdsCsv,
-                    ancestorCount,
-                    skip,
-                    pageSize,
-                    cancellationToken);
+            var baseQuery = _repository.GetQueryable()
+                .OrderBy(p => p.Name)
+                .AsQueryable();
 
-            // Mapeo a ViewModel
-            var items = rows.Select(x => new ProductViewModel
+            if (query.Id.HasValue)
             {
-                Id = x.ProductId,
-                Name = x.ProductName,
-                CategoryName = x.FullCategoryPath,
-                FullCategoryCode = x.FullCategoryCode
-            }).ToList();
+                baseQuery = baseQuery.Where(p => p.Id == query.Id);
+            }
 
-            return new PagedResult<ProductViewModel>
+            if (query.CategoryIds.Length != 0)
             {
-                TotalCount = total,
-                Items = items
-            };
+                baseQuery = baseQuery.Where(p => query.CategoryIds.Contains(p.CategoryId));
+            }
+
+            var mapped = baseQuery.Select(p => new ProductViewModel
+            {
+                Id = p.Id,
+                Name = p.Name,
+                CategoryName = p.Category.Name ?? "-"
+            });
+
+            return await mapped.ToPagedResultAsync(pageNumber, pageSize, cancellationToken);
         }
     }
 }

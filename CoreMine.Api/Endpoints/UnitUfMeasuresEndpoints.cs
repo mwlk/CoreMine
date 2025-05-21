@@ -1,5 +1,4 @@
 ﻿using CoreMine.ApplicationBusiness.Interfaces.Shared;
-using CoreMine.ApplicationBusiness.UseCases.UnitOfMeasures.Handlers;
 using CoreMine.ApplicationBusiness.UseCases.UnitOfMeasures.Queries;
 using CoreMine.Models.Common;
 using CoreMine.Models.ViewModels;
@@ -22,7 +21,9 @@ namespace CoreMine.Api.Endpoints
                 var result = await handler.HandleAsync(query, cancellationToken);
                 return Results.Ok(result);
             })
-                .Produces<PagedResult<UnitOfMeasureViewModel>>(StatusCodes.Status200OK);
+                .Produces<PagedResult<UnitOfMeasureViewModel>>(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status404NotFound)
+                .WithDescription("Listado de unidades de medidas");
         }
     }
 

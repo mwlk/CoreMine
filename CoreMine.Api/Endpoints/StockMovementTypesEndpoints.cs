@@ -21,7 +21,9 @@ namespace CoreMine.Api.Endpoints
                 var result = await handler.HandleAsync(query, cancellationToken);
                 return Results.Ok(result);
             })
-                .Produces<PagedResult<StockMovementTypeViewModel>>(StatusCodes.Status200OK);
+                .Produces<PagedResult<StockMovementTypeViewModel>>(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status404NotFound)
+                .WithDescription("Listado de tipos de movimientos de stock");
         }
     }
 }

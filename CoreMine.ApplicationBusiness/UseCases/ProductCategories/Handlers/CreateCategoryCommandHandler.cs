@@ -18,6 +18,8 @@ namespace CoreMine.ApplicationBusiness.UseCases.Categories.Handlers
 
         public async Task<int> HandleAsync(CreateCategoryCommand command, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var newCategory = new ProductCategory
             {
                 Name = command.Name,

@@ -1,5 +1,4 @@
 ﻿using CoreMine.ApplicationBusiness.Interfaces.Shared;
-using CoreMine.ApplicationBusiness.Mappings;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -9,8 +8,6 @@ namespace CoreMine.ApplicationBusiness
     {
         public static IServiceCollection AddApplicationBusiness(this IServiceCollection services)
         {
-            services.AddAutoMapper(typeof(ProductProfile).Assembly);
-
             Register(services, typeof(ICommandHandler<,>));
             Register(services, typeof(IQueryHandler<,>));
 

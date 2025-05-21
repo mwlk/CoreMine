@@ -8,7 +8,7 @@ namespace CoreMine.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<UnitOfMeasure> builder)
         {
-            builder.ToTable("UnitOfMeasure");
+            builder.ToTable("UnitOfMeasures");
 
             builder.HasKey(p => p.Id);
 

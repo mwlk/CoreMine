@@ -9,8 +9,9 @@
             app.MapProductCategoriesEndpoints();
             app.MapProductsEndpoints();
             app.MapProductStateTypesEndpoints();
-            app.MapUnitOfMeasuresEndpoints();
             app.MapStockMovementTypesEndpoints();
+            app.MapSuppliersEndpoints();
+            app.MapUnitOfMeasuresEndpoints();
         }
     }
 }

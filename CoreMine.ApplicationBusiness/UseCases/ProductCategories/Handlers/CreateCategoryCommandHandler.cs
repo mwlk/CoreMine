@@ -20,18 +20,30 @@ namespace CoreMine.ApplicationBusiness.UseCases.Categories.Handlers
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var newCategory = new ProductCategory
-            {
-                Name = command.Name,
-                Code = command.Code,
-                ParentId = command.ParentId,
-            };
+            command.Validate();
 
             await unitOfWork.BeginTransactionAsync(cancellationToken);
-            await repository.AddAsync(newCategory, cancellationToken);
-            await unitOfWork.CommitTransactionAsync(cancellationToken);
 
-            return newCategory.Id;
+            try
+            {
+                var newCategory = new ProductCategory
+                {
+                    Name = command.Name,
+                    Code = command.Code,
+                    ParentId = command.ParentId,
+                };
+
+                await repository.AddAsync(newCategory, cancellationToken);
+                await unitOfWork.SaveChangesAsync(cancellationToken);
+                await unitOfWork.CommitTransactionAsync(cancellationToken);
+
+                return newCategory.Id;
+            }
+            catch (Exception)
+            {
+                await unitOfWork.RollbackTransactionAsync();
+                throw;
+            }
         }
     }
 }

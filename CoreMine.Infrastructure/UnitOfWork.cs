@@ -27,7 +27,6 @@ namespace CoreMine.Infraestructure
 
             try
             {
-                await _context.SaveChangesAsync(cancellationToken);
                 await _currentTransaction.CommitAsync(cancellationToken);
             }
             catch

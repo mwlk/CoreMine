@@ -3,7 +3,7 @@ using CoreMine.Entities;
 
 namespace CoreMine.ApplicationBusiness.Interfaces
 {
-    public interface IMachinesRepository : IRepository<Machine>
+    public interface ISuppliersRepository : IRepository<Supplier>
     {
     }
 }

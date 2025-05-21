@@ -22,6 +22,7 @@ namespace CoreMine.Data.Configurations
                 .HasMaxLength(200);
 
             builder.Property(p => p.UnitPrice)
+                .HasColumnType("decimal(18,4)")
                 .HasPrecision(18, 4);
 
             builder.Property(p => p.CreatedAt)

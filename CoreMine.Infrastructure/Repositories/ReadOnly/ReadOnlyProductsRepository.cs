@@ -17,11 +17,6 @@ namespace CoreMine.Infraestructure.Repositories.ReadOnly
             _context = context;
         }
 
-        public Task<(int TotalCount, List<ProductWithCategoryReadModel> Rows)> GetProductsByHierarchyAsync(string? name, string ancestorIdsCsv, int ancestorCount, int skip, int take, CancellationToken cancellationToken)
-        {
-            throw new NotImplementedException();
-        }
-
         public IQueryable<Product> GetQueryable()
         {
             return _context.Products

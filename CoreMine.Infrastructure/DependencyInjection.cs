@@ -36,6 +36,7 @@ namespace CoreMine.Infrastructure
 
             services.AddScoped<IDateTimeProvider, DateTimeProvider>();
 
+            services.AddTransient<IRepairsRepository, RepairsRepository>();
             services.AddTransient<IReadOnlyRepairsRepository, ReadOnlyRepairsRepository>();
 
             return services;

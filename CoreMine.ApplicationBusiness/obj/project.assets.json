@@ -2798,23 +2798,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\mirko\\.nuget\\packages\\": {},
+    "C:\\Users\\mirko.wlk\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\repo\\CoreMine\\CoreMine.ApplicationBusiness\\CoreMine.ApplicationBusiness.csproj",
+      "projectUniqueName": "C:\\Users\\mirko.wlk\\Documents\\Pruebas\\CoreMine\\CoreMine.ApplicationBusiness\\CoreMine.ApplicationBusiness.csproj",
       "projectName": "CoreMine.ApplicationBusiness",
-      "projectPath": "D:\\repo\\CoreMine\\CoreMine.ApplicationBusiness\\CoreMine.ApplicationBusiness.csproj",
-      "packagesPath": "C:\\Users\\mirko\\.nuget\\packages\\",
-      "outputPath": "D:\\repo\\CoreMine\\CoreMine.ApplicationBusiness\\obj\\",
+      "projectPath": "C:\\Users\\mirko.wlk\\Documents\\Pruebas\\CoreMine\\CoreMine.ApplicationBusiness\\CoreMine.ApplicationBusiness.csproj",
+      "packagesPath": "C:\\Users\\mirko.wlk\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\mirko.wlk\\Documents\\Pruebas\\CoreMine\\CoreMine.ApplicationBusiness\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\mirko\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\mirko.wlk\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -2823,21 +2823,20 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
           "projectReferences": {
-            "D:\\repo\\CoreMine\\CoreMine.Data\\CoreMine.Data.csproj": {
-              "projectPath": "D:\\repo\\CoreMine\\CoreMine.Data\\CoreMine.Data.csproj"
+            "C:\\Users\\mirko.wlk\\Documents\\Pruebas\\CoreMine\\CoreMine.Data\\CoreMine.Data.csproj": {
+              "projectPath": "C:\\Users\\mirko.wlk\\Documents\\Pruebas\\CoreMine\\CoreMine.Data\\CoreMine.Data.csproj"
             },
-            "D:\\repo\\CoreMine\\CoreMine.Entities\\CoreMine.Entities.csproj": {
-              "projectPath": "D:\\repo\\CoreMine\\CoreMine.Entities\\CoreMine.Entities.csproj"
+            "C:\\Users\\mirko.wlk\\Documents\\Pruebas\\CoreMine\\CoreMine.Entities\\CoreMine.Entities.csproj": {
+              "projectPath": "C:\\Users\\mirko.wlk\\Documents\\Pruebas\\CoreMine\\CoreMine.Entities\\CoreMine.Entities.csproj"
             },
-            "D:\\repo\\CoreMine\\CoreMine.Models\\CoreMine.Models.csproj": {
-              "projectPath": "D:\\repo\\CoreMine\\CoreMine.Models\\CoreMine.Models.csproj"
+            "C:\\Users\\mirko.wlk\\Documents\\Pruebas\\CoreMine\\CoreMine.Models\\CoreMine.Models.csproj": {
+              "projectPath": "C:\\Users\\mirko.wlk\\Documents\\Pruebas\\CoreMine\\CoreMine.Models\\CoreMine.Models.csproj"
             }
           }
         }

@@ -7,7 +7,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
 builder.Services.AddSingleton<CoreMine.Client.Services.ThemeService>();
 
-builder.Services.AddRadzenComponents().AddRadzenComponents();
+builder.Services.AddRadzenComponents();
 
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");

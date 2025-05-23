@@ -25,17 +25,26 @@ namespace CoreMine.Data
         public DbSet<Machine> Machines { get; set; }
         public DbSet<Repair> Repairs { get; set; }
         public DbSet<RepairProduct> RepairProducts { get; set; }
-        //sql view
+
+        #region sql views
         public DbSet<RepairWithProductsReadModel> RepairsWithProducts => Set<RepairWithProductsReadModel>();
+
+        public DbSet<ProductsWithFullCategoryInfoReadModel> ProductsWithFullCategoryInfo => Set<ProductsWithFullCategoryInfoReadModel>();
+        #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
-            // sql view for repairs
+            #region view's configuration
             modelBuilder.Entity<RepairWithProductsReadModel>()
                .HasNoKey()
                .ToView("vw_RepairsWithProducts");
+
+            modelBuilder.Entity<ProductsWithFullCategoryInfoReadModel>()
+                .HasNoKey()
+                .ToView("vw_ProductsWithFullCategoryInfo");
+            #endregion
         }
     }
 }

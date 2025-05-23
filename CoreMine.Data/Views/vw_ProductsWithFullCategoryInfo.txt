@@ -1,0 +1,60 @@
+﻿##dbo.vw_ProductsWithFullCategoryInfo
+
+CREATE VIEW vw_ProductsWithFullCategoryInfo AS
+WITH CategoryCTE AS (
+    SELECT
+        pc.Id,
+        pc.Code,
+        pc.ParentId,
+        CAST(pc.Code AS VARCHAR(MAX)) AS FullCategoryCode,
+        pc.Name
+    FROM ProductCategories pc
+    WHERE pc.ParentId IS NULL
+
+    UNION ALL
+
+    SELECT
+        pc.Id,
+        pc.Code,
+        pc.ParentId,
+        CAST(cte.FullCategoryCode + '/' + pc.Code AS VARCHAR(MAX)) AS FullCategoryCode,
+        pc.Name
+    FROM ProductCategories pc
+    INNER JOIN CategoryCTE cte ON pc.ParentId = cte.Id
+),
+LastStatePerProduct AS (
+    SELECT
+        ps.ProductId,
+        pst.Name AS LastStateTypeName
+    FROM ProductStates ps
+    INNER JOIN ProductStateTypes pst ON ps.ProductStateTypeId = pst.Id
+    WHERE ps.Id IN (
+        SELECT MAX(Id)
+        FROM ProductStates
+        GROUP BY ProductId
+    )
+)
+SELECT
+    p.Id,
+    p.Name,
+    p.Description,
+    cat.Name AS CategoryName,
+    cte.FullCategoryCode,
+    s.Surname + ' ' + s.Name AS SupplierName,
+    p.UnitPrice,
+    uom.Name AS UnitOfMeasureName,
+    ls.LastStateTypeName,
+    l.Id AS LocationId,
+    l.Name AS LocationName,
+    sl.MaxQuantity,
+    sl.MinQuantity,
+    st.Quantity
+FROM Products p
+INNER JOIN ProductCategories cat ON p.CategoryId = cat.Id
+INNER JOIN CategoryCTE cte ON p.CategoryId = cte.Id
+LEFT JOIN Suppliers s ON p.SupplierId = s.Id
+LEFT JOIN UnitOfMeasures uom ON p.UnitOfMeasureId = uom.Id
+LEFT JOIN LastStatePerProduct ls ON p.Id = ls.ProductId
+LEFT JOIN StockLevels sl ON p.Id = sl.ProductId
+LEFT JOIN Stocks st ON p.Id = st.ProductId
+LEFT JOIN Locations l ON st.LocationId = l.Id;

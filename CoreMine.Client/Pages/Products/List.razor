@@ -1,108 +1,187 @@
 ﻿@page "/products"
+@using CoreMine.Client.Models.ReadModels
 @using CoreMine.Models.Common
-@using CoreMine.Models.ViewModels
-@inject HttpClient HttpClient
+@inject HttpClient Http
 
-<h3>Productos</h3>
+<h3>Listado de Productos</h3>
 
-<div class="mb-3">
-    <input class="form-control"
-           @bind="searchString"
-           @bind:event="oninput"
-           placeholder="Buscar..."
-           @onkeydown="HandleKeyDown" />
-</div>
+<p>Items cargados: @items.Count() | Total: @totalCount</p>
 
-<table class="table table-striped table-hover table-bordered">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Código</th>
-            <th>Nombre</th>
-            <th>Categoría</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (items is not null && items.Count > 0)
-        {
-            @foreach (var item in items)
-            {
-                <tr>
-                    <td>@item.Id</td>
-                    <td>@item.FullCategoryCode</td>
-                    <td>@item.Name</td>
-                    <td>@item.CategoryName</td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="4" class="text-center">No hay productos disponibles.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<RadzenDataGrid TItem="ProductReadModel"
+                Data="@items"
+                Count="@totalCount"
+                LoadData="@LoadData"
+                AllowPaging="true"
+                PageSize="@pageSize"
+                AllowSorting="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                PagingSummaryFormat="Mostrando página {0} de {1} (total {2} registros)"
+                Style="width: 100%">
+    <Columns>
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="Id" Title="ID" Width="80px">
+            <Template Context="data">@data.Id</Template>
+        </RadzenDataGridColumn>
 
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="Name" Title="Nombre">
+            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.Name) ? data.Name : "-")</Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="Description" Title="Descripción">
+            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.Description) ? data.Description : "-")</Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="CategoryName" Title="Categoría">
+            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.CategoryName) ? data.CategoryName : "-")</Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="FullCategoryCode" Title="Código Categoría">
+            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.FullCategoryCode) ? data.FullCategoryCode : "-")</Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="SupplierName" Title="Proveedor">
+            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.SupplierName) ? data.SupplierName : "-")</Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="UnitPrice" Title="Precio Unitario">
+            <Template Context="data">@data.UnitPrice.ToString("C")</Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="UnitOfMeasureName" Title="Unidad de Medida">
+            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.UnitOfMeasureName) ? data.UnitOfMeasureName : "-")</Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="LastStateTypeName" Title="Último Estado">
+            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.LastStateTypeName) ? data.LastStateTypeName : "-")</Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="LocationId" Title="Código Ubicación">
+            <Template Context="data">@(data.LocationId.HasValue? data.LocationId: "-")</Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="LocationName" Title="Ubicación">
+            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.LocationName) ? data.LocationName : "-")</Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="MaxQuantity" Title="Cantidad Máxima">
+            <Template Context="data">@(data.MaxQuantity.HasValue? data.MaxQuantity: "-")</Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="MinQuantity" Title="Cantidad Mínima">
+            <Template Context="data">@(data.MinQuantity.HasValue? data.MinQuantity: "-")</Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="ProductReadModel" Property="Quantity" Title="Stock Actual">
+            <Template Context="data">@(data.Quantity.HasValue? data.Quantity: "-")</Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+<!-- Controles de paginación personalizados -->
 <div class="d-flex justify-content-between align-items-center mt-3">
-    <button class="btn btn-secondary" @onclick="PreviousPage" disabled="@(!CanGoPrevious)">Anterior</button>
-    <span>Página @currentPage de @totalPages</span>
-    <button class="btn btn-secondary" @onclick="NextPage" disabled="@(!CanGoNext)">Siguiente</button>
+    <div>
+        <span>Mostrando @((currentPageIndex * pageSize) + 1) a @Math.Min((currentPageIndex + 1) * pageSize, totalCount) de @totalCount registros</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <div>
+            <label class="me-2">Registros por página:</label>
+            <RadzenDropDown TValue="int"
+                            Data="@pageSizeOptions"
+                            Value="@pageSize"
+                            Change="@OnPageSizeChanged"
+                            Style="width: 80px" />
+        </div>
+        <div>
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="first_page"
+                          Click="@(() => GoToPage(0))"
+                          Disabled="@(currentPageIndex == 0)" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="chevron_left"
+                          Click="@(() => GoToPage(currentPageIndex - 1))"
+                          Disabled="@(currentPageIndex == 0)" />
+            <span class="mx-2">Página @currentPage de @totalPages</span>
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="chevron_right"
+                          Click="@(() => GoToPage(currentPageIndex + 1))"
+                          Disabled="@(currentPageIndex >= totalPages - 1)" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="last_page"
+                          Click="@(() => GoToPage(totalPages - 1))"
+                          Disabled="@(currentPageIndex >= totalPages - 1)" />
+        </div>
+    </div>
 </div>
 
 @code {
-    private int currentPage = 1;
-    private int rowsPerPage = 2;
-    private int totalPages = 1;
-    private string searchString = string.Empty;
-    private List<ProductViewModel> items = new();
+    private IEnumerable<ProductReadModel> items = new List<ProductReadModel>();
+    private int totalCount = 0;
+    private int pageSize = 10;
+    private int currentPageIndex = 0;
+
+    private readonly List<int> pageSizeOptions = new() { 5, 10, 25, 50, 100 };
+
+    private int currentPage => currentPageIndex + 1;
+    private int totalPages => pageSize == 0 ? 1 : (int)Math.Ceiling((double)totalCount / pageSize);
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+        await LoadData(new LoadDataArgs { Skip = 0, Top = pageSize });
     }
 
-    private async Task LoadData()
+    private async Task LoadData(LoadDataArgs args)
     {
-        var url = $"api/products?pageNumber={currentPage}&pageSize={rowsPerPage}";
-
-        if (!string.IsNullOrWhiteSpace(searchString))
-            url += $"&Name={Uri.EscapeDataString(searchString)}";
-
-        var response = await HttpClient.GetFromJsonAsync<PagedResult<ProductViewModel>>(url);
-
-        items = response?.Items?.ToList() ?? new List<ProductViewModel>();
-        var totalItems = response?.TotalCount ?? 0;
-        totalPages = (int)Math.Ceiling(totalItems / (double)rowsPerPage);
-    }
-
-    private async Task HandleKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
+        try
         {
-            currentPage = 1;
-            await LoadData();
+            int top = args.Top ?? pageSize;
+            int skip = args.Skip ?? 0;
+
+            currentPageIndex = skip / top;
+
+            var url = $"api/products?pageNumber={currentPage}&pageSize={top}";
+            var response = await Http.GetFromJsonAsync<PagedResult<ProductReadModel>>(url);
+
+            if (response != null)
+            {
+                items = response.Items ?? new List<ProductReadModel>();
+                totalCount = response.TotalCount;
+            }
+            else
+            {
+                items = new List<ProductReadModel>();
+                totalCount = 0;
+            }
+
+            // Forzar actualización de la UI
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"LoadData Error: {ex.Message}");
+            items = new List<ProductReadModel>();
+            totalCount = 0;
+            StateHasChanged();
         }
     }
 
-    private async Task PreviousPage()
+    private async Task OnPageSizeChanged(object value)
     {
-        if (currentPage > 1)
+        if (value != null && int.TryParse(value.ToString(), out int newPageSize))
         {
-            currentPage--;
-            await LoadData();
+            pageSize = newPageSize;
+            currentPageIndex = 0; // Resetear a la primera página
+
+            // Cargar datos con el nuevo tamaño de página
+            await LoadData(new LoadDataArgs { Top = pageSize, Skip = 0 });
         }
     }
 
-    private async Task NextPage()
+    private async Task GoToPage(int pageIndex)
     {
-        if (currentPage < totalPages)
+        if (pageIndex >= 0 && pageIndex < totalPages)
         {
-            currentPage++;
-            await LoadData();
+            currentPageIndex = pageIndex;
+            await LoadData(new LoadDataArgs { Skip = currentPageIndex * pageSize, Top = pageSize });
         }
     }
-
-    private bool CanGoPrevious => currentPage > 1;
-    private bool CanGoNext => currentPage < totalPages;
 }

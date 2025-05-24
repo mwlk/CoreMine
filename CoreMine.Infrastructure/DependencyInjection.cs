@@ -28,7 +28,6 @@ namespace CoreMine.Infrastructure
 
             services.AddTransient<IReadOnlyProductStateTypesRepository, ReadOnlyProductStateTypesRepository>();
             services.AddTransient<IReadOnlyUnitOfMeasuresRepository, ReadOnlyUnitOfMeasuresRepository>();
-            services.AddTransient<IReadOnlyStockMovementTypesRepository, ReadOnlyStockMovementTypesRepository>();
             services.AddTransient<IReadOnlyMachinesRepository, ReadOnlyMachinesRepository>();
             services.AddTransient<IReadOnlyLocationsRepository, ReadOnlyLocationsRepository>();
 
@@ -38,6 +37,12 @@ namespace CoreMine.Infrastructure
 
             services.AddTransient<IRepairsRepository, RepairsRepository>();
             services.AddTransient<IReadOnlyRepairsRepository, ReadOnlyRepairsRepository>();
+
+            services.AddTransient<IStockRepository, StockRepository>();
+            services.AddTransient<IReadOnlyStockRepository, ReadOnlyStockRepository>();
+
+            services.AddTransient<IReadOnlyStockMovementTypesRepository, ReadOnlyStockMovementTypesRepository>();
+            services.AddTransient<IStockMovementsRepository, StockMovementsRepository>();
 
             return services;
         }

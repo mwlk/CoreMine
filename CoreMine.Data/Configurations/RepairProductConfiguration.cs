@@ -16,6 +16,10 @@ namespace CoreMine.Data.Configurations
                 .IsRequired()
                 .HasColumnType("decimal(18,2)");
 
+            builder.Property(p => p.UnitPrice)
+                .HasColumnType("decimal(18,4)")
+                .HasPrecision(18, 4);
+
             builder.HasOne(rp => rp.Repair)
                 .WithMany(r => r.RepairProducts)
                 .HasForeignKey(rp => rp.RepairId);

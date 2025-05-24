@@ -119,6 +119,10 @@ namespace CoreMine.ApplicationBusiness.UseCases.Repairs.Handlers
                     await _stockMovementsRepository.AddAsync(movement, cancellationToken);
                 }
 
+                var productPrices = await _readOnlyProductsRepository.GetQueryable()
+                    .Where(p => productIds.Contains(p.Id))
+                    .ToDictionaryAsync(p => p.Id, p => p.UnitPrice, cancellationToken);
+
                 var entityToAdd = new Repair
                 {
                     MachineId = command.MachineId,
@@ -128,6 +132,7 @@ namespace CoreMine.ApplicationBusiness.UseCases.Repairs.Handlers
                     {
                         ProductId = p.ProductId,
                         QuantityUsed = p.QuantityUsed,
+                        UnitPrice = productPrices[p.ProductId]
                     }).ToList(),
                     StartDate = command.StartDate.HasValue ? command.StartDate.Value : _dateTimeProvider.UtcNow,
                 };

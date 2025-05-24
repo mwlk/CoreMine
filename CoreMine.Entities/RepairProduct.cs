@@ -9,5 +9,7 @@
         public Product Product { get; set; } = null!;
 
         public decimal QuantityUsed { get; set; }
+        public decimal UnitPrice { get; set; }
+
     }
 }

@@ -17,7 +17,7 @@ SELECT
     rp.QuantityUsed,
 
     p.Name AS ProductName,
-    p.UnitPrice,
+    rp.UnitPrice,
     p.CategoryId,
     p.UnitOfMeasureId,
 

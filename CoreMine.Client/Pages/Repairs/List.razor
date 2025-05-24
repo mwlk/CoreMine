@@ -1,0 +1,257 @@
+﻿@page "/repairs"
+@inject HttpClient HttpClient
+@using CoreMine.Models.Common
+@using CoreMine.Models.ViewModels
+@using System.Text.Json
+
+<h3>Listado de Reparaciones</h3>
+
+<p>Reparaciones listadas: @items.Count() | Total: @totalCount</p>
+
+<RadzenDataGrid TItem="JsonElement"
+                Data="@items"
+                Count="@totalCount"
+                LoadData="@LoadData"
+                AllowPaging="true"
+                PageSize="@pageSize"
+                AllowSorting="true"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                PagingSummaryFormat="Mostrando página {0} de {1} (total {2} registros)"
+                Style="width: 100%">
+    <Columns>
+        <RadzenDataGridColumn TItem="JsonElement" Title="ID" Width="80px">
+            <Template Context="repair">
+                @repair.GetProperty("id").GetInt32()
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="JsonElement" Title="Máquina" Width="150px">
+            <Template Context="repair">
+                @repair.GetProperty("machine").GetProperty("code").GetString()
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="JsonElement" Title="Fecha Inicio" Width="120px">
+            <Template Context="repair">
+                @repair.GetProperty("startDate").GetDateTime().ToString("dd/MM/yyyy")
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="JsonElement" Title="Fecha Fin" Width="120px">
+            <Template Context="repair">
+                @{
+                    var endDateProp = repair.GetProperty("endDate");
+                    var endDate = endDateProp.ValueKind == JsonValueKind.Null
+                    ? "En proceso"
+                    : endDateProp.GetDateTime().ToString("dd/MM/yyyy");
+                }
+                @endDate
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="JsonElement" Title="Descripción" Width="200px">
+            <Template Context="repair">
+                @{
+                    var description = repair.GetProperty("description").GetString() ?? "";
+                    var displayDesc = string.IsNullOrEmpty(description) ? "Sin descripción" : description;
+                }
+                <div title="@displayDesc" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    @displayDesc
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="JsonElement" Title="Observaciones" Width="200px">
+            <Template Context="repair">
+                @{
+                    var obsProperty = repair.GetProperty("observations");
+                    var observations = obsProperty.ValueKind == JsonValueKind.Null
+                    ? "Sin observaciones"
+                    : obsProperty.GetString();
+                }
+                <div title="@observations" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    @observations
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="JsonElement" Title="Productos Utilizados" Width="400px" Sortable="false">
+            <Template Context="repair">
+                @{
+                    var productsArray = repair.GetProperty("products");
+                }
+                @if (productsArray.GetArrayLength() > 0)
+                {
+                    <div style="background: #f8f9fa; padding: 8px; border-radius: 4px;">
+                        <table style="width: 100%; font-size: 0.85rem; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #e9ecef;">
+                                    <th style="padding: 4px 6px; text-align: left; border: 1px solid #dee2e6;">Producto</th>
+                                    <th style="padding: 4px 6px; text-align: center; border: 1px solid #dee2e6;">Cant.</th>
+                                    <th style="padding: 4px 6px; text-align: left; border: 1px solid #dee2e6;">Categoría</th>
+                                    <th style="padding: 4px 6px; text-align: center; border: 1px solid #dee2e6;">U.M.</th>
+                                    <th style="padding: 4px 6px; text-align: right; border: 1px solid #dee2e6;">Precio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in productsArray.EnumerateArray())
+                                {
+                                    <tr>
+                                        <td style="padding: 4px 6px; border: 1px solid #dee2e6;">
+                                            <strong>@product.GetProperty("name").GetString()</strong>
+                                            <br /><small class="text-muted">ID: @product.GetProperty("id").GetInt32()</small>
+                                        </td>
+                                        <td style="padding: 4px 6px; text-align: center; border: 1px solid #dee2e6;">
+                                            <span class="badge bg-primary">@product.GetProperty("quantityUsed").GetDecimal()</span>
+                                        </td>
+                                        <td style="padding: 4px 6px; border: 1px solid #dee2e6;">
+                                            @product.GetProperty("category").GetProperty("name").GetString()
+                                        </td>
+                                        <td style="padding: 4px 6px; text-align: center; border: 1px solid #dee2e6;">
+                                            @product.GetProperty("unitOfMeasure").GetProperty("symbol").GetString()
+                                        </td>
+                                        <td style="padding: 4px 6px; text-align: right; border: 1px solid #dee2e6;">
+                                            $@product.GetProperty("unitPrice").GetDecimal().ToString("N2")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div style="margin-top: 6px; font-size: 0.8rem;">
+                            <strong>Total productos: @productsArray.GetArrayLength()</strong>
+                            @{
+                                var total = 0m;
+                                foreach (var product in productsArray.EnumerateArray())
+                                {
+                                    total += product.GetProperty("quantityUsed").GetDecimal() * product.GetProperty("unitPrice").GetDecimal();
+                                }
+                            }
+                            | <strong>Valor total: $@total.ToString("N2")</strong>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div style="text-align: center; color: #6c757d; font-style: italic; padding: 20px;">
+                        <i class="fas fa-box-open" style="font-size: 24px; margin-bottom: 8px;"></i><br />
+                        Sin productos utilizados
+                    </div>
+                }
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+
+</RadzenDataGrid>
+
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <div>
+        <span>Mostrando @((currentPageIndex * pageSize) + 1) a @Math.Min((currentPageIndex + 1) * pageSize, totalCount) de @totalCount registros</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <div>
+            <label class="me-2">Registros por página:</label>
+            <RadzenDropDown TValue="int"
+                            Data="@pageSizeOptions"
+                            Value="@pageSize"
+                            Change="@OnPageSizeChanged"
+                            Style="width: 80px" />
+        </div>
+        <div>
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="first_page"
+                          Click="@(() => GoToPage(0))"
+                          Disabled="@(currentPageIndex == 0)" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="chevron_left"
+                          Click="@(() => GoToPage(currentPageIndex - 1))"
+                          Disabled="@(currentPageIndex == 0)" />
+            <span class="mx-2">Página @currentPage de @totalPages</span>
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="chevron_right"
+                          Click="@(() => GoToPage(currentPageIndex + 1))"
+                          Disabled="@(currentPageIndex >= totalPages - 1)" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="last_page"
+                          Click="@(() => GoToPage(totalPages - 1))"
+                          Disabled="@(currentPageIndex >= totalPages - 1)" />
+        </div>
+    </div>
+</div>
+
+
+@code {
+    private IEnumerable<JsonElement> items = new List<JsonElement>();
+    private int totalCount = 0;
+    private int pageSize = 10;
+    private int currentPageIndex = 0;
+
+    private readonly List<int> pageSizeOptions = new() { 5, 10, 25, 50, 100 };
+
+    private int currentPage => currentPageIndex + 1;
+    private int totalPages => pageSize == 0 ? 1 : (int)Math.Ceiling((double)totalCount / pageSize);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData(new LoadDataArgs { Skip = 0, Top = pageSize });
+    }
+
+    private async Task LoadData(LoadDataArgs args)
+    {
+        try
+        {
+            int top = args.Top ?? pageSize;
+            int skip = args.Skip ?? 0;
+
+            currentPageIndex = skip / top;
+
+            var url = $"api/repairs?pageNumber={currentPage}&pageSize={top}";
+            var jsonResponse = await HttpClient.GetStringAsync(url);
+            var jsonDoc = JsonDocument.Parse(jsonResponse);
+            var root = jsonDoc.RootElement;
+
+            if (root.TryGetProperty("items", out var itemsProperty))
+            {
+                items = itemsProperty.EnumerateArray().ToList();
+                totalCount = root.TryGetProperty("totalCount", out var countProperty)
+                    ? countProperty.GetInt32()
+                    : 0;
+            }
+            else
+            {
+                items = new List<JsonElement>();
+                totalCount = 0;
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"LoadData Error: {ex.Message}");
+            items = new List<JsonElement>();
+            totalCount = 0;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnPageSizeChanged(object value)
+    {
+        if (value != null && int.TryParse(value.ToString(), out int newPageSize))
+        {
+            pageSize = newPageSize;
+            currentPageIndex = 0; // Resetear a la primera página
+
+            // Cargar datos con el nuevo tamaño de página
+            await LoadData(new LoadDataArgs { Top = pageSize, Skip = 0 });
+        }
+    }
+
+    private async Task GoToPage(int pageIndex)
+    {
+        if (pageIndex >= 0 && pageIndex < totalPages)
+        {
+            currentPageIndex = pageIndex;
+            await LoadData(new LoadDataArgs { Skip = currentPageIndex * pageSize, Top = pageSize });
+        }
+    }
+}

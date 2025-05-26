@@ -43,12 +43,6 @@
 
     private bool IsLoginPage => Nav.Uri.Contains("/login");
 
-    protected override void OnInitialized()
-    {
-        darkMode = ThemeService.IsDarkMode;
-        ThemeService.OnThemeChanged += ChangeTheme;
-    }
-
     async void ToggleDarkMode()
     {
         await ThemeService.ToggleTheme();
@@ -69,4 +63,12 @@
     {
         ThemeService.OnThemeChanged -= ChangeTheme;
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ThemeService.InitializeAsync();
+        darkMode = ThemeService.IsDarkMode;
+        ThemeService.OnThemeChanged += ChangeTheme;
+    }
+
 }

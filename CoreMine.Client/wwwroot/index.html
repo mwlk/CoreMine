@@ -9,8 +9,9 @@
     <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
     <link rel="icon" type="image/png" href="favicon.png" />
-    <link href="CoreMine.Client.styles.css" rel="stylesheet" />
-    <link href="_content/Radzen.Blazor/css/default.css" rel="stylesheet" />
+    <!--<link href="CoreMine.Client.styles.css" rel="stylesheet" />-->
+
+    <link id="radzen-theme" href="_content/Radzen.Blazor/css/dark-base.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -33,3 +34,22 @@
 </body>
 
 </html>
+
+<script>
+    // Función que cambia el tema (dark-base <-> material)
+    window.setRadzenTheme = function (theme) {
+        const link = document.getElementById("radzen-theme");
+        if (link) {
+            link.href = `_content/Radzen.Blazor/css/${theme}.css`;
+        }
+    };
+
+    // Estado actual (inicial dark)
+    let currentTheme = "dark-base";
+
+    // Función para alternar
+    function toggleTheme() {
+        currentTheme = (currentTheme === "dark-base") ? "material" : "dark-base";
+        window.setRadzenTheme(currentTheme);
+    }
+</script>

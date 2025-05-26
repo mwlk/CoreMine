@@ -4,39 +4,37 @@ namespace CoreMine.Client.Services
 {
     public class ThemeService
     {
-        private const string ThemeKey = "isDarkMode";
-        private readonly IJSRuntime _runtime;
+        private const string ThemeKey = "theme";
+        private readonly IJSRuntime _jsRuntime;
 
-        public ThemeService(IJSRuntime runtime)
-        {
-            _runtime = runtime;
-        }
-
-        public bool IsDarkMode { get; private set; } = false;
-
+        public bool IsDarkMode { get; private set; }
         public event Action? OnThemeChanged;
 
-        public async Task ToggleTheme()
+        public ThemeService(IJSRuntime jsRuntime)
         {
-            IsDarkMode = !IsDarkMode;
-            await _runtime.InvokeVoidAsync("localStorage.setItem", ThemeKey, IsDarkMode.ToString().ToLower());
-            OnThemeChanged?.Invoke();
+            _jsRuntime = jsRuntime;
         }
 
         public async Task InitializeAsync()
         {
-            var result = await _runtime.InvokeAsync<string>("localStorage.getItem", ThemeKey);
+            var theme = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", ThemeKey) ?? "material";
+            IsDarkMode = theme.Contains("dark", StringComparison.OrdinalIgnoreCase);
+            await SetTheme(theme);
+        }
 
-            if (bool.TryParse(result, out var darkMode))
-            {
-                IsDarkMode = darkMode;
-            }
-            else
-            {
-                IsDarkMode = false;
-            }
+        public async Task ToggleTheme()
+        {
+            var newTheme = IsDarkMode ? "material" : "dark-base";
+            await SetTheme(newTheme);
+        }
 
+        private async Task SetTheme(string theme)
+        {
+            IsDarkMode = theme.Contains("dark", StringComparison.OrdinalIgnoreCase);
+            await _jsRuntime.InvokeVoidAsync("setRadzenTheme", theme);
+            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", ThemeKey, theme);
             OnThemeChanged?.Invoke();
         }
     }
 }
+

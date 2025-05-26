@@ -1,0 +1,75 @@
+﻿@page "/login"
+
+@using CoreMine.Client.Authtentication
+@using System.ComponentModel.DataAnnotations
+@inject AuthService AuthService
+@inject NavigationManager Nav
+@inject NotificationService NotificationService
+
+
+@if (!string.IsNullOrEmpty(Error))
+{
+    <div class="alert alert-danger">@Error</div>
+}
+
+<RadzenTemplateForm TItem="LoginRequest" Data="@LoginModel" Submit="@HandleLogin">
+
+  
+
+    <RadzenCard Style="max-width: 400px; margin: auto; margin-top: 100px;">
+
+
+        <ChildContent>
+            <RadzenStack>
+                <h3>Iniciar Sesión</h3>
+            </RadzenStack>
+
+            <RadzenLabel Text="Email" Component="Email" />
+            <RadzenTextBox @bind-Value="LoginModel.Username" Name="Username" Style="width: 100%;" />
+            <RadzenRequiredValidator Component="Email" Text="Email es requerido" />
+
+            <RadzenLabel Text="Contraseña" Component="Password" Style="margin-top: 20px;" />
+            <RadzenPassword @bind-Value="LoginModel.Password" Name="Password" Style="width: 100%;" />
+            <RadzenRequiredValidator Component="Password" Text="Contraseña es requerida" />
+
+            <RadzenButton Text="Ingresar" ButtonStyle="ButtonStyle.Primary" Style="margin-top: 20px; width: 100%; background-color: #73A341" />
+        </ChildContent>
+    </RadzenCard>
+</RadzenTemplateForm>
+
+
+@code {
+    private string? Error;
+    private LoginRequest LoginModel = new();
+
+    private async Task HandleLogin(LoginRequest request)
+    {
+        var result = await AuthService.Login(request.Username, request.Password);
+
+        if (result)
+        {
+            Nav.NavigateTo("/");
+        }
+        else
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "No se pudo loguear",
+                Duration = 5000
+            });
+        }
+    }
+
+    private sealed class LoginRequest
+    {
+        [Required]
+        public string Username { get; set; } = string.Empty;
+
+        [Required]
+        public string Password { get; set; } = string.Empty;
+    }
+}
+
+

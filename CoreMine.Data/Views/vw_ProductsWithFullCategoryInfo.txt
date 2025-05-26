@@ -1,6 +1,6 @@
 ﻿##dbo.vw_ProductsWithFullCategoryInfo
 
-CREATE VIEW vw_ProductsWithFullCategoryInfo AS
+ALTER VIEW vw_ProductsWithFullCategoryInfo AS
 WITH CategoryCTE AS (
     SELECT
         pc.Id,

@@ -1,25 +1,32 @@
 ﻿@inherits LayoutComponentBase
 @using CoreMine.Client.Services
 @inject CoreMine.Client.Services.ThemeService ThemeService
+@inject NavigationManager Nav
 
 <RadzenLayout Style="min-height:100vh; display:flex; flex-direction:column;">
 
-    <!-- HEADER -->
-    <RadzenHeader Style="background-color:#73A341; color:white; display:flex; align-items:center; padding:0.5rem;">
-        <RadzenButton Icon="menu" ButtonStyle="ButtonStyle.Light" Style="margin-right:1rem;" Click="ToggleDrawer" />
-        <h2 style="margin:0; flex-grow:1;">CoreMine</h2>
-        <RadzenButton Icon="@(darkMode ? "light_mode" : "dark_mode")"
-                      ButtonStyle="ButtonStyle.Light"
-                      Click="ToggleDarkMode" />
-    </RadzenHeader>
+    @if (!IsLoginPage)
+    {
+        <!-- HEADER -->
+        <RadzenHeader Style="background-color:#73A341; color:white; display:flex; align-items:center; padding:0.5rem;">
+            <RadzenButton Icon="menu" ButtonStyle="ButtonStyle.Light" Style="margin-right:1rem;" Click="ToggleDrawer" />
+            <h2 style="margin:0; flex-grow:1;">CoreMine</h2>
+            <RadzenButton Icon="@(darkMode ? "light_mode" : "dark_mode")"
+                          ButtonStyle="ButtonStyle.Light"
+                          Click="ToggleDarkMode" />
+        </RadzenHeader>
+    }
 
     <div style="flex:1; display:flex; overflow:hidden;">
 
-        <!-- SIDEBAR -->
-        <RadzenSidebar Expanded="@drawerOpen"
-                       Style="@($"display:flex; flex-direction:column; height:100vh; width:240px; background-color:{(darkMode ? "#333" : "#f5f5f5")};")">
-            <NavMenu />
-        </RadzenSidebar>
+        @if (!IsLoginPage)
+        {
+            <!-- SIDEBAR -->
+            <RadzenSidebar Expanded="@drawerOpen"
+                           Style="@($"display:flex; flex-direction:column; height:100vh; width:240px; background-color:{(darkMode ? "#333" : "#f5f5f5")};")">
+                <NavMenu />
+            </RadzenSidebar>
+        }
 
         <!-- MAIN CONTENT -->
         <RadzenMain Style="flex:1; padding:1rem; background-color:@(darkMode ? "#001828" : "#fafafa"); overflow:auto;">
@@ -34,11 +41,7 @@
     private bool darkMode;
     private bool drawerOpen = true;
 
-    protected override void OnInitialized()
-    {
-        darkMode = ThemeService.IsDarkMode;
-        ThemeService.OnThemeChanged += ChangeTheme;
-    }
+    private bool IsLoginPage => Nav.Uri.Contains("/login");
 
     async void ToggleDarkMode()
     {
@@ -60,4 +63,12 @@
     {
         ThemeService.OnThemeChanged -= ChangeTheme;
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ThemeService.InitializeAsync();
+        darkMode = ThemeService.IsDarkMode;
+        ThemeService.OnThemeChanged += ChangeTheme;
+    }
+
 }

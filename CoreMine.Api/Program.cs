@@ -6,8 +6,11 @@ using CoreMine.Data;
 using CoreMine.Data.Seed;
 using CoreMine.Infraestructure;
 using CoreMine.Infrastructure;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
+using System.Text;
 
 namespace CoreMine.Api
 {
@@ -43,6 +46,26 @@ namespace CoreMine.Api
                                         .AllowAnyHeader()
                                         .AllowAnyMethod());
             });
+            #endregion
+
+            #region JWT
+
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = "CoreMine",
+                        ValidAudience = "CoreMine.Client",
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes("core-mine-jwt-key"))
+                    };
+                });
+
             #endregion
 
             builder.Services.AddControllers();

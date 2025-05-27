@@ -1,4 +1,4 @@
-﻿##dbo.vw_ProductsWithFullCategoryInfo
+﻿-- dbo.vw_ProductsWithFullCategoryInfo source
 
 ALTER VIEW vw_ProductsWithFullCategoryInfo AS
 WITH CategoryCTE AS (
@@ -25,6 +25,7 @@ WITH CategoryCTE AS (
 LastStatePerProduct AS (
     SELECT
         ps.ProductId,
+        pst.Id AS LastStateTypeId,
         pst.Name AS LastStateTypeName
     FROM ProductStates ps
     INNER JOIN ProductStateTypes pst ON ps.ProductStateTypeId = pst.Id
@@ -38,11 +39,13 @@ SELECT
     p.Id,
     p.Name,
     p.Description,
+    p.categoryId AS CategoryId,
     cat.Name AS CategoryName,
     cte.FullCategoryCode,
     s.Surname + ' ' + s.Name AS SupplierName,
     p.UnitPrice,
     uom.Name AS UnitOfMeasureName,
+    ls.LastStateTypeId,
     ls.LastStateTypeName,
     l.Id AS LocationId,
     l.Name AS LocationName,

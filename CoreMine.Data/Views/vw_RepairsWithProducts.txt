@@ -1,4 +1,4 @@
-﻿## dbo.vw_RepairsWithProducts source
+﻿-- dbo.vw_RepairsWithProducts source
 
 ALTER VIEW vw_RepairsWithProducts AS
 SELECT
@@ -15,9 +15,9 @@ SELECT
 
     rp.ProductId,
     rp.QuantityUsed,
+    rp.UnitPrice,
 
     p.Name AS ProductName,
-    rp.UnitPrice,
     p.CategoryId,
     p.UnitOfMeasureId,
 

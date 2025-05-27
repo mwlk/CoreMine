@@ -13,6 +13,7 @@
             app.MapStockMovementTypesEndpoints();
             app.MapSuppliersEndpoints();
             app.MapUnitOfMeasuresEndpoints();
+            app.MapUsersEndpoints();
         }
     }
 }

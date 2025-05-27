@@ -12,27 +12,24 @@
     <div class="alert alert-danger">@Error</div>
 }
 
+<RadzenNotification />
+
 <RadzenTemplateForm TItem="LoginRequest" Data="@LoginModel" Submit="@HandleLogin">
-
-  
-
     <RadzenCard Style="max-width: 400px; margin: auto; margin-top: 100px;">
-
-
         <ChildContent>
             <RadzenStack>
                 <h3>Iniciar Sesión</h3>
             </RadzenStack>
 
-            <RadzenLabel Text="Email" Component="Email" />
+            <RadzenLabel Text="Nombre de usuario" Component="Text" Style="margin-top: 20px;" />
             <RadzenTextBox @bind-Value="LoginModel.Username" Name="Username" Style="width: 100%;" />
-            <RadzenRequiredValidator Component="Email" Text="Email es requerido" />
+            <RadzenRequiredValidator Component="Username" Text="nombre de usuario es requerido" />
 
             <RadzenLabel Text="Contraseña" Component="Password" Style="margin-top: 20px;" />
             <RadzenPassword @bind-Value="LoginModel.Password" Name="Password" Style="width: 100%;" />
             <RadzenRequiredValidator Component="Password" Text="Contraseña es requerida" />
 
-            <RadzenButton Text="Ingresar" ButtonStyle="ButtonStyle.Primary" Style="margin-top: 20px; width: 100%; background-color: #73A341" />
+            <RadzenButton Text="Ingresar" ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Style="margin-top: 20px; width: 100%; background-color: #73A341" />
         </ChildContent>
     </RadzenCard>
 </RadzenTemplateForm>

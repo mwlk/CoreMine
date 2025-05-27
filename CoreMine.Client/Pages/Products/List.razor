@@ -15,68 +15,360 @@
                 AllowPaging="true"
                 PageSize="@pageSize"
                 AllowSorting="true"
+                AllowColumnResize="true"
+                AllowFiltering="true"
+                FilterMode="FilterMode.Simple"
                 PagerHorizontalAlign="HorizontalAlign.Left"
                 ShowPagingSummary="true"
                 PagingSummaryFormat="Mostrando página {0} de {1} (total {2} registros)"
-                Style="width: 100%">
+                Style="width: 100%; font-size: 14px;"
+                Class="product-grid-container">
     <Columns>
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="Id" Title="ID" Width="80px">
-            <Template Context="data">@data.Id</Template>
+        <!-- ID Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="Id"
+                              Title="ID"
+                              Width="100px"
+                              TextAlign="TextAlign.Center"
+                              Frozen="true">
+            <Template Context="data">
+                <span class="fw-bold text-primary">@data.Id</span>
+            </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="Name" Title="Nombre">
-            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.Name) ? data.Name : "-")</Template>
+        <!-- Nombre Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="Name"
+                              Title="Nombre del Producto"
+                              Width="250px"
+                              Frozen="true"
+                              Resizable="true">
+            <Template Context="data">
+                <div class="cell-padding" title="@data.Name">
+                    <strong>@(!string.IsNullOrWhiteSpace(data.Name) ? data.Name : "Sin nombre")</strong>
+                </div>
+            </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="Description" Title="Descripción">
-            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.Description) ? data.Description : "-")</Template>
+        <!-- Descripción Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="Description"
+                              Title="Descripción"
+                              Width="300px"
+                              Resizable="true">
+            <Template Context="data">
+                <div class="cell-padding truncate-text" title="@data.Description">
+                    @if (!string.IsNullOrWhiteSpace(data.Description))
+                    {
+                        <span>@data.Description</span>
+                    }
+                    else
+                    {
+                        <em class="text-muted">Sin descripción</em>
+                    }
+                </div>
+            </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="CategoryName" Title="Categoría">
-            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.CategoryName) ? data.CategoryName : "-")</Template>
+        <!-- Categoría Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="CategoryName"
+                              Title="Categoría"
+                              Width="180px"
+                              Resizable="true">
+            <Template Context="data">
+                <div class="cell-padding" title="@data.CategoryName">
+                    @if (!string.IsNullOrWhiteSpace(data.CategoryName))
+                    {
+                        <span class="custom-badge badge-secondary">@data.CategoryName</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">-</span>
+                    }
+                </div>
+            </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="FullCategoryCode" Title="Código Categoría">
-            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.FullCategoryCode) ? data.FullCategoryCode : "-")</Template>
+        <!-- Código Categoría Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="FullCategoryCode"
+                              Title="Código Cat."
+                              Width="120px"
+                              TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <div class="cell-padding">
+                    <span class="code-style">@(!string.IsNullOrWhiteSpace(data.FullCategoryCode) ? data.FullCategoryCode : "-")</span>
+                </div>
+            </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="SupplierName" Title="Proveedor">
-            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.SupplierName) ? data.SupplierName : "-")</Template>
+        <!-- Proveedor Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="SupplierName"
+                              Title="Proveedor"
+                              Width="200px"
+                              Resizable="true">
+            <Template Context="data">
+                <div class="cell-padding" title="@data.SupplierName">
+                    @if (!string.IsNullOrWhiteSpace(data.SupplierName))
+                    {
+                        <span>🏢 @data.SupplierName</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Sin proveedor</span>
+                    }
+                </div>
+            </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="UnitPrice" Title="Precio Unitario">
-            <Template Context="data">@data.UnitPrice.ToString("C")</Template>
+        <!-- Precio Unitario Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="UnitPrice"
+                              Title="Precio Unit."
+                              Width="120px"
+                              TextAlign="TextAlign.Right">
+            <Template Context="data">
+                <div class="cell-padding">
+                    <span class="fw-bold text-success">@data.UnitPrice.ToString("C")</span>
+                </div>
+            </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="UnitOfMeasureName" Title="Unidad de Medida">
-            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.UnitOfMeasureName) ? data.UnitOfMeasureName : "-")</Template>
+        <!-- Unidad de Medida Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="UnitOfMeasureName"
+                              Title="U. Medida"
+                              Width="100px"
+                              TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <div class="cell-padding">
+                    <span class="custom-badge badge-info">@(!string.IsNullOrWhiteSpace(data.UnitOfMeasureName) ? data.UnitOfMeasureName : "-")</span>
+                </div>
+            </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="LastStateTypeName" Title="Último Estado">
-            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.LastStateTypeName) ? data.LastStateTypeName : "-")</Template>
+        <!-- Estado Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="LastStateTypeName"
+                              Title="Estado"
+                              Width="120px"
+                              TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <div class="cell-padding">
+                    @if (!string.IsNullOrWhiteSpace(data.LastStateTypeName))
+                    {
+                        var badgeClass = GetStateBadgeClass(data.LastStateTypeName);
+                        <span class="custom-badge @badgeClass">@data.LastStateTypeName</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">-</span>
+                    }
+                </div>
+            </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="LocationId" Title="Código Ubicación">
-            <Template Context="data">@(data.LocationId.HasValue? data.LocationId: "-")</Template>
+        <!-- Ubicación Columns -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="LocationId"
+                              Title="Cód. Ubic."
+                              Width="100px"
+                              TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <div class="cell-padding">
+                    <span class="code-style">@(data.LocationId?.ToString() ?? "-")</span>
+                </div>
+            </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="LocationName" Title="Ubicación">
-            <Template Context="data">@(!string.IsNullOrWhiteSpace(data.LocationName) ? data.LocationName : "-")</Template>
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="LocationName"
+                              Title="Ubicación"
+                              Width="180px"
+                              Resizable="true">
+            <Template Context="data">
+                <div class="cell-padding" title="@data.LocationName">
+                    @if (!string.IsNullOrWhiteSpace(data.LocationName))
+                    {
+                        <span>📍 @data.LocationName</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Sin ubicación</span>
+                    }
+                </div>
+            </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="MaxQuantity" Title="Cantidad Máxima">
-            <Template Context="data">@(data.MaxQuantity.HasValue? data.MaxQuantity: "-")</Template>
+        <!-- Cantidad Máxima Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="MaxQuantity"
+                              Title="Máx."
+                              Width="80px"
+                              TextAlign="TextAlign.Right">
+            <Template Context="data">
+                <div class="cell-padding">
+                    <span class="text-info">@(data.MaxQuantity?.ToString("N0") ?? "-")</span>
+                </div>
+            </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="MinQuantity" Title="Cantidad Mínima">
-            <Template Context="data">@(data.MinQuantity.HasValue? data.MinQuantity: "-")</Template>
+        <!-- Cantidad Mínima Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="MinQuantity"
+                              Title="Mín."
+                              Width="80px"
+                              TextAlign="TextAlign.Right">
+            <Template Context="data">
+                <div class="cell-padding">
+                    <span class="text-warning">@(data.MinQuantity?.ToString("N0") ?? "-")</span>
+                </div>
+            </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="ProductReadModel" Property="Quantity" Title="Stock Actual">
-            <Template Context="data">@(data.Quantity.HasValue? data.Quantity: "-")</Template>
+        <!-- Stock Actual Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="Quantity"
+                              Title="Stock"
+                              Width="100px"
+                              TextAlign="TextAlign.Right">
+            <Template Context="data">
+                <div class="cell-padding">
+                    @if (data.Quantity.HasValue)
+                    {
+                        var stockClass = GetStockLevelClass(data.Quantity.Value, data.MinQuantity, data.MaxQuantity);
+                        <span class="fw-bold @stockClass">@data.Quantity.Value.ToString("N0")</span>
+                        @if (data.MinQuantity.HasValue && data.Quantity < data.MinQuantity)
+                        {
+                            <span class="text-danger">⚠️</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted">-</span>
+                    }
+                </div>
+            </Template>
         </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
+
+@* Agregar estos métodos en el code-behind del componente *@
+@code {
+    // Método para obtener la clase CSS del badge según el estado
+    private string GetStateBadgeClass(string state)
+    {
+        return state?.ToLower() switch
+        {
+            "activo" or "disponible" => "badge-success",
+            "inactivo" or "no disponible" => "badge-danger",
+            "pendiente" => "badge-warning",
+            "en proceso" => "badge-info",
+            _ => "badge-secondary"
+        };
+    }
+
+    // Método para obtener la clase CSS según el nivel de stock
+    private string GetStockLevelClass(decimal currentStock, decimal? minStock, decimal? maxStock)
+    {
+        if (minStock.HasValue && currentStock < minStock)
+            return "text-danger"; // Stock bajo
+
+        if (maxStock.HasValue && currentStock > maxStock * 0.8m)
+            return "text-success"; // Stock alto
+
+        return "text-primary"; // Stock normal
+    }
+}
+
+@* Estilos CSS simplificados para Blazor *@
+<style>
+    .product-grid-container {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .fw-bold {
+        font-weight: bold;
+    }
+
+    .text-primary {
+        color: #0d6efd;
+    }
+
+    .text-success {
+        color: #198754;
+    }
+
+    .text-danger {
+        color: #dc3545;
+    }
+
+    .text-warning {
+        color: #fd7e14;
+    }
+
+    .text-info {
+        color: #0dcaf0;
+    }
+
+    .text-muted {
+        color: #6c757d;
+    }
+
+    .custom-badge {
+        font-size: 0.75em;
+        padding: 0.35em 0.65em;
+        border-radius: 0.375rem;
+        color: white;
+        display: inline-block;
+    }
+
+    .badge-success {
+        background-color: #198754;
+    }
+
+    .badge-danger {
+        background-color: #dc3545;
+    }
+
+    .badge-warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .badge-info {
+        background-color: #0dcaf0;
+        color: #000;
+    }
+
+    .badge-secondary {
+        background-color: #6c757d;
+    }
+
+    .code-style {
+        font-size: 0.875em;
+        background-color: #f8f9fa;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        border: 1px solid #dee2e6;
+        font-family: monospace;
+    }
+
+    .cell-padding {
+        padding: 12px 8px;
+        vertical-align: middle;
+    }
+
+    .truncate-text {
+        max-width: 240px;
+        word-wrap: break-word;
+        line-height: 1.4;
+    }
+</style>
 
 <!-- Controles de paginación personalizados -->
 <div class="d-flex justify-content-between align-items-center mt-3">

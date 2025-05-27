@@ -8,16 +8,20 @@ namespace CoreMine.Client.Authtentication
     {
         private readonly HttpClient _httpClient;
         private readonly ILocalStorageService _localStorage;
+        private readonly CustomAuthStateProvider _authStateProvider;
 
-        public AuthService(HttpClient httpClient, ILocalStorageService localStorage)
+        public AuthService(HttpClient httpClient, ILocalStorageService localStorage, CustomAuthStateProvider authStateProvider)
         {
             _httpClient = httpClient;
             _localStorage = localStorage;
+            _authStateProvider = authStateProvider;
         }
 
         public async Task<bool> Login(string username, string password)
         {
-            var response = await _httpClient.PostAsJsonAsync("/login", new
+            var url = $"api/users/login";
+
+            var response = await _httpClient.PostAsJsonAsync(url, new
             {
                 Username = username,
                 Password = password
@@ -33,6 +37,8 @@ namespace CoreMine.Client.Authtentication
 
                 _httpClient.DefaultRequestHeaders
                     .Authorization = new AuthenticationHeaderValue("Bearer", result.Token);
+
+                _authStateProvider.NotifyUserAuthentication(result.Token);
 
                 return true;
             }

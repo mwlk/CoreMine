@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public string Name { get; set; } = default!;
         public string? Description { get; set; }
+        public string? Code { get; set; }
         public string? CategoryName { get; set; }
         public string? FullCategoryCode { get; set; }
         public string? SupplierName { get; set; }

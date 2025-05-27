@@ -52,6 +52,7 @@ namespace CoreMine.ApplicationBusiness.UseCases.Products.Handlers
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
+                    Code = p.Code,
                     CategoryId = p.CategoryId,
                     CategoryName = p.CategoryName,
                     FullCategoryCode = p.FullCategoryCode,

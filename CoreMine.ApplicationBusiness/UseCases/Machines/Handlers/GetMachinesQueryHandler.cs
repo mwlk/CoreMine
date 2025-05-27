@@ -54,7 +54,8 @@ namespace CoreMine.ApplicationBusiness.UseCases.Machines.Handlers
                 Code = p.Code,
                 AdquisitionDate = p.AcquisitionDate,
                 Description = p.Description,
-                IsActive = p.IsActive
+                IsActive = p.IsActive,
+                ModelYear = p.ModelYear
             }).ToPagedResultAsync(pageNumber, pageSize, cancellationToken);
 
         }

@@ -50,21 +50,21 @@
             </Template>
         </RadzenDataGridColumn>
 
-        <!-- Descripción Column -->
+        <!-- Código Column -->
         <RadzenDataGridColumn TItem="ProductReadModel"
-                              Property="Description"
-                              Title="Descripción"
+                              Property="Code"
+                              Title="Código"
                               Width="300px"
                               Resizable="true">
             <Template Context="data">
-                <div class="cell-padding truncate-text" title="@data.Description">
-                    @if (!string.IsNullOrWhiteSpace(data.Description))
+                <div class="cell-padding truncate-text" title="@data.Code">
+                    @if (!string.IsNullOrWhiteSpace(data.Code))
                     {
-                        <span>@data.Description</span>
+                        <span>@data.Code</span>
                     }
                     else
                     {
-                        <em class="text-muted">Sin descripción</em>
+                        <em class="text-muted">No posee código</em>
                     }
                 </div>
             </Template>

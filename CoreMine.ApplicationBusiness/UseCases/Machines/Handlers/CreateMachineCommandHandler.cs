@@ -33,7 +33,8 @@ namespace CoreMine.ApplicationBusiness.UseCases.Machines.Handlers
                     Code = command.Code,
                     Description = command.Description,
                     AcquisitionDate = _dateTimeProvider.UtcNow,
-                    IsActive = true
+                    IsActive = true,
+                    ModelYear = command.ModelYear ?? _dateTimeProvider.UtcNow.Year
                 };
 
                 await _repository.AddAsync(entitytToAdd, cancellationToken);

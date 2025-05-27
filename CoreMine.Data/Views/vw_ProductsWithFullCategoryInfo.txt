@@ -39,6 +39,7 @@ SELECT
     p.Id,
     p.Name,
     p.Description,
+    p.Code, 
     p.categoryId AS CategoryId,
     cat.Name AS CategoryName,
     cte.FullCategoryCode,

@@ -8,6 +8,7 @@ namespace CoreMine.Entities
         public string? Description { get; set; }
         public DateTime AcquisitionDate { get; set; }
         public bool IsActive { get; set; } = true;
+        public int ModelYear { get; set; }
 
         public ICollection<Repair> Repairs { get; set; }
 

@@ -7,6 +7,7 @@ namespace CoreMine.Entities
         public int CategoryId { get; set; }
         public ProductCategory Category { get; set; } = null!;
         public string? Description { get; set; }
+        public string Code { get; set; }
         public int? SupplierId { get; set; }
         public Supplier? Supplier { get; set; }
         public double UnitPrice { get; set; }

@@ -4,6 +4,7 @@
     {
         public string Code { get; set; } = default!;
         public string? Description { get; set; }
+        public int? ModelYear { get; set; }
 
         public void Validate()
         {

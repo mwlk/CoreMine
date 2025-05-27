@@ -9,5 +9,6 @@ namespace CoreMine.Models.ViewModels
         public string? Description { get; set; } = default!;
         public DateTime AdquisitionDate { get; set; }
         public bool IsActive { get; set; }
+        public int ModelYear { get; set; }
     }
 }

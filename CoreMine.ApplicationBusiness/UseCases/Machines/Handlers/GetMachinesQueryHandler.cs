@@ -38,7 +38,7 @@ namespace CoreMine.ApplicationBusiness.UseCases.Machines.Handlers
                 baseQuery = baseQuery.Where(p => query.Ids.Contains(p.Id));
             }
 
-            if (!query.Code.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(query.Code))
             {
                 baseQuery = baseQuery.Where(p => p.Code.Contains(query.Code));
             }

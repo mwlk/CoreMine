@@ -7,6 +7,12 @@
 
 <h3>Listado de Reparaciones</h3>
 
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="@OnAddClick">
+        Agregar
+    </RadzenButton>
+</div>
+
 <p>Reparaciones listadas: @items.Count() | Total: @totalCount</p>
 
 <RadzenDataGrid TItem="JsonElement"
@@ -182,6 +188,8 @@
 
 
 @code {
+    [Inject] NavigationManager NavManager { get; set; }
+
     private IEnumerable<JsonElement> items = new List<JsonElement>();
     private int totalCount = 0;
     private int pageSize = 10;
@@ -254,5 +262,10 @@
             currentPageIndex = pageIndex;
             await LoadData(new LoadDataArgs { Skip = currentPageIndex * pageSize, Top = pageSize });
         }
+    }
+
+    void OnAddClick()
+    {
+        NavManager.NavigateTo("/repairs/new");
     }
 }

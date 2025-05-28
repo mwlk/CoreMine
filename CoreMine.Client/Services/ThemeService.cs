@@ -18,19 +18,19 @@ namespace CoreMine.Client.Services
         public async Task InitializeAsync()
         {
             var theme = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", ThemeKey) ?? "material";
-            IsDarkMode = theme.Contains("dark", StringComparison.OrdinalIgnoreCase);
+            IsDarkMode = theme.Contains("material-dark", StringComparison.OrdinalIgnoreCase);
             await SetTheme(theme);
         }
 
         public async Task ToggleTheme()
         {
-            var newTheme = IsDarkMode ? "material" : "dark-base";
+            var newTheme = IsDarkMode ? "material" : "material-dark";
             await SetTheme(newTheme);
         }
 
         private async Task SetTheme(string theme)
         {
-            IsDarkMode = theme.Contains("dark", StringComparison.OrdinalIgnoreCase);
+            IsDarkMode = theme.Contains("material-dark", StringComparison.OrdinalIgnoreCase);
             await _jsRuntime.InvokeVoidAsync("setRadzenTheme", theme);
             await _jsRuntime.InvokeVoidAsync("localStorage.setItem", ThemeKey, theme);
             OnThemeChanged?.Invoke();

@@ -7,8 +7,15 @@
 
 @inject HttpClient HttpClient
 @inject NotificationService NotificationService
+@inject NavigationManager NavManager
 
 <RadzenNotification />
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="@(() => NavManager.NavigateTo("/repairs"))">
+        Volver
+    </RadzenButton>
+</div>
 
 <div class="container-fluid" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
     <div class="d-flex align-items-center mb-4">
@@ -16,7 +23,7 @@
         <h2 class="mb-0">Nueva Reparación</h2>
     </div>
 
-    <RadzenTemplateForm TItem="CreateRepairDto" Data="@repairNew" OnValidSubmit="SaveRepair">
+    <RadzenTemplateForm TItem="CreateRepairDto" Data="@repairNew" Submit="SaveRepair">
         <div class="row">
             <!-- Información Principal -->
             <div class="col-md-8">
@@ -31,12 +38,12 @@
                     <!-- Descripción -->
                     <div class="form-group mb-3">
                         <RadzenLabel Text="Descripción" Style="font-weight: 600; margin-bottom: 8px; display: block;" />
-                        <RadzenTextBox @bind-Value="repairNew.Description" 
-                                       Name="Description" 
+                        <RadzenTextBox @bind-Value="repairNew.Description"
+                                       Name="Description"
                                        Placeholder="Ingrese una descripción detallada de la reparación"
                                        Style="width: 100%" />
-                        <RadzenRequiredValidator Component="Description" 
-                                                 Text="La descripción es obligatoria" 
+                        <RadzenRequiredValidator Component="Description"
+                                                 Text="La descripción es obligatoria"
                                                  Style="display:block; margin-top: 4px; color: var(--rz-danger); font-size: 0.875rem;" />
                     </div>
 
@@ -51,20 +58,20 @@
                                         @bind-Value="repairNew.MachineId"
                                         Style="width: 100%"
                                         Placeholder="Seleccione la maquinaria a reparar" />
-                        <RadzenRequiredValidator Component="MachineId" 
-                                                 Text="Debe seleccionar una maquinaria" 
+                        <RadzenRequiredValidator Component="MachineId"
+                                                 Text="Debe seleccionar una maquinaria"
                                                  Style="display:block; margin-top: 4px; color: var(--rz-danger); font-size: 0.875rem;" />
                     </div>
 
                     <!-- Observaciones -->
                     <div class="form-group mb-0">
                         <RadzenLabel Text="Observaciones" Style="font-weight: 600; margin-bottom: 8px; display: block;" />
-                        <RadzenTextArea @bind-Value="repairNew.Observations" 
-                                        Name="Observations" 
+                        <RadzenTextArea @bind-Value="repairNew.Observations"
+                                        Name="Observations"
                                         Rows="3"
                                         Placeholder="Observaciones adicionales (opcional)"
                                         Style="width: 100%" />
-                        <RadzenValidator Component="Observations" 
+                        <RadzenValidator Component="Observations"
                                          Text="Las observaciones deben tener al menos 10 caracteres"
                                          Validator="@(new Func<string, bool>(value => string.IsNullOrEmpty(value) || value.Length >= 10))"
                                          Style="display:block; margin-top: 4px; color: var(--rz-danger); font-size: 0.875rem;" />
@@ -151,10 +158,10 @@
                                             }
                                         </div>
                                         <div class="ms-3">
-                                            <RadzenButton Icon="delete" 
-                                                          ButtonStyle="ButtonStyle.Danger" 
+                                            <RadzenButton Icon="delete"
+                                                          ButtonStyle="ButtonStyle.Danger"
                                                           Variant="Variant.Text"
-                                                          Size="ButtonSize.Small" 
+                                                          Size="ButtonSize.Small"
                                                           Click="() => RemoveProduct(prod)"
                                                           title="Eliminar producto" />
                                         </div>
@@ -173,8 +180,8 @@
                     }
 
                     <!-- Validación de productos -->
-                    <RadzenValidator Component="ProductsList" 
-                                     Text="Debe agregar al menos un producto" 
+                    <RadzenValidator Component="ProductsList"
+                                     Text="Debe agregar al menos un producto"
                                      Validator="@(new Func<object, bool>(_ => repairNew.Products.Any()))"
                                      Style="display:block; margin-top: 12px; color: var(--rz-danger); font-size: 0.875rem;" />
                 </RadzenCard>
@@ -210,14 +217,14 @@
                     <hr />
 
                     <div class="d-grid gap-2">
-                        <RadzenButton Text="Guardar Reparación" 
-                                      ButtonType="ButtonType.Submit" 
+                        <RadzenButton Text="Guardar Reparación"
+                                      ButtonType="ButtonType.Submit"
                                       ButtonStyle="ButtonStyle.Primary"
                                       Icon="save"
                                       Size="ButtonSize.Large"
                                       Style="width: 100%;" />
-                        
-                        <RadzenButton Text="Cancelar" 
+
+                        <RadzenButton Text="Cancelar"
                                       ButtonStyle="ButtonStyle.Light"
                                       Icon="cancel"
                                       Click="@(() => { /* Navigate back */ })"
@@ -272,7 +279,7 @@
 
     private void OnProductSelected()
     {
-        selectedQuantity = null; // Reset quantity when product changes
+        selectedQuantity = null;
         StateHasChanged();
     }
 
@@ -289,7 +296,7 @@
     private decimal GetMinQuantity()
     {
         var product = GetSelectedProduct();
-        return GetQuantityStep(); // Use step as minimum
+        return GetQuantityStep();
     }
 
     private decimal? GetMaxQuantity()
@@ -411,18 +418,41 @@
 
     private async Task SaveRepair()
     {
+        Console.WriteLine("metodo save");
+
         try
         {
-            // TODO: Implement actual save logic
-            NotificationService.Notify(new NotificationMessage
-            {
-                Severity = NotificationSeverity.Success,
-                Summary = "Reparación guardada",
-                Detail = "La reparación ha sido registrada correctamente",
-                Duration = 5000
-            });
 
-            Console.WriteLine($"Saving repair: {System.Text.Json.JsonSerializer.Serialize(repairNew)}");
+            var ulr = "api/repairs";
+
+            var result = await HttpClient.PostAsJsonAsync(ulr, repairNew);
+
+            if (result.IsSuccessStatusCode)
+            {
+
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Reparación guardada",
+                    Detail = "La reparación ha sido registrada correctamente",
+                    Duration = 5000
+                });
+
+                repairNew = new CreateRepairDto();
+                selectedProductId = null;
+                selectedQuantity = null;
+                StateHasChanged();
+            }
+            else
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Error al guardar la reparación: ",
+                    Duration = 5000
+                });
+            }
         }
         catch (Exception ex)
         {
@@ -435,4 +465,7 @@
             });
         }
     }
+
+
+    
 }

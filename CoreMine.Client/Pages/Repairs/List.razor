@@ -1,5 +1,5 @@
 ﻿@page "/repairs"
-@* @attribute [Authorize] *@
+@attribute [Authorize] 
 @inject HttpClient HttpClient
 @using CoreMine.Models.Common
 @using CoreMine.Models.ViewModels
@@ -88,44 +88,45 @@
                 @{
                     var productsArray = repair.GetProperty("products");
                 }
+                
                 @if (productsArray.GetArrayLength() > 0)
                 {
-                    <div style="background: #f8f9fa; padding: 8px; border-radius: 4px;">
+                    <div style="background: var(--rz-base-100); padding: 8px; border-radius: 4px; border: 1px solid var(--rz-base-300);">
                         <table style="width: 100%; font-size: 0.85rem; border-collapse: collapse;">
                             <thead>
-                                <tr style="background: #e9ecef;">
-                                    <th style="padding: 4px 6px; text-align: left; border: 1px solid #dee2e6;">Producto</th>
-                                    <th style="padding: 4px 6px; text-align: center; border: 1px solid #dee2e6;">Cant.</th>
-                                    <th style="padding: 4px 6px; text-align: left; border: 1px solid #dee2e6;">Categoría</th>
-                                    <th style="padding: 4px 6px; text-align: center; border: 1px solid #dee2e6;">U.M.</th>
-                                    <th style="padding: 4px 6px; text-align: right; border: 1px solid #dee2e6;">Precio</th>
+                                <tr style="background: var(--rz-base-200);">
+                                    <th style="padding: 4px 6px; text-align: left; border: 1px solid var(--rz-base-300); color: var(--rz-text-color);">Producto</th>
+                                    <th style="padding: 4px 6px; text-align: center; border: 1px solid var(--rz-base-300); color: var(--rz-text-color);">Cant.</th>
+                                    <th style="padding: 4px 6px; text-align: left; border: 1px solid var(--rz-base-300); color: var(--rz-text-color);">Categoría</th>
+                                    <th style="padding: 4px 6px; text-align: center; border: 1px solid var(--rz-base-300); color: var(--rz-text-color);">U.M.</th>
+                                    <th style="padding: 4px 6px; text-align: right; border: 1px solid var(--rz-base-300); color: var(--rz-text-color);">Precio</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var product in productsArray.EnumerateArray())
                                 {
                                     <tr>
-                                        <td style="padding: 4px 6px; border: 1px solid #dee2e6;">
+                                        <td style="padding: 4px 6px; border: 1px solid var(--rz-base-300); color: var(--rz-text-color);">
                                             <strong>@product.GetProperty("name").GetString()</strong>
-                                            <br /><small class="text-muted">ID: @product.GetProperty("id").GetInt32()</small>
+                                            <br /><small style="color: var(--rz-text-secondary);">ID: @product.GetProperty("id").GetInt32()</small>
                                         </td>
-                                        <td style="padding: 4px 6px; text-align: center; border: 1px solid #dee2e6;">
-                                            <span class="badge bg-primary">@product.GetProperty("quantityUsed").GetDecimal()</span>
+                                        <td style="padding: 4px 6px; text-align: center; border: 1px solid var(--rz-base-300);">
+                                            <span class="badge" style="background: var(--rz-primary); color: var(--rz-primary-lighter);">@product.GetProperty("quantityUsed").GetDecimal()</span>
                                         </td>
-                                        <td style="padding: 4px 6px; border: 1px solid #dee2e6;">
+                                        <td style="padding: 4px 6px; border: 1px solid var(--rz-base-300); color: var(--rz-text-color);">
                                             @product.GetProperty("category").GetProperty("name").GetString()
                                         </td>
-                                        <td style="padding: 4px 6px; text-align: center; border: 1px solid #dee2e6;">
+                                        <td style="padding: 4px 6px; text-align: center; border: 1px solid var(--rz-base-300); color: var(--rz-text-color);">
                                             @product.GetProperty("unitOfMeasure").GetProperty("symbol").GetString()
                                         </td>
-                                        <td style="padding: 4px 6px; text-align: right; border: 1px solid #dee2e6;">
+                                        <td style="padding: 4px 6px; text-align: right; border: 1px solid var(--rz-base-300); color: var(--rz-text-color);">
                                             $@product.GetProperty("unitPrice").GetDecimal().ToString("N2")
                                         </td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
-                        <div style="margin-top: 6px; font-size: 0.8rem;">
+                        <div style="margin-top: 6px; font-size: 0.8rem; color: var(--rz-text-color);">
                             <strong>Total productos: @productsArray.GetArrayLength()</strong>
                             @{
                                 var total = 0m;
@@ -140,7 +141,7 @@
                 }
                 else
                 {
-                    <div style="text-align: center; color: #6c757d; font-style: italic; padding: 20px;">
+                    <div style="text-align: center; color: var(--rz-text-secondary); font-style: italic; padding: 20px;">
                         <i class="fas fa-box-open" style="font-size: 24px; margin-bottom: 8px;"></i><br />
                         Sin productos utilizados
                     </div>

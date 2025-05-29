@@ -12,4 +12,8 @@
     <ProjectReference Include="..\CoreMine.Models\CoreMine.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="UseCases\Stocks\Commands\" />
+  </ItemGroup>
+
 </Project>

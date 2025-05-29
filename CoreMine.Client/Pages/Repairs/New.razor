@@ -59,6 +59,7 @@
                                         Style="width: 100%"
                                         Placeholder="Seleccione la maquinaria a reparar" />
                         <RadzenRequiredValidator Component="MachineId"
+                                                 DefaultValue="0"
                                                  Text="Debe seleccionar una maquinaria"
                                                  Style="display:block; margin-top: 4px; color: var(--rz-danger); font-size: 0.875rem;" />
                     </div>
@@ -180,10 +181,13 @@
                     }
 
                     <!-- Validación de productos -->
-                    <RadzenValidator Component="ProductsList"
-                                     Text="Debe agregar al menos un producto"
-                                     Validator="@(new Func<object, bool>(_ => repairNew.Products.Any()))"
-                                     Style="display:block; margin-top: 12px; color: var(--rz-danger); font-size: 0.875rem;" />
+                    <RadzenTextBox @bind-Value="productValidationField"
+                                   Name="ProductsList"
+                                   Style="display: none;" />
+
+                    <RadzenRequiredValidator Component="ProductsList"
+                                             Text="Debe agregar al menos un producto para continuar"
+                                             Style="display:block; margin-top: 12px;" />
                 </RadzenCard>
             </div>
 
@@ -227,7 +231,7 @@
                         <RadzenButton Text="Cancelar"
                                       ButtonStyle="ButtonStyle.Light"
                                       Icon="cancel"
-                                      Click="@(() => { /* Navigate back */ })"
+                                      Click="@(() => { repairNew = new(); })"
                                       Style="width: 100%;" />
                     </div>
                 </RadzenCard>
@@ -244,6 +248,14 @@
     private CreateRepairDto repairNew = new();
     private int? selectedProductId;
     private decimal? selectedQuantity;
+
+    private string _productValidationField = "";
+
+    private string productValidationField
+    {
+        get => repairNew.Products.Any() ? "valid" : "";
+        set => _productValidationField = value;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -418,11 +430,8 @@
 
     private async Task SaveRepair()
     {
-        Console.WriteLine("metodo save");
-
         try
         {
-
             var ulr = "api/repairs";
 
             var result = await HttpClient.PostAsJsonAsync(ulr, repairNew);
@@ -467,5 +476,5 @@
     }
 
 
-    
+
 }

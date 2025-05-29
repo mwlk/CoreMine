@@ -11,6 +11,7 @@
             app.MapProductStateTypesEndpoints();
             app.MapRepairsEndpoints();
             app.MapStockMovementTypesEndpoints();
+            app.MapStocksEndpoints();
             app.MapSuppliersEndpoints();
             app.MapUnitOfMeasuresEndpoints();
             app.MapUsersEndpoints();

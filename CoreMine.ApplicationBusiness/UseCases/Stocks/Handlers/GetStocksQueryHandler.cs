@@ -7,16 +7,16 @@ using CoreMine.Models.ViewModels;
 
 namespace CoreMine.ApplicationBusiness.UseCases.Stocks.Handlers
 {
-    public class GetStocksHandler : IQueryHandler<GetStocksQuery, PagedResult<StockViewModel>>
+    public class GetStocksQueryHandler : IQueryHandler<GetStockLevelsQuery, PagedResult<StockViewModel>>
     {
         private readonly IReadOnlyStockRepository _repository;
 
-        public GetStocksHandler(IReadOnlyStockRepository repository)
+        public GetStocksQueryHandler(IReadOnlyStockRepository repository)
         {
             _repository = repository;
         }
 
-        public async Task<PagedResult<StockViewModel>> HandleAsync(GetStocksQuery query, CancellationToken cancellationToken)
+        public async Task<PagedResult<StockViewModel>> HandleAsync(GetStockLevelsQuery query, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 

@@ -239,7 +239,7 @@
                     @if (data.Quantity.HasValue)
                     {
                         var stockClass = GetStockLevelClass(data.Quantity.Value, data.MinQuantity, data.MaxQuantity);
-                        <span class="fw-bold @stockClass">@data.Quantity.Value.ToString("N0")</span>
+                        <span class="fw-bold @stockClass">@data.Quantity.Value.ToString("N2")</span>
                         @if (data.MinQuantity.HasValue && data.Quantity < data.MinQuantity)
                         {
                             <span class="text-danger">⚠️</span>

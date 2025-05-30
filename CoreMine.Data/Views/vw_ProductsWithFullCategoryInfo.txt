@@ -17,7 +17,7 @@ WITH CategoryCTE AS (
         pc.Id,
         pc.Code,
         pc.ParentId,
-        CAST(cte.FullCategoryCode + '/' + pc.Code AS VARCHAR(MAX)) AS FullCategoryCode,
+        CAST(cte.FullCategoryCode + '-' + pc.Code AS VARCHAR(MAX)) AS FullCategoryCode,
         pc.Name
     FROM ProductCategories pc
     INNER JOIN CategoryCTE cte ON pc.ParentId = cte.Id

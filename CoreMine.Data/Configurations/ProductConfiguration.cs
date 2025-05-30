@@ -14,6 +14,9 @@ namespace CoreMine.Data.Configurations
 
             builder.HasIndex(p => p.Id);
 
+            builder.HasIndex(p => p.Code)
+                .IsUnique();
+
             builder.Property(p => p.Name)
                 .IsRequired()
                 .HasMaxLength(200);

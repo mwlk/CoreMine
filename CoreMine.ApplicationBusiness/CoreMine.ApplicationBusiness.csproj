@@ -13,7 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UseCases\StockLevels\Commands\" />
     <Folder Include="UseCases\Stocks\Commands\" />
   </ItemGroup>
 

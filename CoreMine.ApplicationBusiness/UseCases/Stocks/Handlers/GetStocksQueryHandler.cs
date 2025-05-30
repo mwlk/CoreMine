@@ -7,11 +7,11 @@ using CoreMine.Models.ViewModels;
 
 namespace CoreMine.ApplicationBusiness.UseCases.Stocks.Handlers
 {
-    public class GetStocksHandler : IQueryHandler<GetStocksQuery, PagedResult<StockViewModel>>
+    public class GetStocksQueryHandler : IQueryHandler<GetStocksQuery, PagedResult<StockViewModel>>
     {
         private readonly IReadOnlyStockRepository _repository;
 
-        public GetStocksHandler(IReadOnlyStockRepository repository)
+        public GetStocksQueryHandler(IReadOnlyStockRepository repository)
         {
             _repository = repository;
         }

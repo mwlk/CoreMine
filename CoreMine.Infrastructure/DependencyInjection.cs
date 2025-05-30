@@ -14,35 +14,38 @@ namespace CoreMine.Infrastructure
     {
         public static IServiceCollection AddInfraestructure(this IServiceCollection services)
         {
-            services.AddTransient<IProductsRepository, ProductsRepository>();
-            services.AddTransient<IRepository<Product>, ProductsRepository>();
-            services.AddTransient<IReadOnlyProductsRepository, ReadOnlyProductsRepository>();
+            services.AddScoped<IProductsRepository, ProductsRepository>();
+            services.AddScoped<IRepository<Product>, ProductsRepository>();
+            services.AddScoped<IReadOnlyProductsRepository, ReadOnlyProductsRepository>();
 
-            services.AddTransient<IProductCategoriesRepository, ProductCategoriesRepository>();
-            services.AddTransient<IRepository<ProductCategory>, ProductCategoriesRepository>();
-            services.AddTransient<IReadOnlyCategoriesRepository, ReadOnlyCategoriesRepository>();
+            services.AddScoped<IProductCategoriesRepository, ProductCategoriesRepository>();
+            services.AddScoped<IRepository<ProductCategory>, ProductCategoriesRepository>();
+            services.AddScoped<IReadOnlyCategoriesRepository, ReadOnlyCategoriesRepository>();
 
-            services.AddTransient<ISuppliersRepository, SuppliersRepository>();
-            services.AddTransient<IRepository<Supplier>, SuppliersRepository>();
-            services.AddTransient<IReadOnlySuppliersRepository, ReadOnlySuppliersRepository>();
+            services.AddScoped<ISuppliersRepository, SuppliersRepository>();
+            services.AddScoped<IRepository<Supplier>, SuppliersRepository>();
+            services.AddScoped<IReadOnlySuppliersRepository, ReadOnlySuppliersRepository>();
 
-            services.AddTransient<IReadOnlyProductStateTypesRepository, ReadOnlyProductStateTypesRepository>();
-            services.AddTransient<IReadOnlyUnitOfMeasuresRepository, ReadOnlyUnitOfMeasuresRepository>();
-            services.AddTransient<IReadOnlyMachinesRepository, ReadOnlyMachinesRepository>();
-            services.AddTransient<IReadOnlyLocationsRepository, ReadOnlyLocationsRepository>();
+            services.AddScoped<IReadOnlyProductStateTypesRepository, ReadOnlyProductStateTypesRepository>();
+            services.AddScoped<IReadOnlyUnitOfMeasuresRepository, ReadOnlyUnitOfMeasuresRepository>();
+            services.AddScoped<IReadOnlyMachinesRepository, ReadOnlyMachinesRepository>();
+            services.AddScoped<IReadOnlyLocationsRepository, ReadOnlyLocationsRepository>();
 
-            services.AddTransient<IMachinesRepository, MachinesRepository>();
+            services.AddScoped<IMachinesRepository, MachinesRepository>();
 
-            services.AddScoped<IDateTimeProvider, DateTimeProvider>();
+            services.AddTransient<IDateTimeProvider, DateTimeProvider>();
 
-            services.AddTransient<IRepairsRepository, RepairsRepository>();
-            services.AddTransient<IReadOnlyRepairsRepository, ReadOnlyRepairsRepository>();
+            services.AddScoped<IRepairsRepository, RepairsRepository>();
+            services.AddScoped<IReadOnlyRepairsRepository, ReadOnlyRepairsRepository>();
 
-            services.AddTransient<IStockRepository, StockRepository>();
-            services.AddTransient<IReadOnlyStockRepository, ReadOnlyStockRepository>();
+            services.AddScoped<IStockRepository, StockRepository>();
+            services.AddScoped<IReadOnlyStockRepository, ReadOnlyStockRepository>();
 
-            services.AddTransient<IReadOnlyStockMovementTypesRepository, ReadOnlyStockMovementTypesRepository>();
-            services.AddTransient<IStockMovementsRepository, StockMovementsRepository>();
+            services.AddScoped<IReadOnlyStockMovementTypesRepository, ReadOnlyStockMovementTypesRepository>();
+            services.AddScoped<IStockMovementsRepository, StockMovementsRepository>();
+
+            services.AddScoped<IReadOnlyStockLevelsRepository, ReadOnlyStockLevelsRepository>();
+            services.AddScoped<IStockLevelsRepository, StockLevelsRepository>();
 
             return services;
         }

@@ -5,109 +5,180 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavManager
 
-<h3>Categorías</h3>
+<h3>Listado de Categorías</h3>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <button class="btn btn-primary" @onclick="@(() => NavManager.NavigateTo("/categories/new"))">
-        Agregar
-    </button>
-</div>
+<RadzenDataGrid TItem="CategoryViewModel"
+                Data="@items"
+                Count="@totalCount"
+                LoadData="@LoadData"
+                AllowPaging="true"
+                PageSize="@pageSize"
+                AllowSorting="true"
+                AllowColumnResize="true"
+                AllowFiltering="false"
+                FilterMode="FilterMode.Simple"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                PagingSummaryFormat="Mostrando página {0} de {1} (total {2} registros)"
+                Style="width: 100%; font-size: 14px;"
+                Class="product-grid-container">
 
-<div class="mb-3">
-    <input class="form-control"
-           @bind="searchString"
-           @bind:event="oninput"
-           placeholder="Buscar..."
-           @onkeydown="HandleKeyDown" />
-</div>
+    <Columns>
+        <RadzenDataGridColumn TItem="CategoryViewModel"
+                              Property="Id"
+                              Title="ID"
+                              TextAlign="TextAlign.Left"
+                              Frozen="true"
+                              Width="80px">
+            <Template Context="data">
+                <span class="fw-bold">@data.Id</span>
+            </Template>
+        </RadzenDataGridColumn>
 
-<table class="table table-striped table-hover table-bordered">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Código</th>
-            <th>Nombre</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (items is not null && items.Count > 0)
-        {
-            @foreach (var item in items)
-            {
-                <tr>
-                    <td>@item.Id</td>
-                    <td>@item.FullCode</td>
-                    <td>@item.Name</td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="3" class="text-center">No hay datos disponibles.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+        <RadzenDataGridColumn TItem="CategoryViewModel"
+                              Property="Code"
+                              Title="Código"
+                              TextAlign="TextAlign.Center"
+                              Frozen="true"
+                              Width="250px">
+            <Template Context="data">
+                <span class="fw-bold">@data.Code</span>
+            </Template>
+        </RadzenDataGridColumn>
 
+        <RadzenDataGridColumn TItem="CategoryViewModel"
+                              Property="Name"
+                              Title="Nombre"
+                              TextAlign="TextAlign.Center"
+                              Frozen="true"
+                              Width="250px">
+            <Template Context="data">
+                <span class="fw-bold">@data.Name</span>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="CategoryViewModel"
+                              Property="FullCode"
+                              Title="Código Completo"
+                              TextAlign="TextAlign.Center"
+                              Frozen="true"
+                              Width="250px">
+            <Template Context="data">
+                <span class="fw-bold">@data.FullCode</span>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+<!-- Controles de paginación personalizados -->
 <div class="d-flex justify-content-between align-items-center mt-3">
-    <button class="btn btn-secondary" @onclick="PreviousPage" disabled="@(!CanGoPrevious)">Anterior</button>
-    <span>Página @currentPage de @totalPages</span>
-    <button class="btn btn-secondary" @onclick="NextPage" disabled="@(!CanGoNext)">Siguiente</button>
+    <div>
+        <span>Mostrando @((currentPageIndex * pageSize) + 1) a @Math.Min((currentPageIndex + 1) * pageSize, totalCount) de @totalCount registros</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <div>
+            <label class="me-2">Registros por página:</label>
+            <RadzenDropDown TValue="int"
+                            Data="@pageSizeOptions"
+                            Value="@pageSize"
+                            Change="@OnPageSizeChanged"
+                            Style="width: 80px" />
+        </div>
+        <div>
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="first_page"
+                          Click="@(() => GoToPage(0))"
+                          Disabled="@(currentPageIndex == 0)" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="chevron_left"
+                          Click="@(() => GoToPage(currentPageIndex - 1))"
+                          Disabled="@(currentPageIndex == 0)" />
+            <span class="mx-2">Página @currentPage de @totalPages</span>
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="chevron_right"
+                          Click="@(() => GoToPage(currentPageIndex + 1))"
+                          Disabled="@(currentPageIndex >= totalPages - 1)" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="last_page"
+                          Click="@(() => GoToPage(totalPages - 1))"
+                          Disabled="@(currentPageIndex >= totalPages - 1)" />
+        </div>
+    </div>
 </div>
 
 @code {
-    private int currentPage = 1;
-    private int rowsPerPage = 5;
-    private int totalPages = 1;
-    private string searchString = string.Empty;
-    private List<CategoryViewModel> items = new();
+    private IEnumerable<CategoryViewModel> items = new List<CategoryViewModel>();
+    private int totalCount = 0;
+    private int pageSize = 10;
+    private int currentPageIndex = 0;
+
+    private readonly List<int> pageSizeOptions = new() { 5, 10, 25, 50, 100 };
+
+    private int currentPage => currentPageIndex + 1;
+    private int totalPages => pageSize == 0 ? 1 : (int)Math.Ceiling((double)totalCount / pageSize);
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+        await LoadData(new LoadDataArgs { Skip = 0, Top = pageSize });
     }
 
-    private async Task LoadData()
+    private async Task LoadData(LoadDataArgs args)
     {
-        var url = $"api/categories?pageNumber={currentPage}&pageSize={rowsPerPage}";
-        if (!string.IsNullOrWhiteSpace(searchString))
-            url += $"&Name={Uri.EscapeDataString(searchString)}";
-
-        var response = await HttpClient.GetFromJsonAsync<PagedResult<CategoryViewModel>>(url);
-
-        items = response?.Items?.ToList() ?? new List<CategoryViewModel>();
-        var totalItems = response?.TotalCount ?? 0;
-        totalPages = (int)Math.Ceiling(totalItems / (double)rowsPerPage);
-    }
-
-    private async Task HandleKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
+        try
         {
-            currentPage = 1;
-            await LoadData();
+            int top = args.Top ?? pageSize;
+            int skip = args.Skip ?? 0;
+
+            currentPageIndex = skip / top;
+
+            var queryParams = new List<string>
+            {
+                $"pageNumber={currentPage}",
+                $"pageSize={top}"
+            };
+
+            var url = $"api/productCategories?{string.Join('&', queryParams)}";
+            var response = await HttpClient.GetFromJsonAsync<PagedResult<CategoryViewModel>>(url);
+
+            if (response != null)
+            {
+                items = response.Items ?? new List<CategoryViewModel>();
+                totalCount = response.TotalCount;
+            }
+            else
+            {
+                items = new List<CategoryViewModel>();
+                totalCount = 0;
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+            items = new List<CategoryViewModel>();
+            totalCount = 0;
+            StateHasChanged();
         }
     }
 
-    private async Task PreviousPage()
+    private async Task OnPageSizeChanged(object value)
     {
-        if (currentPage > 1)
+        if (value != null && int.TryParse(value.ToString(), out int newPageSize))
         {
-            currentPage--;
-            await LoadData();
+            pageSize = newPageSize;
+            currentPageIndex = 0; // Resetear a la primera página
+
+            // Cargar datos con el nuevo tamaño de página
+            await LoadData(new LoadDataArgs { Top = pageSize, Skip = 0 });
         }
     }
 
-    private async Task NextPage()
+    private async Task GoToPage(int pageIndex)
     {
-        if (currentPage < totalPages)
+        if (pageIndex >= 0 && pageIndex < totalPages)
         {
-            currentPage++;
-            await LoadData();
+            currentPageIndex = pageIndex;
+            await LoadData(new LoadDataArgs { Skip = currentPageIndex * pageSize, Top = pageSize });
         }
     }
-
-    private bool CanGoPrevious => currentPage > 1;
-    private bool CanGoNext => currentPage < totalPages;
 }

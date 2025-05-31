@@ -14,9 +14,9 @@ namespace CoreMine.Infraestructure.Repositories
             _context = context;
         }
 
-        public Task AddAsync(Stock entityToAdd, CancellationToken cancellationToken)
+        public async Task AddAsync(Stock entityToAdd, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            await _context.Stocks.AddAsync(entityToAdd, cancellationToken);
         }
 
         public Task DeleteAsync(int id, CancellationToken cancellationToken)

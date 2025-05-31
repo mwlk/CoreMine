@@ -19,5 +19,12 @@ namespace CoreMine.Infraestructure.Repositories.ReadOnly
             return _context.ProductsWithFullCategoryInfo
                 .AsNoTracking();
         }
+
+        public async Task<Dictionary<string, int>> GetProductIdsByCodesAsync(IEnumerable<string> codes, CancellationToken cancellationToken)
+        {
+            return await _context.Products
+                .Where(p => p.Code.Equals(p.Code))
+                .ToDictionaryAsync(p => p.Code, p => p.Id, cancellationToken);
+        }
     }
 }

@@ -2,6 +2,7 @@
 using CoreMine.ApplicationBusiness.Interfaces.ReadOnly;
 using CoreMine.Data;
 using CoreMine.Entities;
+using CoreMine.Data.ReadModels;
 
 namespace CoreMine.Infraestructure.Repositories.ReadOnly
 {
@@ -14,11 +15,11 @@ namespace CoreMine.Infraestructure.Repositories.ReadOnly
             _context = context;
         }
 
-        public IQueryable<ProductCategory> GetQueryable()
+        public IQueryable<CategoryWithFullCodeReadModel> GetQueryable()
         {
-            var query = _context.ProductCategories.AsQueryable().AsNoTracking();
-
-            return query;
+            return _context.Categories
+                .AsQueryable()
+                .AsNoTracking();
         }
     }
 }

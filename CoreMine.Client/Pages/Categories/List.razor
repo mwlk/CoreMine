@@ -5,7 +5,15 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavManager
 
-<h3>Listado de Categorías</h3>
+<h3>Listado de Categorias</h3>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="@(() => {})">
+        Agregar
+    </RadzenButton>
+</div>
+
+<p>Categorias listadas: @items.Count() | Total: @totalCount</p>
 
 <RadzenDataGrid TItem="CategoryViewModel"
                 Data="@items"
@@ -21,50 +29,30 @@
                 ShowPagingSummary="true"
                 PagingSummaryFormat="Mostrando página {0} de {1} (total {2} registros)"
                 Style="width: 100%; font-size: 14px;"
-                Class="product-grid-container">
+                Class="shadow-sm rounded border">
 
     <Columns>
-        <RadzenDataGridColumn TItem="CategoryViewModel"
-                              Property="Id"
-                              Title="ID"
-                              TextAlign="TextAlign.Left"
-                              Frozen="true"
-                              Width="80px">
+        <RadzenDataGridColumn TItem="CategoryViewModel" Property="Id" Title="ID" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
-                <span class="fw-bold">@data.Id</span>
+                <span class="fw-semibold">@data.Id</span>
             </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="CategoryViewModel"
-                              Property="Code"
-                              Title="Código"
-                              TextAlign="TextAlign.Center"
-                              Frozen="true"
-                              Width="250px">
+        <RadzenDataGridColumn TItem="CategoryViewModel" Property="Code" Title="Código" Width="200px">
             <Template Context="data">
-                <span class="fw-bold">@data.Code</span>
+                <span>@data.Code</span>
             </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="CategoryViewModel"
-                              Property="Name"
-                              Title="Nombre"
-                              TextAlign="TextAlign.Center"
-                              Frozen="true"
-                              Width="250px">
+        <RadzenDataGridColumn TItem="CategoryViewModel" Property="Name" Title="Nombre" Width="250px">
             <Template Context="data">
-                <span class="fw-bold">@data.Name</span>
+                <span>@data.Name</span>
             </Template>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="CategoryViewModel"
-                              Property="FullCode"
-                              Title="Código Completo"
-                              TextAlign="TextAlign.Center"
-                              Frozen="true"
-                              Width="250px">
+        <RadzenDataGridColumn TItem="CategoryViewModel" Property="FullCode" Title="Código Completo" Width="250px">
             <Template Context="data">
-                <span class="fw-bold">@data.FullCode</span>
+                <span class="text-muted">@data.FullCode</span>
             </Template>
         </RadzenDataGridColumn>
     </Columns>
@@ -140,25 +128,16 @@
             var url = $"api/productCategories?{string.Join('&', queryParams)}";
             var response = await HttpClient.GetFromJsonAsync<PagedResult<CategoryViewModel>>(url);
 
-            if (response != null)
-            {
-                items = response.Items ?? new List<CategoryViewModel>();
-                totalCount = response.TotalCount;
-            }
-            else
-            {
-                items = new List<CategoryViewModel>();
-                totalCount = 0;
-            }
-
-            StateHasChanged();
+            items = response?.Items ?? new List<CategoryViewModel>();
+            totalCount = response?.TotalCount ?? 0;
         }
-        catch (Exception)
+        catch
         {
             items = new List<CategoryViewModel>();
             totalCount = 0;
-            StateHasChanged();
         }
+
+        StateHasChanged();
     }
 
     private async Task OnPageSizeChanged(object value)
@@ -166,9 +145,7 @@
         if (value != null && int.TryParse(value.ToString(), out int newPageSize))
         {
             pageSize = newPageSize;
-            currentPageIndex = 0; // Resetear a la primera página
-
-            // Cargar datos con el nuevo tamaño de página
+            currentPageIndex = 0;
             await LoadData(new LoadDataArgs { Top = pageSize, Skip = 0 });
         }
     }

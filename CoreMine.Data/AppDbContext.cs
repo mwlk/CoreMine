@@ -30,6 +30,8 @@ namespace CoreMine.Data
         public DbSet<RepairWithProductsReadModel> RepairsWithProducts => Set<RepairWithProductsReadModel>();
 
         public DbSet<ProductsWithFullCategoryInfoReadModel> ProductsWithFullCategoryInfo => Set<ProductsWithFullCategoryInfoReadModel>();
+
+        public DbSet<CategoryWithFullCodeReadModel> Categories => Set<CategoryWithFullCodeReadModel>();
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -44,6 +46,10 @@ namespace CoreMine.Data
             modelBuilder.Entity<ProductsWithFullCategoryInfoReadModel>()
                 .HasNoKey()
                 .ToView("vw_ProductsWithFullCategoryInfo");
+
+            modelBuilder.Entity<CategoryWithFullCodeReadModel>()
+                .HasNoKey()
+                .ToView("vw_CategoriesWithFullCode");
             #endregion
         }
     }

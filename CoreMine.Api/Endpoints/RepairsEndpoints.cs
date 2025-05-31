@@ -24,7 +24,7 @@ namespace CoreMine.Api.Endpoints
                 var result = await handler.HandleAsync(query, cancellationToken);
                 return Results.Ok(result);
             })
-                .WithDescription("Lsitado de reparaciones por maquina y su producto")
+                .WithDescription("Listar reparaciones")
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status404NotFound);
 
@@ -37,7 +37,7 @@ namespace CoreMine.Api.Endpoints
             {
                 var result = await handler.HandleAsync(command, cancellationToken);
                 return Results.Created("", result);
-            }).WithDescription("Genera un nuevo registro en reparaciones")
+            }).WithDescription("Registrar reparación")
             .Produces(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest);
         }

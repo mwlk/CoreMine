@@ -24,7 +24,7 @@ namespace CoreMine.Api.Endpoints
                 var result = await handler.HandleAsync(command, cancellationToken);
                 return Results.Created("", result);
             })
-                .WithDescription("Creación de nuevo registro para máquinas en la bbdd")
+                .WithDescription("Registrar nueva máquinas")
                 .Produces(StatusCodes.Status201Created)
                 .Produces(StatusCodes.Status400BadRequest);
 
@@ -38,7 +38,7 @@ namespace CoreMine.Api.Endpoints
                 var result = await handler.HandleAsync(query, cancellationToken);
                 return Results.Ok(result);
             })
-                .WithDescription("Listado de máquinas registradas")
+                .WithDescription("Listar máquinas registradas")
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status404NotFound);
         }

@@ -25,7 +25,7 @@ namespace CoreMine.Api.Endpoints
             })
                 .Produces<PagedResult<CategoryViewModel>>(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status404NotFound)
-                .WithDescription("Listado de categorias de repuestos");
+                .WithDescription("Listar categorias de repuestos");
 
 
             // POST: api/categories
@@ -39,7 +39,7 @@ namespace CoreMine.Api.Endpoints
             })
                 .Produces<int>(StatusCodes.Status201Created)
                 .Produces(StatusCodes.Status400BadRequest)
-                .WithDescription("Alta de nueva categoria para repuestos");
+                .WithDescription("Registrar nueva categoria para repuestos");
 
 
         }

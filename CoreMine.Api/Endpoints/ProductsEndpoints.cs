@@ -21,7 +21,7 @@ namespace CoreMine.Api.Endpoints
             })
                 .Produces<List<ProductsWithFullCategoryInfoReadModel>>(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status404NotFound)
-                .WithDescription("Listado de repuestos");
+                .WithDescription("Listar repuestos");
         }
     }
 }

@@ -23,7 +23,7 @@ namespace CoreMine.Api.Endpoints
             })
                 .Produces<PagedResult<ProductStateTypeViewModel>>(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status404NotFound)
-                .WithDescription("Listado de estado de los repuestos");
+                .WithDescription("Listar tipos de estados para los repuestos");
 
         }
     }

@@ -24,7 +24,7 @@ namespace CoreMine.Api.Endpoints
                 var result = await handler.HandleAsync(query, cancellationToken);
                 return Results.Ok(result);
             })
-                .WithDescription("Listado de proveedores")
+                .WithDescription("Listar proveedores")
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status404NotFound);
 
@@ -38,7 +38,7 @@ namespace CoreMine.Api.Endpoints
                 var result = await handler.HandleAsync(command, cancellationToken);
                 return Results.Created("", result);
             })
-                .WithDescription("Creación de nuevo registro en proveedores")
+                .WithDescription("Registrar nuevo proveedor")
                 .Produces(StatusCodes.Status201Created)
                 .Produces(StatusCodes.Status400BadRequest);
         }

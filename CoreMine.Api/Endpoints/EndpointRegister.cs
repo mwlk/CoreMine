@@ -9,6 +9,7 @@
             app.MapProductCategoriesEndpoints();
             app.MapProductsEndpoints();
             app.MapProductStateTypesEndpoints();
+            app.MapPurchaseInvoicesEndpoints();
             app.MapRepairsEndpoints();
             app.MapStockLevelsEndpoint();
             app.MapStockMovementTypesEndpoints();

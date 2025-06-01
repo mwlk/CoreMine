@@ -9,10 +9,12 @@ namespace CoreMine.Entities
         public string Phone { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public virtual ICollection<Product> Products { get; set; }
+        public virtual ICollection<PurchaseInvoice> PurchaseInvoices { get; set; }
 
         public Supplier()
         {
             Products = new HashSet<Product>();
+            PurchaseInvoices = new HashSet<PurchaseInvoice>();
         }
     }
 }

@@ -24,7 +24,7 @@ namespace CoreMine.Api.Endpoints
             })
                 .Produces<PagedResult<StockViewModel>>(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status404NotFound)
-                .WithDescription("Listado de stocks");
+                .WithDescription("Listar stocks de repuestos");
         }
     }
 }

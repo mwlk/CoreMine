@@ -23,7 +23,7 @@ namespace CoreMine.Api.Endpoints
             })
                 .Produces<PagedResult<StockMovementTypeViewModel>>(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status404NotFound)
-                .WithDescription("Listado de tipos de movimientos de stock");
+                .WithDescription("Listar tipos de movimientos de stock");
         }
     }
 }

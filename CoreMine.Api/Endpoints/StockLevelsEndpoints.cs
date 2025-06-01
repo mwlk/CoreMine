@@ -26,7 +26,7 @@ namespace CoreMine.Api.Endpoints
             })
                 .Produces<PagedResult<StockLevelViewModel>>(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status404NotFound)
-                .WithDescription("Listado de niveles de configuración de máximos y minimos de stock");
+                .WithDescription("Listar niveles de configuración de máximos y minimos de stock");
 
             // POST: api/stockLevels
             group.MapPost("/", async (
@@ -38,7 +38,7 @@ namespace CoreMine.Api.Endpoints
                 var result = await handler.HandleAsync(command, cancellationToken);
                 return Results.Created("", result);
             })
-                .WithDescription("Creación de nuevo registro para configuración de niveles de stock")
+                .WithDescription("Registrar nueva configuración de niveles máximos y minimos de stock")
                 .Produces(StatusCodes.Status201Created)
                 .Produces(StatusCodes.Status400BadRequest); ;
         }

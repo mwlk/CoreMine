@@ -21,7 +21,7 @@ namespace CoreMine.Api.Endpoints
                 var result = await handler.HandleAsync(query, cancellationToken);
                 return Results.Ok(result);
             })
-                .WithDescription("Listado de Ubicaciones de respuestos")
+                .WithDescription("Listar ubicaciones de respuestos")
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status404NotFound);
         }

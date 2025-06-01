@@ -26,7 +26,7 @@ namespace CoreMine.Api.Endpoints
 
                 return Results.Ok(result);
             })
-                .WithDescription("Login moq del sistema")
+                .WithDescription("Autenticar usuario en sistema - prueba")
                 .Produces(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status401Unauthorized);
         }

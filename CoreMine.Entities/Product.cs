@@ -7,7 +7,7 @@ namespace CoreMine.Entities
         public int CategoryId { get; set; }
         public ProductCategory Category { get; set; } = null!;
         public string? Description { get; set; }
-        public string Code { get; set; }
+        public string Code { get; set; } = string.Empty;
         public int? SupplierId { get; set; }
         public Supplier? Supplier { get; set; }
         public double UnitPrice { get; set; }
@@ -19,6 +19,7 @@ namespace CoreMine.Entities
         public virtual ICollection<StockLevel> StockLevels { get; set; }
         public virtual ICollection<Stock> Stocks { get; set; }
         public virtual ICollection<StockMovement> StockMovements { get; set; }
+        public virtual ICollection<PurchaseInvoiceDetail> PurchaseInvoiceDetails { get; set; }
 
         public Product()
         {
@@ -26,6 +27,7 @@ namespace CoreMine.Entities
             StockLevels = new HashSet<StockLevel>();
             Stocks = new HashSet<Stock>();
             StockMovements = new HashSet<StockMovement>();
+            PurchaseInvoiceDetails = new HashSet<PurchaseInvoiceDetail>();
         }
     }
 }

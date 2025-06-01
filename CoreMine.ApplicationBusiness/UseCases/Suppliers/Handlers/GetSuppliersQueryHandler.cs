@@ -38,10 +38,13 @@ namespace CoreMine.ApplicationBusiness.UseCases.Suppliers.Handlers
                 baseQuery = baseQuery.Where(p => query.Ids.Contains(p.Id));
             }
 
-            if (!query.FullName.IsNullOrEmpty())
+            if (!string.IsNullOrWhiteSpace(query.FullName))
             {
-                baseQuery = baseQuery.Where(p => string.Concat(p.Name, ' ', p.Surname).Contains(query.FullName));
+                var filter = query.FullName.ToLower().Trim();
+                baseQuery = baseQuery.Where(p =>
+                    (p.Name + " " + p.Surname).ToLower().Contains(filter));
             }
+
 
             return await baseQuery.Select(p => new SupplierViewModel
             {

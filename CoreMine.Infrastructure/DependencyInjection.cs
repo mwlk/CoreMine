@@ -47,6 +47,8 @@ namespace CoreMine.Infrastructure
             services.AddScoped<IReadOnlyStockLevelsRepository, ReadOnlyStockLevelsRepository>();
             services.AddScoped<IStockLevelsRepository, StockLevelsRepository>();
 
+            services.AddScoped<IPurchaseInvoicesRepository, PurchaseInvoicesRepository>();
+
             return services;
         }
     }

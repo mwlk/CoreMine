@@ -6,6 +6,6 @@ namespace CoreMine.ApplicationBusiness.Interfaces.ReadOnly
 {
     public interface IReadOnlyCategoriesRepository
     {
-        IQueryable<ProductCategory> GetQueryable();
+        IQueryable<CategoryWithFullCodeReadModel> GetQueryable();
     }
 }

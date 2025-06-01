@@ -49,8 +49,7 @@ namespace CoreMine.ApplicationBusiness.UseCases.PurchaseInvoices.Handlers
 
                 if (notFound.Any())
                 {
-                    // cambiar a exepcion particular
-                    throw new Exception($"Productos no encontrados: {string.Join(",", notFound)}");
+                    throw new ProductsNotFoundException(string.Join(",", notFound));
                 }
 
                 var productStockDict = await _readOnlyStockRepository.GetQueryable()
@@ -109,6 +108,7 @@ namespace CoreMine.ApplicationBusiness.UseCases.PurchaseInvoices.Handlers
 
                 await _repository.AddAsync(entityToAdd, cancellationToken);
 
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
 
                 return entityToAdd.Id;

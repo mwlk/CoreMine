@@ -4,7 +4,6 @@ using CoreMine.ApplicationBusiness.Interfaces.Shared;
 using CoreMine.ApplicationBusiness.UseCases.Locations.Queries;
 using CoreMine.Models.Common;
 using CoreMine.Models.ViewModels;
-using Microsoft.IdentityModel.Tokens;
 
 namespace CoreMine.ApplicationBusiness.UseCases.Locations.Handler
 {

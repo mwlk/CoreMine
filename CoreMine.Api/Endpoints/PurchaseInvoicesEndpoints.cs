@@ -22,7 +22,7 @@ namespace CoreMine.Api.Endpoints
             })
                 .Produces<int>(StatusCodes.Status201Created)
                 .Produces(StatusCodes.Status400BadRequest)
-                .WithDescription("Registrar factura de proveedor");
+                .WithDescription("Registrar factura de compra");
         }
     }
 }

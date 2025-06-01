@@ -8,11 +8,14 @@ namespace CoreMine.Data.Configurations
     {
         public void Configure(EntityTypeBuilder<PurchaseInvoice> builder)
         {
-            builder.ToTable("PurchasInvoices");
+            builder.ToTable("PurchaseInvoices");
 
             builder.HasKey(p => p.Id);
 
             builder.HasIndex(p => p.Id);
+
+            builder.HasIndex(p => p.InvoiceNumber)
+                .IsUnique();
 
             builder.Property(p => p.InvoiceNumber)
                 .IsRequired()

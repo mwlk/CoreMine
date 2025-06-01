@@ -4,6 +4,7 @@ using CoreMine.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoreMine.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250601072606_feat_add_unique_into_invoice_number")]
+    partial class feat_add_unique_into_invoice_number
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -394,7 +397,7 @@ namespace CoreMine.Data.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("PurchaseInvoices", (string)null);
+                    b.ToTable("PurchasInvoices", (string)null);
                 });
 
             modelBuilder.Entity("CoreMine.Entities.PurchaseInvoiceDetail", b =>

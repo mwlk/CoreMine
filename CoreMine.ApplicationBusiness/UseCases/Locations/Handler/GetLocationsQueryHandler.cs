@@ -38,12 +38,12 @@ namespace CoreMine.ApplicationBusiness.UseCases.Locations.Handler
                 baseQuery = baseQuery.Where(p => query.Ids.Contains(p.Id));
             }
 
-            if (!query.Name.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(query.Name))
             {
                 baseQuery = baseQuery.Where(p => p.Name.Contains(query.Name));
             }
 
-            if (!query.Description.IsNullOrEmpty())
+            if (!string.IsNullOrEmpty(query.Description))
             {
                 baseQuery = baseQuery.Where(p => p.Description.Contains(query.Description));
             }

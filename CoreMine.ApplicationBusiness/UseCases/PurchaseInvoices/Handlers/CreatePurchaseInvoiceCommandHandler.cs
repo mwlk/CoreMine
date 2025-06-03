@@ -34,28 +34,35 @@ namespace CoreMine.ApplicationBusiness.UseCases.PurchaseInvoices.Handlers
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            // DEBUG - ver qué fecha está llegando
+            Console.WriteLine($"IngresedAt recibido: '{command.IngresedAt}'");
+            Console.WriteLine($"IngresedAt ticks: {command.IngresedAt.Ticks}");
+            Console.WriteLine($"DateTime.MinValue ticks: {DateTime.MinValue.Ticks}");
+            Console.WriteLine($"Es MinValue?: {command.IngresedAt == DateTime.MinValue}");
+
+            var productCodes = command.Products
+                .Select(p => p.ProductCode)
+                .Distinct()
+                .ToList();
+
+            var productIdsMap = await _productsRepository.GetProductIdsByCodesAsync(productCodes, cancellationToken);
+
+            var notFound = productCodes.Except(productIdsMap.Keys).ToList();
+
+            if (notFound.Any())
+            {
+                throw new ProductsNotFoundException(string.Join(",", notFound));
+            }
+
+            var productStockDict = await _readOnlyStockRepository.GetQueryable()
+                .Where(p => productIdsMap.Select(p => p.Value).Contains(p.ProductId)
+                        && (p.LocationId == command.LocationId))
+                .ToDictionaryAsync(p => p.ProductId, cancellationToken);
+
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
             try
             {
-                var productCodes = command.Products
-                    .Select(p => p.ProductCode)
-                    .Distinct()
-                    .ToList();
-
-                var productIdsMap = await _productsRepository.GetProductIdsByCodesAsync(productCodes, cancellationToken);
-
-                var notFound = productCodes.Except(productIdsMap.Keys).ToList();
-
-                if (notFound.Any())
-                {
-                    throw new ProductsNotFoundException(string.Join(",", notFound));
-                }
-
-                var productStockDict = await _readOnlyStockRepository.GetQueryable()
-                    .Where(p => productIdsMap.Select(p => p.Value).Contains(p.ProductId)
-                            && (p.LocationId == command.LocationId))
-                    .ToDictionaryAsync(p => p.ProductId, cancellationToken);
 
                 foreach (var item in command.Products)
                 {
@@ -73,6 +80,7 @@ namespace CoreMine.ApplicationBusiness.UseCases.PurchaseInvoices.Handlers
                             ProductId = productId,
                             LocationId = command.LocationId,
                             Quantity = item.Quantity,
+                            UpdatedAt = _dateTimeProvider.UtcNow,
                         };
 
                         await _stockRepository.AddAsync(newStock, cancellationToken);

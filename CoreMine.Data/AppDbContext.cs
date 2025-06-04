@@ -25,6 +25,8 @@ namespace CoreMine.Data
         public DbSet<Machine> Machines { get; set; }
         public DbSet<Repair> Repairs { get; set; }
         public DbSet<RepairProduct> RepairProducts { get; set; }
+        public DbSet<PurchaseInvoice> PurchaseInvoices { get; set; }
+        public DbSet<PurchaseInvoiceDetail> PurchaseInvoiceDetails { get; set; }
 
         #region sql views
         public DbSet<RepairWithProductsReadModel> RepairsWithProducts => Set<RepairWithProductsReadModel>();

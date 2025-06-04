@@ -1,5 +1,8 @@
 ﻿using CoreMine.ApplicationBusiness.Interfaces.Shared;
 using CoreMine.ApplicationBusiness.UseCases.PurchaseInvoices.Commands;
+using CoreMine.ApplicationBusiness.UseCases.PurchaseInvoices.Queries;
+using CoreMine.Models.Common;
+using CoreMine.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoreMine.Api.Endpoints
@@ -23,6 +26,20 @@ namespace CoreMine.Api.Endpoints
                 .Produces<int>(StatusCodes.Status201Created)
                 .Produces(StatusCodes.Status400BadRequest)
                 .WithDescription("Registrar factura de compra");
+
+            group.MapGet("", async (
+                [AsParameters] GetPurchaseInvoicesQuery query,
+                IQueryHandler<GetPurchaseInvoicesQuery, PagedResult<PurchaseInvoiceViewModel>> handler,
+                CancellationToken cancellationToken
+                ) =>
+            {
+                var result = await handler.HandleAsync(query, cancellationToken);
+
+                return Results.Ok(result);
+            })
+                .Produces<PagedResult<PurchaseInvoiceViewModel>>(StatusCodes.Status200OK)
+                .Produces(StatusCodes.Status400BadRequest)
+                .WithDescription("Listar facturas de compra");
         }
     }
 }

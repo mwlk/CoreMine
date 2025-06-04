@@ -89,41 +89,114 @@
                         </h5>
                     </div>
 
-                    <!-- Agregar Producto -->
-                    <div class="add-product-section p-3" style="background-color: var(--rz-base-100); border-radius: 8px; margin-bottom: 20px;">
+                    <!-- Agregar Producto - UI CORREGIDA -->
+                    <div class="add-product-section p-4" style="background: #f8f9fa; border-radius: 12px; margin-bottom: 24px; border: 1px solid #dee2e6;">
+                        <div class="d-flex align-items-center mb-3">
+                            <RadzenIcon Icon="add_shopping_cart" Style="color: #28a745; margin-right: 8px;" />
+                            <h6 class="mb-0" style="color: #495057; font-weight: 600;">Agregar Producto a la Reparación</h6>
+                        </div>
+                        
                         <div class="row g-3">
                             <div class="col-md-6">
-                                <RadzenLabel Text="Producto" Style="font-weight: 600; margin-bottom: 8px; display: block;" />
+                                <RadzenLabel Text="Seleccionar Producto" Style="font-weight: 500; margin-bottom: 6px; display: block; color: #495057;" />
                                 <RadzenDropDown Data="@Products"
                                                 TextProperty="Name"
                                                 ValueProperty="Id"
                                                 @bind-Value="selectedProductId"
                                                 Change="OnProductSelected"
-                                                Placeholder="Seleccionar producto"
-                                                Style="width: 100%" />
+                                                Placeholder="Buscar y seleccionar..."
+                                                Style="width: 100%; height: 40px;" />
                             </div>
+                            
                             <div class="col-md-3">
-                                <RadzenLabel Text="@GetQuantityLabel()" Style="font-weight: 600; margin-bottom: 8px; display: block;" />
+                                <RadzenLabel Text="@GetQuantityLabel()" Style="font-weight: 500; margin-bottom: 6px; display: block; color: #495057;" />
                                 <RadzenNumeric @bind-Value="selectedQuantity"
                                                Min="@GetMinQuantity()"
                                                Max="@GetMaxQuantity()"
                                                Step="@GetQuantityStep().ToString(CultureInfo.InvariantCulture)"
-                                               Placeholder="Cantidad"
-                                               Style="width: 100%" />
-                                @if (GetStockInfo() != null)
-                                {
-                                    <small class="text-muted mt-1 d-block">@GetStockInfo()</small>
-                                }
+                                               Placeholder="0"
+                                               Style="width: 100%; height: 40px;" />
                             </div>
-                            <div class="col-md-3 d-flex align-items-center">
+                            
+                            <div class="col-md-3">
+                                <RadzenLabel Text="&nbsp;" Style="font-weight: 500; margin-bottom: 6px; display: block;" />
                                 <RadzenButton Text="Agregar"
-                                              Icon="add_circle"
+                                              Icon="add"
                                               Click="@AddProduct"
                                               Disabled="@(!CanAddProduct())"
                                               ButtonStyle="ButtonStyle.Success"
-                                              Style="width: 100%;" />
+                                              Style="width: 100%; height: 40px; font-weight: 600;" />
                             </div>
                         </div>
+                        
+                        <!-- Fila para mostrar información del producto seleccionado -->
+                        @if (selectedProductId.HasValue)
+                        {
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="product-info-panel">
+                                        @{
+                                            var selectedProduct = Products?.FirstOrDefault(p => p.Id == selectedProductId.Value);
+                                        }
+                                        @if (selectedProduct != null)
+                                        {
+                                            <div class="row g-2">
+                                                <div class="col-md-3">
+                                                    <small class="info-label">Stock Disponible:</small>
+                                                    <span class="info-value stock-value @GetStockColorClass(selectedProduct.Quantity, selectedProduct.MinQuantity)">
+                                                        @(selectedProduct.Quantity?.ToString("N2") ?? "0") @selectedProduct.UnitOfMeasureName
+                                                    </span>
+                                                </div>
+                                                
+                                                @if (selectedProduct.UnitPrice > 0)
+                                                {
+                                                    <div class="col-md-3">
+                                                        <small class="info-label">Precio Unitario:</small>
+                                                        <span class="info-value">@selectedProduct.UnitPrice.ToString("C")</span>
+                                                    </div>
+                                                }
+                                                
+                                                @if (!string.IsNullOrEmpty(selectedProduct.CategoryName))
+                                                {
+                                                    <div class="col-md-3">
+                                                        <small class="info-label">Categoría:</small>
+                                                        <span class="info-value">@selectedProduct.CategoryName</span>
+                                                    </div>
+                                                }
+                                                
+                                                @if (!string.IsNullOrEmpty(selectedProduct.Code))
+                                                {
+                                                    <div class="col-md-3">
+                                                        <small class="info-label">Código:</small>
+                                                        <span class="info-value">@selectedProduct.Code</span>
+                                                    </div>
+                                                }
+                                            </div>
+                                            
+                                            <!-- Alertas de stock -->
+                                            @if (selectedProduct.Quantity.HasValue && selectedProduct.MinQuantity.HasValue && selectedProduct.Quantity < selectedProduct.MinQuantity)
+                                            {
+                                                <div class="alert alert-warning py-2 px-3 mt-2 mb-0" style="border-radius: 6px;">
+                                                    <small class="mb-0 d-flex align-items-center">
+                                                        <RadzenIcon Icon="warning" Style="margin-right: 6px; font-size: 16px;" />
+                                                        ⚠️ Stock bajo: El producto está por debajo del mínimo recomendado
+                                                    </small>
+                                                </div>
+                                            }
+                                            else if (GetStockInfo() != null)
+                                            {
+                                                <div class="alert alert-info py-2 px-3 mt-2 mb-0" style="background-color: #e7f3ff; border: 1px solid #b8daff; border-radius: 6px;">
+                                                    <small class="mb-0 d-flex align-items-center">
+                                                        <RadzenIcon Icon="info" Style="margin-right: 6px; font-size: 16px;" />
+                                                        @GetStockInfo()
+                                                    </small>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
                     </div>
 
                     <!-- Lista de Productos -->
@@ -150,6 +223,7 @@
                                                 @if (product?.UnitPrice > 0)
                                                 {
                                                     <span class="ms-3">Precio unitario: <strong>$@product.UnitPrice.ToString("F2")</strong></span>
+                                                    <span class="ms-3">Subtotal: <strong>$@((product.UnitPrice * prod.QuantityUsed).ToString("F2"))</strong></span>
                                                 }
                                             </div>
                                             @if (!string.IsNullOrEmpty(product?.CategoryName))
@@ -241,6 +315,116 @@
     </RadzenTemplateForm>
 </div>
 
+<style>
+    /* Estilos específicos para la sección de agregar productos */
+    .add-product-section {
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .add-product-section:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* Panel de información del producto */
+    .product-info-panel {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    .info-label {
+        display: block;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        margin-bottom: 2px;
+    }
+    
+    .info-value {
+        display: block;
+        color: #495057;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    
+    .stock-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+    
+    .stock-normal {
+        color: #28a745;
+    }
+    
+    .stock-low {
+        color: #dc3545;
+    }
+    
+    .stock-medium {
+        color: #fd7e14;
+    }
+    
+    /* Mejorar la apariencia del dropdown */
+    .add-product-section .rz-dropdown {
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        transition: border-color 0.2s ease-in-out;
+    }
+    
+    .add-product-section .rz-dropdown:focus-within {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    
+    /* Mejorar la apariencia del input numérico */
+    .add-product-section .rz-numeric {
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        transition: border-color 0.2s ease-in-out;
+    }
+    
+    .add-product-section .rz-numeric:focus-within {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    
+    /* Estilo para el botón de agregar */
+    .add-product-section .rz-button-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .add-product-section .rz-button-success:hover:not(:disabled) {
+        background: linear-gradient(135deg, #218838 0%, #1abc9c 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    }
+    
+    .add-product-section .rz-button-success:disabled {
+        background: #6c757d;
+        opacity: 0.6;
+    }
+    
+    /* Estilo para los alerts */
+    .add-product-section .alert-info {
+        background: linear-gradient(135deg, #e7f3ff 0%, #f0f8ff 100%);
+        border-left: 4px solid #0dcaf0;
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    .add-product-section .alert-warning {
+        background: linear-gradient(135deg, #fff3cd 0%, #fef9e7 100%);
+        border-left: 4px solid #fd7e14;
+        animation: slideDown 0.3s ease-out;
+    }
+</style>
 
 @code {
     private IEnumerable<MachineViewModel> Machines { get; set; } = new List<MachineViewModel>();
@@ -362,6 +546,20 @@
         return null;
     }
 
+    // Método para determinar la clase CSS del color del stock
+    private string GetStockColorClass(decimal? currentStock, decimal? minStock)
+    {
+        if (!currentStock.HasValue) return "stock-low";
+        
+        if (minStock.HasValue)
+        {
+            if (currentStock < minStock) return "stock-low";
+            if (currentStock < minStock * 1.5m) return "stock-medium";
+        }
+        
+        return "stock-normal";
+    }
+
     private bool CanAddProduct()
     {
         if (!selectedProductId.HasValue || !selectedQuantity.HasValue || selectedQuantity <= 0)
@@ -475,7 +673,4 @@
             });
         }
     }
-
-
-
 }

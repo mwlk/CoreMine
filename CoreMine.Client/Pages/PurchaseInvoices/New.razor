@@ -51,7 +51,8 @@
                                    Style="width: 100%" 
                                    Name="InvoiceNumber" 
                                    Placeholder="Ingrese el número de factura"
-                                   Disabled="@isLoading" />
+                                   Disabled="@isLoading" 
+                                   @attributes="@(new Dictionary<string, object> { {"pattern", "[0-9]*"}, {"inputmode", "numeric"} })"/>
                     <RadzenRequiredValidator Component="InvoiceNumber" 
                                              Text="El número de factura es requerido" 
                                              Style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px;" />
@@ -533,7 +534,6 @@
         formSubmitAttempted = true;
         StateHasChanged();
 
-        // Validaciones personalizadas
         if (!productsList.Any())
         {
             NotificationService.Notify(new NotificationMessage 
@@ -615,9 +615,11 @@
                 { 
                     Severity = NotificationSeverity.Success, 
                     Summary = "Éxito", 
-                    Detail = "Factura de compra guardada correctamente" 
+                    Detail = "Factura de compra guardada correctamente",
+                    Duration = 4000
                 });
 
+                await Task.Delay(2500);
                 NavManager.NavigateTo("/suppliers");
             }
             else

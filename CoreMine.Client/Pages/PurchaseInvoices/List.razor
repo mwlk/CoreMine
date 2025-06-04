@@ -95,37 +95,66 @@
                 }
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="Details" Title="Cant. Total" Sortable="false" Width="100px">
+        <RadzenDataGridColumn Property="Details" Title="Cant. Total" Sortable="false" Width="100px" TextAlign="TextAlign.Center">
+            <HeaderTemplate>
+                <div style="text-align: center; width: 100%; padding: 0 8px;">Cant. Total</div>
+            </HeaderTemplate>
             <Template Context="invoice">
-                <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@invoice.Details.Sum(d => d.Quantity).ToString()" />
+                <div style="text-align: center; width: 100%; padding: 0 8px;">
+                    <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@invoice.Details.Sum(d => d.Quantity).ToString()" />
+                </div>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="Total" Title="Total" FormatString="{0:C}" Width="100px" />
+        <RadzenDataGridColumn Property="Total" Title="Total" Width="100px" TextAlign="TextAlign.Right">
+            <HeaderTemplate>
+                <div style="text-align: right; width: 100%; padding: 0 8px;">Total</div>
+            </HeaderTemplate>
+            <Template Context="invoice">
+                <div style="text-align: right; width: 100%; padding: 0 8px;">
+                    <RadzenText TextStyle="TextStyle.Body1" class="rz-color-success">
+                        @invoice.Total.ToString("C")
+                    </RadzenText>
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 
     <Template Context="invoice">
         <RadzenCard class="rz-my-2">
             <RadzenText TextStyle="TextStyle.H6" class="rz-mb-3">Detalle de Productos - Factura #@invoice.Id</RadzenText>
             
-            <RadzenDataGrid Data="invoice.Details" class="rz-mt-2">
-                <Columns>
-                    <RadzenDataGridColumn Property="ProductCode" Title="Código" Width="120px" />
-                    <RadzenDataGridColumn Property="ProductName" Title="Producto" />
-                    <RadzenDataGridColumn Property="Quantity" Title="Cantidad" Width="80px">
-                        <Template Context="detail">
-                            <RadzenText TextAlign="TextAlign.Center">@detail.Quantity</RadzenText>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="UnitPrice" Title="Precio Unit." FormatString="{0:C}" Width="100px" />
-                    <RadzenDataGridColumn Title="Subtotal" Width="100px">
-                        <Template Context="detail">
-                            <RadzenText TextStyle="TextStyle.Body1">
-                                @((detail.Quantity * detail.UnitPrice).ToString("C"))
-                            </RadzenText>
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
+            <div class="rz-data-table" style="width: 100%; border: 1px solid var(--rz-grid-border-color); border-radius: 4px; overflow: hidden;">
+                <!-- Header -->
+                <div style="display: flex; background-color: var(--rz-grid-header-background-color); border-bottom: 1px solid var(--rz-grid-border-color); font-weight: 600; padding: 8px 0;">
+                    <div style="flex: 0 0 10%; min-width: 100px; padding: 8px 12px; text-align: left;">Código</div>
+                    <div style="flex: 0 0 40%; min-width: 150px; padding: 8px 12px; text-align: left;">Producto</div>
+                    <div style="flex: 0 0 15%; min-width: 80px; padding: 8px 12px; text-align: center;">Cantidad</div>
+                    <div style="flex: 0 0 15%; min-width: 100px; padding: 8px 12px; text-align: right;">Precio Unit.</div>
+                    <div style="flex: 1; min-width: 100px; padding: 8px 12px; text-align: right;">Subtotal</div>
+                </div>
+                
+                <!-- Rows -->
+                @foreach (var detail in invoice.Details)
+                {
+                    <div style="display: flex; border-bottom: 1px solid var(--rz-grid-border-color); padding: 8px 0; background-color: var(--rz-grid-cell-background-color);">
+                        <div style="flex: 0 0 10%; min-width: 100px; padding: 8px 12px; text-align: left;">
+                            <RadzenText TextStyle="TextStyle.Body2">@detail.ProductCode</RadzenText>
+                        </div>
+                        <div style="flex: 0 0 40%; min-width: 150px; padding: 8px 12px; text-align: left;">
+                            <RadzenText TextStyle="TextStyle.Body1" title="@detail.ProductName">@detail.ProductName</RadzenText>
+                        </div>
+                        <div style="flex: 0 0 15%; min-width: 80px; padding: 8px 12px; text-align: center;">
+                            <RadzenText TextStyle="TextStyle.Body1">@detail.Quantity</RadzenText>
+                        </div>
+                        <div style="flex: 0 0 15%; min-width: 100px; padding: 8px 12px; text-align: right;">
+                            <RadzenText TextStyle="TextStyle.Body1">@detail.UnitPrice.ToString("C")</RadzenText>
+                        </div>
+                        <div style="flex: 1; min-width: 100px; padding: 8px 12px; text-align: right;">
+                            <RadzenText TextStyle="TextStyle.Body1" class="rz-color-success">@((detail.Quantity * detail.UnitPrice).ToString("C"))</RadzenText>
+                        </div>
+                    </div>
+                }
+            </div>
         </RadzenCard>
     </Template>
 </RadzenDataGrid>

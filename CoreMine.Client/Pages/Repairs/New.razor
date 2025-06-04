@@ -268,7 +268,7 @@
         try
         {
             var machinesTask = HttpClient.GetFromJsonAsync<PagedResult<MachineViewModel>>("api/machines");
-            var productsTask = HttpClient.GetFromJsonAsync<PagedResult<ProductReadModel>>("api/products");
+            var productsTask = HttpClient.GetFromJsonAsync<PagedResult<ProductReadModel>>("api/products?pageSize=0");
 
             await Task.WhenAll(machinesTask, productsTask);
 

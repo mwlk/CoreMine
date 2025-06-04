@@ -1,0 +1,262 @@
+﻿@page "/products/new"
+@using CoreMine.Client.Models.Forms
+@using CoreMine.Client.Models.ReadModels
+@using CoreMine.Models.Common
+@using CoreMine.Models.ViewModels
+@attribute [Authorize]
+
+@inject HttpClient HttpClient
+@inject NotificationService NotificationService
+@inject NavigationManager NavManager
+
+<RadzenNotification />
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="@(() => NavManager.NavigateTo("/products"))">
+        Volver
+    </RadzenButton>
+</div>
+
+<div class="container-fluid" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <div class="d-flex align-items-center mb-4">
+        <RadzenIcon Icon="build" Style="font-size: 2rem; margin-right: 12px; color: var(--rz-primary);" />
+        <h2 class="mb-0">Registrar Repuesto</h2>
+    </div>
+
+    <RadzenTemplateForm TItem="CreateProductDto" Data="newProduct" Submit="SaveProduct">
+        <RadzenCard Style="padding: 2rem">
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <RadzenLabel Text="Nombre *" Style="font-weight: 600; margin-bottom: 8px; display: block" />
+                    <RadzenTextBox @bind-Value="newProduct.Name" Style="width: 100%"
+                                   Name="ProductName"
+                                   Placeholder="Ingrese nombre" Disabled="@isLoading" />
+                    <RadzenRequiredValidator Component="ProductName" Text="El nombre del repuesto es requerido"
+                                             Style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px;" />
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <RadzenLabel Text="Código *" Style="font-weight: 600; margin-bottom: 8px; display: block" />
+                    <RadzenTextBox @bind-Value="newProduct.Code" Style="width: 100%"
+                                   Name="ProductCode"
+                                   Placeholder="Ingrese código" Disabled="@isLoading" />
+                    <RadzenRequiredValidator Component="ProductCode" Text="El código del repuesto es requerido"
+                                             Style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px;" />
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <RadzenLabel Text="Categoría *" Style="font-weight: 600; margin-bottom: 8px; display: block" />
+                    <RadzenDropDown Data="@Categories" ValueProperty="Id"
+                                    @bind-Value="newProduct.ProductCategoryId"
+                                    Style="width: 100%"
+                                    Placeholder="Seleccione una categoría"
+                                    Disabled="@isLoading"
+                                    Name="ProductCategoryId">
+                        <Template Context="category">
+                            @($"{category.Code} | {category.Name}")
+                        </Template>
+                    </RadzenDropDown>
+                    <RadzenRequiredValidator Component="ProductCategoryId"
+                                             Text="Categoría es requerida"
+                                             Style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px;" />
+
+                </div>
+                <div class="col-md-6 mb-3">
+                    <RadzenLabel Text="Descripción" Style="font-weight: 600; margin-bottom: 8px; display: block" />
+                    <RadzenTextBox @bind-Value="newProduct.Description" Style="width: 100%"
+                                   Name="ProductDescription"
+                                   Placeholder="Ingrese descripción" Disabled="@isLoading" />
+
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <RadzenLabel Text="Proveedor *" Style="font-weight: 600; margin-bottom: 8px; display: block" />
+                    <RadzenDropDown Data="@Suppliers" ValueProperty="Id"
+                                    @bind-Value="newProduct.SupplierId"
+                                    Style="width: 100%"
+                                    Placeholder="Seleccione un proveedor"
+                                    Disabled="@isLoading"
+                                    Name="SupplierId">
+                        <Template Context="supplier">
+                            @($"{supplier.Surname}, {supplier.Name}")
+                        </Template>
+                    </RadzenDropDown>
+                    <RadzenRequiredValidator Component="SupplierId"
+                                             Text="Proveedor es requerido"
+                                             Style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px;" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <RadzenLabel Text="Unidad de medida *" Style="font-weight: 600; margin-bottom: 8px; display: block" />
+                    <RadzenDropDown Data="@UnitOfMeasures" ValueProperty="Id"
+                                    @bind-Value="newProduct.UnitOfMeasureId"
+                                    Style="width: 100%"
+                                    Placeholder="Seleccione una unidad de medida"
+                                    Disabled="@isLoading"
+                                    Name="UnitOfMeasureId"
+                                    TextProperty="Name">
+                    </RadzenDropDown>
+                    <RadzenRequiredValidator Component="UnitOfMeasureId"
+                                             Text="Unidad de medida es requerida"
+                                             Style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px;" />
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <RadzenLabel Text="Precio unitario *" Style="font-weight: 600; margin-bottom: 8px; display: block" />
+                    <RadzenNumeric @bind-Value="newProduct.UnitPrice" Style="width: 100%"
+                                   Name="UnitPrice"
+                                   Min="0"
+                                   Placeholder="Ingrese precio unitario" Disabled="@isLoading" />
+                    <RadzenRequiredValidator Component="UnitPrice" Text="El precio unitario es requerido"
+                                             Style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px;" />
+                </div>
+            </div>
+
+                 <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <RadzenButton Text="Cancelar"
+                                      ButtonStyle="ButtonStyle.Light"
+                                      Icon="cancel"
+                                      Click="@(() => { 
+                                          newProduct = new() {  };
+                                          formSubmitAttempted = false;
+                                      })"
+                                      Size="ButtonSize.Medium"
+                                      Disabled="@isLoading"
+                                      Style="padding: 12px 24px;" />
+
+                        <RadzenButton Text="Guardar Repuesto"
+                                      ButtonType="ButtonType.Submit"
+                                      ButtonStyle="ButtonStyle.Primary"
+                                      Icon="save"
+                                      Size="ButtonSize.Medium"
+                                      Disabled="@isLoading"
+                                      Style="padding: 12px 24px;" />
+                    </div>
+                </div>
+            </div>
+        </RadzenCard>
+    </RadzenTemplateForm>
+
+</div>
+
+@code {
+    private CreateProductDto newProduct = new();
+    private bool isLoading = false;
+    private bool formSubmitAttempted = false;
+
+    private IEnumerable<CategoryViewModel> Categories = new List<CategoryViewModel>();
+    private IEnumerable<SupplierReadModel> Suppliers = new List<SupplierReadModel>();
+    private IEnumerable<UnitOfMeasureReadModel> UnitOfMeasures = new List<UnitOfMeasureReadModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        var categoriesTask = HttpClient.GetFromJsonAsync<PagedResult<CategoryViewModel>>("api/productCategories");
+        var suppliersTask = HttpClient.GetFromJsonAsync<PagedResult<SupplierReadModel>>("api/suppliers");
+        var unitOfMeasuresTask = HttpClient.GetFromJsonAsync<PagedResult<UnitOfMeasureReadModel>>("api/unitOfMeasures");
+
+        await Task.WhenAll(categoriesTask, suppliersTask, unitOfMeasuresTask);
+
+        var categories = await categoriesTask;
+        var suppliers = await suppliersTask;
+        var unitOfMeasures = await unitOfMeasuresTask;
+
+        Categories = categories?.Items ?? new List<CategoryViewModel>();
+        Suppliers = suppliers?.Items ?? new List<SupplierReadModel>();
+        UnitOfMeasures = unitOfMeasures?.Items ?? new List<UnitOfMeasureReadModel>();
+    }
+
+    private async void SaveProduct()
+    {
+        formSubmitAttempted = true;
+        StateHasChanged();
+
+        // validaciones
+        if (newProduct.ProductCategoryId <= 0)
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Warning, 
+                Summary = "Advertencia", 
+                Detail = "Debe seleccionar una categoría" 
+            });
+            return;
+        }
+
+        if (newProduct.SupplierId <= 0)
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Warning, 
+                Summary = "Advertencia", 
+                Detail = "Debe seleccionar un proveedor" 
+            });
+            return;
+        }
+
+        if (newProduct.UnitOfMeasureId <= 0)
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Warning, 
+                Summary = "Advertencia", 
+                Detail = "Debe seleccionar una unidad de medida" 
+            });
+            return;
+        }
+
+        isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            var response = await HttpClient.PostAsJsonAsync("api/products", newProduct);
+
+            if (response.IsSuccessStatusCode)
+            {
+                NotificationService.Notify(new NotificationMessage 
+                { 
+                    Severity = NotificationSeverity.Success, 
+                    Summary = "Éxito", 
+                    Detail = "Repuesto registrado correctamente" 
+                });
+
+                NavManager.NavigateTo("/products");
+            }
+            else
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = $"Hubo un problema al guardar el repuesto: {response.StatusCode}",
+                });
+            }
+        }
+        catch (Exception)
+        {
+             NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = $"Error guardando repuesto",
+                });
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+}

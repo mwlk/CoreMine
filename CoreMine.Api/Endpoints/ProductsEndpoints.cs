@@ -1,7 +1,9 @@
 ﻿using CoreMine.ApplicationBusiness.Interfaces.Shared;
+using CoreMine.ApplicationBusiness.UseCases.Products.Commands;
 using CoreMine.ApplicationBusiness.UseCases.Products.Queries;
 using CoreMine.Data.ReadModels;
 using CoreMine.Models.Common;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CoreMine.Api.Endpoints
 {
@@ -21,7 +23,23 @@ namespace CoreMine.Api.Endpoints
             })
                 .Produces<List<ProductsWithFullCategoryInfoReadModel>>(StatusCodes.Status200OK)
                 .Produces(StatusCodes.Status404NotFound)
-                .WithDescription("Listar repuestos");
+                .WithDescription("Listar Repuestos");
+
+            group.MapPost("/", async (
+                [FromBody] CreateProductCommand command,
+                ICommandHandler<CreateProductCommand, int> handler,
+                CancellationToken cancellationToken
+                ) =>
+            {
+                var result = await handler.HandleAsync(command, cancellationToken);
+
+                return Results.Created($"Repuesto Creado: {result}", result);
+            })
+                .WithDescription("Agregar Repuesto")
+                .Produces<int>(StatusCodes.Status201Created)
+                .Produces(StatusCodes.Status400BadRequest);
+
         }
     }
 }
+

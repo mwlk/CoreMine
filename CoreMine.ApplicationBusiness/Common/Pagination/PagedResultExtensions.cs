@@ -12,10 +12,20 @@ namespace CoreMine.ApplicationBusiness.Common.Pagination
             CancellationToken cancellationToken = default)
         {
             if (pageNumber <= 0) pageNumber = 1;
-            if (pageSize <= 0) pageSize = 10;
+
+            if (pageSize <= 0)
+            {
+                var allItems = await query.ToListAsync(cancellationToken);
+                return new PagedResult<T>
+                {
+                    TotalCount = allItems.Count,
+                    PageNumber = 1,
+                    PageSize = allItems.Count,
+                    Items = allItems
+                };
+            }
 
             var total = await query.CountAsync(cancellationToken);
-
             var items = await query
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

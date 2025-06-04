@@ -17,7 +17,6 @@ namespace CoreMine.Infrastructure.Repositories
         public async Task AddAsync(Product entityToAdd, CancellationToken cancellationToken)
         {
             await _context.AddAsync(entityToAdd, cancellationToken);
-            await _context.SaveChangesAsync(cancellationToken);
         }
 
         public async Task DeleteAsync(int id, CancellationToken cancellationToken)

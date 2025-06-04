@@ -22,7 +22,7 @@ namespace CoreMine.ApplicationBusiness.UseCases.Products.Handlers
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            int pageSize = query.PageSize > 0 ? query.PageSize.Value : 10;
+            int pageSize = query.PageSize.HasValue ? query.PageSize.Value : 10;
             int pageNumber = query.PageNumber > 0 ? query.PageNumber.Value : 1;
 
             var baseQuery = _repository.GetQueryable();

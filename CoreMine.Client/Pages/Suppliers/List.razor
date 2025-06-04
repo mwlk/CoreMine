@@ -5,9 +5,8 @@
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
 
-<h3>Listado de Proveedores</h3>
+<h3>Listar Proveedores</h3>
 
-<!-- Panel de filtros -->
 <div class="rz-card rz-variant-filled mb-4 p-4">
     <div class="card-header">
         <h5 class="card-title mb-0">Filtros de Búsqueda</h5>
@@ -17,7 +16,7 @@
             <div class="col-md-4">
                 <label class="form-label">Buscar por Nombre Completo:</label>
                 <RadzenTextBox @bind-Value="searchFullName"
-                               Placeholder="Ingrese nombre o apellido..."
+                               Placeholder="Ingrese nombre o apellido"
                                class="w-100"
                                @onkeypress="@(async (e) => { if (e.Key == "Enter") await ApplyFilters(); })" />
             </div>
@@ -25,7 +24,7 @@
                 <label class="form-label">Buscar por ID:</label>
                 <RadzenNumeric TValue="int?"
                                @bind-Value="filterById"
-                               Placeholder="ID del proveedor..."
+                               Placeholder="Id del proveedor"
                                class="w-100" />
             </div>
             <div class="col-md-5 d-flex align-items-end gap-2">
@@ -288,7 +287,7 @@
     // Nuevos métodos para las acciones
     private void ViewInvoices(int supplierId)
     {
-        NavigationManager.NavigateTo($"/supplier-invoices/{supplierId}");
+        NavigationManager.NavigateTo($"/suppliers/{supplierId}/purchase-invoices");
     }
 
     private void CreateInvoice(int supplierId)

@@ -1,0 +1,285 @@
+﻿@page "/purchase-invoices"
+@page "/purchase-invoices/{SupplierId:int}"
+@page "/suppliers/{SupplierId:int}/purchase-invoices"
+@using CoreMine.Client.Models.ReadModels
+@using CoreMine.Models.Common
+
+@inject HttpClient Http
+@inject NotificationService NotificationService
+@inject NavigationManager NavigationManager
+
+<h3>Listar Facturas de Compra</h3>
+
+@* Filtros opcionales si no vienes desde proveedor *@
+@if (!SupplierId.HasValue)
+{
+    <RadzenCard class="rz-my-4">
+        <RadzenRow Gap="1rem">
+            <RadzenColumn Size="4">
+                <RadzenLabel Text="Proveedor" />
+                <RadzenDropDown @bind-Value="selectedSupplierId"
+                                Data="suppliers"
+                                TextProperty="Surname"
+                                ValueProperty="Id"
+                                Placeholder="Seleccionar proveedor"
+                                AllowClear="true" 
+                                Style="width: 100%"/>
+            </RadzenColumn>
+            <RadzenColumn Size="3">
+                <RadzenLabel Text="Fecha Desde" />
+                <RadzenDatePicker @bind-Value="fromDate" DateFormat="dd/MM/yyyy" />
+            </RadzenColumn>
+            <RadzenColumn Size="3">
+                <RadzenLabel Text="Fecha Hasta" />
+                <RadzenDatePicker @bind-Value="toDate" DateFormat="dd/MM/yyyy" />
+            </RadzenColumn>
+            <RadzenColumn Size="2">
+                <RadzenLabel Text="&nbsp;" Style="width: 100%"/>
+                <RadzenButton Text="Buscar" Icon="search" Click="LoadInvoices" />
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenCard>
+}
+
+@* Información del proveedor si vienes filtrado *@
+@if (SupplierId.HasValue && currentSupplier != null)
+{
+    <RadzenAlert AlertStyle="AlertStyle.Info" class="rz-my-4">
+        <RadzenText>
+            Mostrando facturas del proveedor: <strong>@currentSupplier.Surname</strong>
+        </RadzenText>
+        <RadzenButton Text="Ver todas las facturas"
+                      Icon="list"
+                      ButtonStyle="ButtonStyle.Light"
+                      Size="ButtonSize.Small"
+                      Click="@(() => {
+                                        selectedSupplierId = null;
+                                        invoices = new List<PurchaseInvoiceReadModel>();
+                                        NavigationManager.NavigateTo("purchase-invoices");
+                                    })" />
+    </RadzenAlert>
+}
+
+<RadzenDataGrid @ref="invoicesGrid"
+                Data="invoices"
+                Count="totalCount"
+                LoadData="LoadData"
+                AllowPaging="true"
+                AllowSorting="true"
+                PageSize="pageSize"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                IsLoading="isLoading"
+                class="rz-mt-4"
+                ExpandMode="DataGridExpandMode.Single"
+                AllowRowSelectOnRowClick="true">
+
+    <Columns>
+        <RadzenDataGridColumn Property="Id" Title="ID" Width="60px" />
+        <RadzenDataGridColumn Property="IngresedAt" Title="Fecha" FormatString="{0:dd/MM/yyyy}" Width="100px" />
+        <RadzenDataGridColumn Property="SupplierName" Title="Proveedor" Width="200px" />
+        <RadzenDataGridColumn Property="Details" Title="Productos" Sortable="false" Width="180px">
+            <Template Context="invoice">
+                <RadzenText TextStyle="TextStyle.Caption">
+                    @invoice.Details.Count() producto(s)
+                </RadzenText>
+                @if (invoice.Details.Any())
+                {
+                    <RadzenText TextStyle="TextStyle.Body2">
+                        @invoice.Details.First().ProductName
+                        @if (invoice.Details.Count() > 1)
+                        {
+                            <span class="rz-color-info">y @(invoice.Details.Count() - 1) más...</span>
+                        }
+                    </RadzenText>
+                }
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="Details" Title="Cant. Total" Sortable="false" Width="100px">
+            <Template Context="invoice">
+                <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="@invoice.Details.Sum(d => d.Quantity).ToString()" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="Total" Title="Total" FormatString="{0:C}" Width="100px" />
+    </Columns>
+
+    <Template Context="invoice">
+        <RadzenCard class="rz-my-2">
+            <RadzenText TextStyle="TextStyle.H6" class="rz-mb-3">Detalle de Productos - Factura #@invoice.Id</RadzenText>
+            
+            <RadzenDataGrid Data="invoice.Details" class="rz-mt-2">
+                <Columns>
+                    <RadzenDataGridColumn Property="ProductCode" Title="Código" Width="120px" />
+                    <RadzenDataGridColumn Property="ProductName" Title="Producto" />
+                    <RadzenDataGridColumn Property="Quantity" Title="Cantidad" Width="80px">
+                        <Template Context="detail">
+                            <RadzenText TextAlign="TextAlign.Center">@detail.Quantity</RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="UnitPrice" Title="Precio Unit." FormatString="{0:C}" Width="100px" />
+                    <RadzenDataGridColumn Title="Subtotal" Width="100px">
+                        <Template Context="detail">
+                            <RadzenText TextStyle="TextStyle.Body1">
+                                @((detail.Quantity * detail.UnitPrice).ToString("C"))
+                            </RadzenText>
+                        </Template>
+                    </RadzenDataGridColumn>
+                </Columns>
+            </RadzenDataGrid>
+        </RadzenCard>
+    </Template>
+</RadzenDataGrid>
+
+@code {
+    [Parameter] public int? SupplierId { get; set; }
+
+    RadzenDataGrid<PurchaseInvoiceReadModel> invoicesGrid;
+    IEnumerable<PurchaseInvoiceReadModel> invoices = new List<PurchaseInvoiceReadModel>();
+    IEnumerable<SupplierReadModel> suppliers = new List<SupplierReadModel>();
+
+    int totalCount = 0;
+    int pageSize = 10;
+    bool isLoading = false;
+
+    // Filtros
+    int? selectedSupplierId;
+    DateTime? fromDate;
+    DateTime? toDate;
+    SupplierReadModel currentSupplier;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!SupplierId.HasValue)
+        {
+            await LoadSuppliers();
+        }
+        else
+        {
+            await LoadCurrentSupplier();
+            selectedSupplierId = SupplierId.Value;
+        }
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (SupplierId.HasValue)
+        {
+            selectedSupplierId = SupplierId.Value;
+            await LoadCurrentSupplier();
+        }
+        else
+        {
+            // Asegurar que se carguen los proveedores cuando no hay SupplierId
+            if (!suppliers.Any())
+            {
+                await LoadSuppliers();
+            }
+            selectedSupplierId = null;
+            currentSupplier = null;
+        }
+
+        await LoadInvoices();
+    }
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        int currentPageSize = args.Top ?? pageSize;
+        int currentPage = (args.Skip ?? 0) / currentPageSize + 1;
+
+        var queryParams = BuildQueryParams(currentPage, currentPageSize);
+
+        try
+        {
+            var response = await Http.GetFromJsonAsync<PagedResult<PurchaseInvoiceReadModel>>(
+                $"api/purchaseinvoices?{queryParams}");
+
+            invoices = response.Items;
+            totalCount = response.TotalCount;
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", $"Error al cargar facturas: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    async Task LoadInvoices()
+    {
+        await invoicesGrid.Reload();
+    }
+
+    async Task LoadSuppliers()
+    {
+        try
+        {
+            var response = await Http.GetFromJsonAsync<PagedResult<SupplierReadModel>>("api/suppliers");
+
+            if (response is not null)
+            {
+                suppliers = response.Items;
+            }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, "Error", $"Error al cargar proveedores: {ex.Message}");
+        }
+    }
+
+    async Task LoadCurrentSupplier()
+    {
+        if (SupplierId.HasValue)
+        {
+            try
+            {
+                var response = await Http.GetFromJsonAsync<PagedResult<SupplierReadModel>>($"api/suppliers?Id={SupplierId.Value}");
+
+                if (response.TotalCount == 1 && response.Items?.Count() == 1)
+                {
+                    currentSupplier = response.Items.Any() ? response.Items.FirstOrDefault(): null;
+                }
+            }
+            catch (Exception ex)
+            {
+                NotificationService.Notify(NotificationSeverity.Warning, "Advertencia", "No se pudo cargar la información del proveedor");
+            }
+        }
+    }
+
+    async Task ShowInvoiceDetails(PurchaseInvoiceReadModel invoice)
+    {
+        await invoicesGrid.ExpandRow(invoice);
+    }
+
+    string BuildQueryParams(int pageNumber, int pageSize)
+    {
+        var queryParams = new List<string>
+        {
+            $"pageNumber={pageNumber}",
+            $"pageSize={pageSize}"
+        };
+
+        var effectiveSupplierId = SupplierId ?? selectedSupplierId;
+        if (effectiveSupplierId.HasValue)
+        {
+            queryParams.Add($"SupplierIds={effectiveSupplierId.Value}");
+        }
+
+        if (fromDate.HasValue)
+        {
+            queryParams.Add($"fromDate={fromDate.Value:yyyy-MM-dd}");
+        }
+
+        if (toDate.HasValue)
+        {
+            queryParams.Add($"toDate={toDate.Value:yyyy-MM-dd}");
+        }
+
+        var result = string.Join("&", queryParams);
+        return result;
+    }
+}

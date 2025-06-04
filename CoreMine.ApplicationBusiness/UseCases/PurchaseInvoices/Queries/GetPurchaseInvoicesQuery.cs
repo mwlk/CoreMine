@@ -6,5 +6,7 @@ namespace CoreMine.ApplicationBusiness.UseCases.PurchaseInvoices.Queries
     {
         public int[]? Ids { get; set; }
         public int[]? SupplierIds { get; set; }
+        public DateTime? FromDate { get; set; }
+        public DateTime? ToDate { get; set; }
     }
 }

@@ -36,12 +36,24 @@ namespace CoreMine.ApplicationBusiness.UseCases.PurchaseInvoices.Handlers
                 baseQuery = baseQuery.Where(p => query.SupplierIds.Contains(p.SupplierId));
             }
 
+            if (query.FromDate.HasValue)
+            {
+                var fromDate = query.FromDate.Value.Date;
+                baseQuery = baseQuery.Where(p => p.IngresedAt >= fromDate);
+            }
+
+            if (query.ToDate.HasValue)
+            {
+                var toDate = query.ToDate.Value.Date.AddDays(1).AddTicks(-1);
+                baseQuery = baseQuery.Where(p => p.IngresedAt <= toDate);
+            }
+
             var projectedQuery = baseQuery.Select(p => new PurchaseInvoiceViewModel
             {
                 Id = p.Id,
                 IngresedAt = p.IngresedAt,
                 SupplierId = p.SupplierId,
-                SupplierName = p.Supplier.Name,
+                SupplierName = p.Supplier.Surname,
 
                 Total = p.PurchaseInvoiceDetails.Sum(d => d.UnitPrice * d.Quantity),
 

@@ -15,12 +15,16 @@ namespace CoreMine.Data.Configurations
             builder.HasIndex(p => p.Id);
 
             builder.Property(p => p.Name)
-                .HasMaxLength(50)
-                .IsRequired();
+                .HasMaxLength(50);
 
             builder.Property(p => p.Surname)
-                .HasMaxLength(50)
-                .IsRequired();
+                .HasMaxLength(50);
+
+            builder.Property(p => p.BusinessName)
+                .HasMaxLength(50);
+
+            builder.Property(p => p.TradeName)
+                .HasMaxLength(100);
 
             builder.Property(p => p.Contact)
                 .HasMaxLength(100);

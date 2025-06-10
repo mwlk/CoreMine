@@ -8,6 +8,8 @@ namespace CoreMine.Entities
         public string? Contact { get; set; } = null!;
         public string Phone { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
+        public string? BusinessName { get; set; } = null!;
+        public string? TradeName { get; set; } = null!;
         public virtual ICollection<Product> Products { get; set; }
         public virtual ICollection<PurchaseInvoice> PurchaseInvoices { get; set; }
 

@@ -1,5 +1,7 @@
 ﻿-- dbo.vw_ProductsWithFullCategoryInfo source
 
+-- dbo.vw_ProductsWithFullCategoryInfo source
+
 ALTER VIEW vw_ProductsWithFullCategoryInfo AS
 WITH CategoryCTE AS (
     SELECT
@@ -43,7 +45,10 @@ SELECT
     p.categoryId AS CategoryId,
     cat.Name AS CategoryName,
     cte.FullCategoryCode,
-    s.Surname + ' ' + s.Name AS SupplierName,
+    COALESCE(
+    	NULLIF(LTRIM(RTRIM(s.Surname + ' ' + s.Name)), ''),
+    	s.TradeName
+    ) AS SupplierName,
     p.UnitPrice,
     uom.Name AS UnitOfMeasureName,
     ls.LastStateTypeId,

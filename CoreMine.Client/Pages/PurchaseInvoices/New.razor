@@ -1,0 +1,651 @@
+﻿@page "/invoices/create"
+@using CoreMine.Client.Models.Forms
+@using CoreMine.Client.Models.ReadModels
+@using CoreMine.Models.Common
+@using CoreMine.Models.DTOs
+
+@attribute [Authorize]
+@inject NavigationManager NavManager
+@inject HttpClient HttpClient
+@inject NotificationService NotificationService
+
+<RadzenNotification />
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="@(() => NavManager.NavigateTo("/suppliers"))">
+        <RadzenIcon Icon="arrow_back" Style="margin-right: 8px;" />
+        Volver
+    </RadzenButton>
+</div>
+
+<div class="container-fluid" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <div class="d-flex align-items-center mb-4">
+        <RadzenIcon Icon="assignment" Style="font-size: 2rem; margin-right: 12px; color: var(--rz-primary);" />
+        <h2 class="mb-0">Registrar Factura</h2>
+    </div>
+
+    <RadzenTemplateForm TItem="CreatePurchaseInvoiceDto" Data="@newInvoice" Submit="Save">
+        <RadzenCard Style="padding: 2rem;">
+            
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <RadzenLabel Text="Proveedor *" Style="font-weight: 600; margin-bottom: 8px; display: block;" />
+                    <RadzenDropDown Data="@Suppliers"
+                                    ValueProperty="Id"
+                                    @bind-Value="newInvoice.SupplierId"
+                                    Style="width: 100%"
+                                    Placeholder="Seleccione un proveedor"
+                                    Disabled="@isLoading"
+                                    Name="SupplierId">
+                        <Template Context="supplier">
+                            @($"{supplier.Surname}, {supplier.Name}")
+                        </Template>
+                    </RadzenDropDown>
+                    <RadzenRequiredValidator Component="SupplierId" 
+                                             Text="El proveedor es requerido" 
+                                             Style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px;" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <RadzenLabel Text="Número de factura *" Style="font-weight: 600; margin-bottom: 8px; display: block;" />
+                    <RadzenTextBox @bind-Value="newInvoice.InvoiceNumber" 
+                                   Style="width: 100%" 
+                                   Name="InvoiceNumber" 
+                                   Placeholder="Ingrese el número de factura"
+                                   Disabled="@isLoading" 
+                                   @attributes="@(new Dictionary<string, object> { {"pattern", "[0-9]*"}, {"inputmode", "numeric"} })"/>
+                    <RadzenRequiredValidator Component="InvoiceNumber" 
+                                             Text="El número de factura es requerido" 
+                                             Style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px;" />
+                    <RadzenLengthValidator Component="InvoiceNumber" 
+                                           Min="1" 
+                                           Max="50" 
+                                           Text="El número de factura debe tener entre 1 y 50 caracteres" 
+                                           Style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px;" />
+                </div>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                    <RadzenLabel Text="Ubicación *" Style="font-weight: 600; margin-bottom: 8px; display: block;" />
+                    <RadzenDropDown Data="@Locations"
+                                    ValueProperty="Id"
+                                    TextProperty="Name"
+                                    @bind-Value="newInvoice.LocationId"
+                                    Style="width: 100%"
+                                    AllowClear="true"
+                                    Placeholder="Seleccione una ubicación"
+                                    Disabled="@isLoading"
+                                    Name="LocationId" />
+                  <RadzenCompareValidator Component="LocationId"
+                                    Value="0"
+                                    Operator="CompareOperator.NotEqual"
+                                    Text="Debe seleccionar ubicación"
+                                    Style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px"/>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <RadzenLabel Text="Fecha de ingreso *" Style="font-weight: 600; margin-bottom: 8px; display: block;" />
+                    <RadzenDatePicker Name="IngresedAt" 
+                                      @bind-Value="newInvoice.IngresedAt" 
+                                      Style="width: 100%" 
+                                      DateFormat="dd/MM/yyyy"
+                                      Disabled="@isLoading" />
+                    <RadzenCompareValidator Component="IngresedAt" 
+                                            Value="@DateTime.MinValue" 
+                                            Operator="CompareOperator.NotEqual"
+                                            Text="La fecha de ingreso es requerida" 
+                                            Style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px;" />
+                    <RadzenCompareValidator Component="IngresedAt" 
+                                            Value="@DateTime.Today.AddYears(1)" 
+                                            Operator="CompareOperator.LessThanEqual"
+                                            Text="La fecha no puede ser mayor a un año en el futuro" 
+                                            Style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px;" />
+                </div>
+            </div>
+
+            <RadzenSeparator Style="margin: 2rem 0;" />
+            
+            <div class="row mb-4">
+                <div class="col-12">
+                    <RadzenLabel Text="Importar Productos desde Archivo *" Style="font-weight: 600; margin-bottom: 16px; display: block; font-size: 1.1rem;" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <RadzenUpload ChooseText="Seleccionar archivo CSV"
+                                  Accept=".csv"
+                                  Style="width: 100%;"
+                                  Complete="@OnFileUploaded"
+                                  Change="@OnFileChange"
+                                  Multiple="false"
+                                  Disabled="@isLoading">
+                    </RadzenUpload>
+                    
+                    @if (!fileProcessed && formSubmitAttempted)
+                    {
+                        <div style="display: block; color: var(--rz-danger); font-size: 0.8rem; margin-top: 4px;">
+                            <RadzenIcon Icon="error" Style="margin-right: 4px; font-size: 0.8rem;" />
+                            Debe importar un archivo CSV con productos
+                        </div>
+                    }
+                                        
+                    @if (isProcessingFile)
+                    {
+                        <div class="mt-3">
+                            <RadzenProgressBar Value="@uploadProgress" 
+                                               Max="100" 
+                                               Style="width: 100%; height: 24px;" 
+                                               ShowValue="true" />
+                            <div class="mt-2 text-center">
+                                <RadzenIcon Icon="hourglass_empty" Style="margin-right: 8px; animation: spin 2s linear infinite;" />
+                                <span style="font-size: 0.9rem; color: var(--rz-text-secondary-color);">
+                                    Procesando archivo... @(uploadProgress.ToString("F0"))%
+                                </span>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (fileProcessed && newInvoice.Products.Any())
+                    {
+                        <div class="mt-3">
+                            <RadzenAlert AlertStyle="AlertStyle.Success" Variant="Variant.Flat">
+                                <RadzenIcon Icon="check_circle" Style="margin-right: 8px;" />
+                                Archivo procesado exitosamente. @newInvoice.Products.Count productos importados.
+                            </RadzenAlert>
+                        </div>
+                    }
+                </div>
+                
+                <div class="col-md-6">
+                    <div style="background: var(--rz-base-100); padding: 1rem; border-radius: 8px; border: 1px solid var(--rz-base-300);">
+                        <h6 style="margin-bottom: 0.5rem; color: var(--rz-primary);">
+                            <RadzenIcon Icon="info" Style="margin-right: 8px;" />
+                            Formato del archivo CSV
+                        </h6>
+                        <p style="margin-bottom: 0.5rem; font-size: 0.9rem;">
+                            El archivo debe contener las siguientes columnas separadas por punto y coma (;):
+                        </p>
+                        <ul style="font-size: 0.85rem; margin-bottom: 0; padding-left: 1.2rem;">
+                            <li>Código del producto</li>
+                            <li>Cantidad</li>
+                            <li>Precio unitario</li>
+                        </ul>
+                        <div style="margin-top: 0.8rem; padding: 0.5rem; background: var(--rz-base-200); border-radius: 4px; font-size: 0.8rem;">
+                            <strong>Ejemplo:</strong><br />
+                            CÓDIGO;CANTIDAD;PRECIO UNITARIO<br />
+                            PROD001;10;25.50<br />
+                            PROD002;5;100.00
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if (newInvoice.Products.Any())
+            {
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <RadzenLabel Text="Productos Importados" Style="font-weight: 600; margin-bottom: 16px; display: block; font-size: 1.1rem;" />
+                        <RadzenDataGrid @ref="productsGrid"
+                                        Data="@productsList" 
+                                        TItem="PurchaseInvoiceDetailDto"
+                                        AllowPaging="true"
+                                        PageSize="10"
+                                        AllowSorting="true"
+                                        Count="@productsList.Count"
+                                        PagerHorizontalAlign="HorizontalAlign.Left"
+                                        ShowPagingSummary="true"
+                                        PagingSummaryFormat="Mostrando página {0} de {1} (total {2} registros)"
+                                        Style="border-radius: 8px; overflow: hidden;">
+                            <Columns>
+                                <RadzenDataGridColumn TItem="PurchaseInvoiceDetailDto" 
+                                                      Property="ProductCode" 
+                                                      Title="Código de producto"
+                                                      Width="200px" />
+                                <RadzenDataGridColumn TItem="PurchaseInvoiceDetailDto" 
+                                                      Property="Quantity" 
+                                                      Title="Cantidad"
+                                                      Width="120px"
+                                                      TextAlign="TextAlign.Right">
+                                    <Template Context="item">
+                                        @item.Quantity.ToString("N0")
+                                    </Template>
+                                </RadzenDataGridColumn>
+                                <RadzenDataGridColumn TItem="PurchaseInvoiceDetailDto" 
+                                                      Property="UnitPrice" 
+                                                      Title="Precio unitario"
+                                                      Width="150px"
+                                                      TextAlign="TextAlign.Right">
+                                    <Template Context="item">
+                                        $@item.UnitPrice.ToString("N2")
+                                    </Template>
+                                </RadzenDataGridColumn>
+                                <RadzenDataGridColumn TItem="PurchaseInvoiceDetailDto" 
+                                                      Title="Total"
+                                                      Width="150px"
+                                                      TextAlign="TextAlign.Right">
+                                    <Template Context="item">
+                                        $@((item.Quantity * item.UnitPrice).ToString("N2"))
+                                    </Template>
+                                </RadzenDataGridColumn>
+                            </Columns>
+                        </RadzenDataGrid>
+                                                
+                        <div class="mt-3 text-end">
+                            <h5 style="margin: 0;">
+                                Total General: <strong style="color: var(--rz-primary);">
+                                    $@totalAmount.ToString("N2")
+                                </strong>
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <RadzenSeparator Style="margin: 2rem 0;" />
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <RadzenButton Text="Cancelar"
+                                      ButtonStyle="ButtonStyle.Light"
+                                      Icon="cancel"
+                                      Click="@(() => { 
+                                          newInvoice = new() { IngresedAt = DateTime.Today }; 
+                                          productsList.Clear(); 
+                                          totalAmount = 0; 
+                                          fileProcessed = false;
+                                          formSubmitAttempted = false;
+                                      })"
+                                      Size="ButtonSize.Medium"
+                                      Disabled="@isLoading"
+                                      Style="padding: 12px 24px;" />
+
+                        <RadzenButton Text="Guardar Factura"
+                                      ButtonType="ButtonType.Submit"
+                                      ButtonStyle="ButtonStyle.Primary"
+                                      Icon="save"
+                                      Size="ButtonSize.Medium"
+                                      Disabled="@isLoading"
+                                      Style="padding: 12px 24px;" />
+                    </div>
+                </div>
+            </div>
+        </RadzenCard>
+    </RadzenTemplateForm>
+</div>
+
+<style>
+    .rz-progressbar {
+        border-radius: 12px !important;
+    }
+    
+    .rz-progressbar-value {
+        background: linear-gradient(45deg, var(--rz-primary), var(--rz-primary-light)) !important;
+        border-radius: 12px !important;
+    }
+
+    .rz-messages {
+        margin-top: 4px !important;
+    }
+
+    .rz-message {
+        font-size: 0.8rem !important;
+        padding: 2px 0 !important;
+    }
+</style>
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int? SupplierId { get; set; }
+
+    private IEnumerable<SupplierReadModel> Suppliers = new List<SupplierReadModel>();
+    private IEnumerable<LocationReadModel> Locations = new List<LocationReadModel>();
+
+    private CreatePurchaseInvoiceDto newInvoice = new();
+
+    private List<PurchaseInvoiceDetailDto> productsList = new();
+    private decimal totalAmount = 0;
+
+    private RadzenDataGrid<PurchaseInvoiceDetailDto> productsGrid;
+
+    private bool isLoading = false;
+    private bool isProcessingFile = false;
+    private bool fileProcessed = false;
+    private bool formSubmitAttempted = false;
+    private int uploadProgress = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Establecer fecha actual por defecto
+        newInvoice.IngresedAt = DateTime.Today;
+
+        if (!SupplierId.HasValue)
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Error, 
+                Summary = "Error", 
+                Detail = "Proveedor requerido" 
+            });
+            NavManager.NavigateTo("/suppliers");
+            return;
+        }
+
+        isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            await LoadSupplierData(SupplierId!.Value);
+            await LoadLocationsData();
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Error, 
+                Summary = "Error", 
+                Detail = ex.Message 
+            });
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task LoadSupplierData(int supplierId)
+    {
+        var url = $"api/suppliers?Id={SupplierId}";
+
+        var result = await HttpClient.GetFromJsonAsync<PagedResult<SupplierReadModel>>(url);
+
+        if (result != null)
+        {
+            Suppliers = result.Items ?? new List<SupplierReadModel>();
+            newInvoice.SupplierId = supplierId;
+        }
+        else
+        {
+            throw new Exception("No se encontró proveedor");
+        }
+    }
+
+    private async Task LoadLocationsData()
+    {
+        var url = "api/locations";
+
+        var result = await HttpClient.GetFromJsonAsync<PagedResult<LocationReadModel>>(url);
+
+        if (result != null)
+        {
+            Locations = result.Items ?? new List<LocationReadModel>();
+        }
+    }
+
+    #region File Upload
+
+    private async Task OnFileChange(Radzen.UploadChangeEventArgs args)
+    {
+        var file = args.Files.FirstOrDefault();
+
+        if (file != null)
+        {
+            isProcessingFile = true;
+            uploadProgress = 0;
+            fileProcessed = false;
+            formSubmitAttempted = false;
+            StateHasChanged();
+
+            try
+            {
+                uploadProgress = 10;
+                StateHasChanged();
+
+                using var stream = file.OpenReadStream();
+                using var reader = new StreamReader(stream);
+                var content = await reader.ReadToEndAsync();
+
+                uploadProgress = 30;
+                StateHasChanged();
+
+                var lines = content.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                var totalLines = lines.Length;
+
+                uploadProgress = 40;
+                StateHasChanged();
+
+                newInvoice.Products.Clear();
+                productsList.Clear(); 
+
+                var validProducts = 0;
+                var invalidLines = new List<string>();
+
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    var line = lines[i];
+
+                    if (!string.IsNullOrWhiteSpace(line))
+                    {
+                        var values = line.Split(';');
+
+                        if (values.Length >= 3)
+                        {
+                            var productCode = values[0].Trim();
+                            var quantityParsed = int.TryParse(values[1].Trim(), out var quantity);
+                            var unitPriceParsed = decimal.TryParse(values[2].Trim(), out var unitPrice);
+
+                            if (!string.IsNullOrWhiteSpace(productCode) && quantityParsed && unitPriceParsed && quantity > 0 && unitPrice > 0)
+                            {
+                                var product = new PurchaseInvoiceDetailDto
+                                {
+                                    ProductCode = productCode,
+                                    Quantity = quantity,
+                                    UnitPrice = unitPrice
+                                };
+
+                                newInvoice.Products.Add(product);
+                                productsList.Add(product);
+                                validProducts++;
+                            }
+                            else
+                            {
+                                invalidLines.Add($"Línea {i + 1}: {line}");
+                            }
+                        }
+                        else
+                        {
+                            invalidLines.Add($"Línea {i + 1}: Formato incorrecto - {line}");
+                        }
+                    }
+
+                    uploadProgress = 40 + (int)((i + 1) / (double)totalLines * 60);
+
+                    if (i % 5 == 0 || i == lines.Length - 1)
+                    {
+                        StateHasChanged();
+                        await Task.Delay(10); 
+                    }
+                }
+
+                totalAmount = productsList.Sum(p => p.Quantity * p.UnitPrice);
+                uploadProgress = 100;
+                fileProcessed = validProducts > 0;
+
+                StateHasChanged();
+
+                await Task.Delay(50);
+                if (productsGrid != null)
+                {
+                    await productsGrid.Reload();
+                }
+
+                // Notificaciones de resultado
+                if (validProducts > 0)
+                {
+                    var message = $"Se importaron {validProducts} productos correctamente";
+                    if (invalidLines.Any())
+                    {
+                        message += $". Se omitieron {invalidLines.Count} líneas con errores";
+                    }
+
+                    NotificationService.Notify(new NotificationMessage 
+                    { 
+                        Severity = NotificationSeverity.Success, 
+                        Summary = "Éxito", 
+                        Detail = message
+                    });
+                }
+                else
+                {
+                    NotificationService.Notify(new NotificationMessage 
+                    { 
+                        Severity = NotificationSeverity.Warning, 
+                        Summary = "Advertencia", 
+                        Detail = "No se encontraron productos válidos en el archivo. Verifique el formato." 
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                NotificationService.Notify(new NotificationMessage 
+                { 
+                    Severity = NotificationSeverity.Error, 
+                    Summary = "Error", 
+                    Detail = $"Error procesando archivo: {ex.Message}" 
+                });
+            }
+            finally
+            {
+                isProcessingFile = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private void OnFileUploaded(Radzen.UploadCompleteEventArgs args)
+    {
+        StateHasChanged();
+    }
+
+    #endregion
+
+    private async Task Save()
+    {
+        formSubmitAttempted = true;
+        StateHasChanged();
+
+        if (!productsList.Any())
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Warning, 
+                Summary = "Advertencia", 
+                Detail = "Debe importar al menos un producto antes de guardar la factura" 
+            });
+            return;
+        }
+
+        if (!SupplierId.HasValue || newInvoice.SupplierId <= 0)
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Warning, 
+                Summary = "Advertencia", 
+                Detail = "Debe seleccionar un proveedor" 
+            });
+            return;
+        }
+
+        if (newInvoice.LocationId <= 0)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Advertencia",
+                Detail = "Debe seleccionar una ubicación"
+            });
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(newInvoice.InvoiceNumber))
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Warning, 
+                Summary = "Advertencia", 
+                Detail = "Debe ingresar el número de factura" 
+            });
+            return;
+        }
+
+        if (newInvoice.IngresedAt == DateTime.MinValue || newInvoice.IngresedAt == default(DateTime))
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Warning, 
+                Summary = "Advertencia", 
+                Detail = "Debe seleccionar la fecha de ingreso" 
+            });
+            return;
+        }
+
+        if (newInvoice.IngresedAt > DateTime.Today.AddYears(1))
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Warning, 
+                Summary = "Advertencia", 
+                Detail = "La fecha de ingreso no puede ser mayor a un año en el futuro" 
+            });
+            return;
+        }
+
+        isLoading = true;
+        StateHasChanged();
+
+        try
+        {
+            newInvoice.Products = productsList;
+
+            var response = await HttpClient.PostAsJsonAsync("api/purchaseInvoices", newInvoice);
+
+            if (response.IsSuccessStatusCode)
+            {
+                NotificationService.Notify(new NotificationMessage 
+                { 
+                    Severity = NotificationSeverity.Success, 
+                    Summary = "Éxito", 
+                    Detail = "Factura de compra guardada correctamente",
+                    Duration = 4000
+                });
+
+                await Task.Delay(2500);
+                NavManager.NavigateTo("/suppliers");
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = $"Hubo un problema al guardar la factura de compra: {response.StatusCode}",
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(new NotificationMessage 
+            { 
+                Severity = NotificationSeverity.Error, 
+                Summary = "Error", 
+                Detail = $"Error guardando factura: {ex.Message}" 
+            });
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+}

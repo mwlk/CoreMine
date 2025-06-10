@@ -1,108 +1,770 @@
 ﻿@page "/products"
+@attribute [Authorize]
+@using CoreMine.Client.Models.ReadModels
 @using CoreMine.Models.Common
-@using CoreMine.Models.ViewModels
-@inject HttpClient HttpClient
+@inject HttpClient Http
+@inject NavigationManager NavManager
 
-<h3>Productos</h3>
+<h3>Listar Repuestos</h3>
 
-<div class="mb-3">
-    <input class="form-control"
-           @bind="searchString"
-           @bind:event="oninput"
-           placeholder="Buscar..."
-           @onkeydown="HandleKeyDown" />
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="@(() => NavManager.NavigateTo("/products/new"))">
+        Agregar
+    </RadzenButton>
+    <div class="d-flex gap-2">
+        <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="filter_list" Text="Filtros"
+                      Click="@(() => showAdvancedFilters = !showAdvancedFilters)" />
+        <RadzenButton ButtonStyle="ButtonStyle.Light" Icon="clear" Text="Limpiar" Click="@ClearAllFilters" />
+    </div>
 </div>
 
-<table class="table table-striped table-hover table-bordered">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>Código</th>
-            <th>Nombre</th>
-            <th>Categoría</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (items is not null && items.Count > 0)
-        {
-            @foreach (var item in items)
-            {
-                <tr>
-                    <td>@item.Id</td>
-                    <td>@item.FullCategoryCode</td>
-                    <td>@item.Name</td>
-                    <td>@item.CategoryName</td>
-                </tr>
-            }
-        }
-        else
-        {
-            <tr>
-                <td colspan="4" class="text-center">No hay productos disponibles.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<!-- Panel de filtros -->
+@if (showAdvancedFilters)
+{
+    <RadzenCard class="rz-mb-4">
+        <RadzenText TextStyle="TextStyle.H6" class="rz-mb-3">Filtros de Búsqueda</RadzenText>
 
+        <!-- Filtro de búsqueda global -->
+        <RadzenRow Gap="1rem" class="rz-mb-3">
+            <RadzenColumn Size="12">
+                <RadzenLabel Text="Búsqueda General" />
+                <RadzenTextBox @bind-Value="filters.GlobalSearch" @oninput="OnGlobalSearchChanged"
+                               Placeholder="Buscar en todos los campos..." Style="width: 100%;" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow Gap="1rem">
+            <RadzenColumn Size="3">
+                <RadzenLabel Text="Código" />
+                <RadzenTextBox @bind-Value="filters.Code" Placeholder="Código del producto" Style="width: 100%;" />
+            </RadzenColumn>
+
+            <RadzenColumn Size="3">
+                <RadzenLabel Text="Categoría" />
+                <RadzenTextBox @bind-Value="filters.CategoryName" Placeholder="Nombre de categoría" Style="width: 100%;" />
+            </RadzenColumn>
+
+            <RadzenColumn Size="3">
+                <RadzenLabel Text="Proveedor" />
+                <RadzenTextBox @bind-Value="filters.SupplierName" Placeholder="Nombre del proveedor" Style="width: 100%;" />
+            </RadzenColumn>
+
+            <RadzenColumn Size="3">
+                <RadzenLabel Text="Ubicación" />
+                <RadzenTextBox @bind-Value="filters.LocationName" Placeholder="Nombre de ubicación" Style="width: 100%;" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <RadzenRow Gap="1rem" class="rz-mt-3">
+            <RadzenColumn Size="2">
+                <RadzenLabel Text="Precio Mínimo" />
+                <RadzenNumeric @bind-Value="filters.MinPrice" Placeholder="0.00" Style="width: 100%;"
+                               TValue="decimal?" FormatString="C" />
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                <RadzenLabel Text="Precio Máximo" />
+                <RadzenNumeric @bind-Value="filters.MaxPrice" Placeholder="0.00" Style="width: 100%;"
+                               TValue="decimal?" FormatString="C" />
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                <RadzenLabel Text="Stock Mínimo" />
+                <RadzenNumeric @bind-Value="filters.MinStock" Placeholder="0" Style="width: 100%;"
+                               TValue="decimal?" />
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                <RadzenLabel Text="Stock Máximo" />
+                <RadzenNumeric @bind-Value="filters.MaxStock" Placeholder="0" Style="width: 100%;"
+                               TValue="decimal?" />
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                <RadzenLabel Text="Estado" />
+                <RadzenTextBox @bind-Value="filters.State" Placeholder="Estado del producto" Style="width: 100%;" />
+            </RadzenColumn>
+
+            <RadzenColumn Size="2">
+                <RadzenLabel Text="&nbsp;" Style="width: 100%;" />
+                <RadzenButton Text="Aplicar" Icon="search" Click="@ApplyAdvancedFilters"
+                              ButtonStyle="ButtonStyle.Primary" Style="width: 100%;" />
+            </RadzenColumn>
+        </RadzenRow>
+
+        <!-- Indicadores de filtros activos -->
+        @if (HasActiveAdvancedFilters())
+        {
+            <RadzenRow class="rz-mt-3">
+                <RadzenColumn Size="12">
+                    <RadzenText TextStyle="TextStyle.Caption" class="rz-color-info">
+                        Filtros activos: @GetActiveFiltersDescription()
+                    </RadzenText>
+                </RadzenColumn>
+            </RadzenRow>
+        }
+    </RadzenCard>
+}
+
+<p>Items cargados: @items.Count() | Total: @totalCount</p>
+
+<RadzenDataGrid TItem="ProductReadModel"
+                @ref="grid"
+                Data="@items"
+                Count="@totalCount"
+                LoadData="@LoadData"
+                AllowPaging="true"
+                PageSize="@pageSize"
+                AllowSorting="true"
+                AllowColumnResize="true"
+                AllowFiltering="false"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                PagingSummaryFormat="Mostrando página {0} de {1} (total {2} registros)"
+                Style="width: 100%; font-size: 14px;"
+                Class="product-grid-container">
+    <Columns>
+        <!-- ID Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="Id"
+                              Title="ID"
+                              Width="100px"
+                              TextAlign="TextAlign.Center"
+                              Frozen="true">
+            <Template Context="data">
+                <span class="fw-bold text-primary">@data.Id</span>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <!-- Nombre Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="Name"
+                              Title="Nombre del Producto"
+                              Width="250px"
+                              Frozen="true"
+                              Resizable="true">
+            <Template Context="data">
+                <div class="cell-padding" title="@data.Name">
+                    <strong>@(!string.IsNullOrWhiteSpace(data.Name) ? data.Name : "Sin nombre")</strong>
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <!-- Código Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="Code"
+                              Title="Código"
+                              Width="300px"
+                              Resizable="true">
+            <Template Context="data">
+                <div class="cell-padding truncate-text" title="@data.Code">
+                    @if (!string.IsNullOrWhiteSpace(data.Code))
+                    {
+                        <span>@data.Code</span>
+                    }
+                    else
+                    {
+                        <em class="text-muted">No posee código</em>
+                    }
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <!-- Categoría Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="CategoryName"
+                              Title="Categoría"
+                              Width="180px"
+                              Resizable="true">
+            <Template Context="data">
+                <div class="cell-padding" title="@data.CategoryName">
+                    @if (!string.IsNullOrWhiteSpace(data.CategoryName))
+                    {
+                        <span class="custom-badge badge-secondary">@data.CategoryName</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">-</span>
+                    }
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <!-- Código Categoría Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="FullCategoryCode"
+                              Title="Código Cat."
+                              Width="120px"
+                              TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <div class="cell-padding">
+                    <span class="code-style">@(!string.IsNullOrWhiteSpace(data.FullCategoryCode) ? data.FullCategoryCode : "-")</span>
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <!-- Proveedor Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="SupplierName"
+                              Title="Proveedor"
+                              Width="200px"
+                              Resizable="true">
+            <Template Context="data">
+                <div class="cell-padding" title="@data.SupplierName">
+                    @if (!string.IsNullOrWhiteSpace(data.SupplierName))
+                    {
+                        <span>🏢 @data.SupplierName</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Sin proveedor</span>
+                    }
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <!-- Precio Unitario Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="UnitPrice"
+                              Title="Precio Unit."
+                              Width="120px"
+                              TextAlign="TextAlign.Right">
+            <Template Context="data">
+                <div class="cell-padding">
+                    <span class="fw-bold text-success">@data.UnitPrice.ToString("C")</span>
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <!-- Unidad de Medida Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="UnitOfMeasureName"
+                              Title="U. Medida"
+                              Width="100px"
+                              TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <div class="cell-padding">
+                    <span class="custom-badge badge-info">@(!string.IsNullOrWhiteSpace(data.UnitOfMeasureName) ? data.UnitOfMeasureName : "-")</span>
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <!-- Estado Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="LastStateTypeName"
+                              Title="Estado"
+                              Width="120px"
+                              TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <div class="cell-padding">
+                    @if (!string.IsNullOrWhiteSpace(data.LastStateTypeName))
+                    {
+                        var badgeClass = GetStateBadgeClass(data.LastStateTypeName);
+                        <span class="custom-badge @badgeClass">@data.LastStateTypeName</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">-</span>
+                    }
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <!-- Ubicación Columns -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="LocationId"
+                              Title="Cód. Ubic."
+                              Width="100px"
+                              TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <div class="cell-padding">
+                    <span class="code-style">@(data.LocationId?.ToString() ?? "-")</span>
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="LocationName"
+                              Title="Ubicación"
+                              Width="180px"
+                              Resizable="true">
+            <Template Context="data">
+                <div class="cell-padding" title="@data.LocationName">
+                    @if (!string.IsNullOrWhiteSpace(data.LocationName))
+                    {
+                        <span>📍 @data.LocationName</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">Sin ubicación</span>
+                    }
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <!-- Cantidad Máxima Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="MaxQuantity"
+                              Title="Máx."
+                              Width="80px"
+                              TextAlign="TextAlign.Right">
+            <Template Context="data">
+                <div class="cell-padding">
+                    <span class="text-info">@(data.MaxQuantity?.ToString("N0") ?? "-")</span>
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <!-- Cantidad Mínima Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="MinQuantity"
+                              Title="Mín."
+                              Width="80px"
+                              TextAlign="TextAlign.Right">
+            <Template Context="data">
+                <div class="cell-padding">
+                    <span class="text-warning">@(data.MinQuantity?.ToString("N0") ?? "-")</span>
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <!-- Stock Actual Column -->
+        <RadzenDataGridColumn TItem="ProductReadModel"
+                              Property="Quantity"
+                              Title="Stock"
+                              Width="100px"
+                              TextAlign="TextAlign.Right">
+            <Template Context="data">
+                <div class="cell-padding">
+                    @if (data.Quantity.HasValue)
+                    {
+                        var stockClass = GetStockLevelClass(data.Quantity.Value, data.MinQuantity, data.MaxQuantity);
+                        <span class="fw-bold @stockClass">@data.Quantity.Value.ToString("N2")</span>
+                        @if (data.MinQuantity.HasValue && data.Quantity < data.MinQuantity)
+                        {
+                            <span class="text-danger">⚠️</span>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted">-</span>
+                    }
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+<!-- Controles de paginación personalizados -->
 <div class="d-flex justify-content-between align-items-center mt-3">
-    <button class="btn btn-secondary" @onclick="PreviousPage" disabled="@(!CanGoPrevious)">Anterior</button>
-    <span>Página @currentPage de @totalPages</span>
-    <button class="btn btn-secondary" @onclick="NextPage" disabled="@(!CanGoNext)">Siguiente</button>
+    <div>
+        <span>Mostrando @((currentPageIndex * pageSize) + 1) a @Math.Min((currentPageIndex + 1) * pageSize, totalCount) de @totalCount registros</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <div>
+            <label class="me-2">Registros por página:</label>
+            <RadzenDropDown TValue="int"
+                            Data="@pageSizeOptions"
+                            Value="@pageSize"
+                            Change="@OnPageSizeChanged"
+                            Style="width: 80px" />
+        </div>
+        <div>
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="first_page"
+                          Click="@(() => GoToPage(0))"
+                          Disabled="@(currentPageIndex == 0)" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="chevron_left"
+                          Click="@(() => GoToPage(currentPageIndex - 1))"
+                          Disabled="@(currentPageIndex == 0)" />
+            <span class="mx-2">Página @currentPage de @totalPages</span>
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="chevron_right"
+                          Click="@(() => GoToPage(currentPageIndex + 1))"
+                          Disabled="@(currentPageIndex >= totalPages - 1)" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="last_page"
+                          Click="@(() => GoToPage(totalPages - 1))"
+                          Disabled="@(currentPageIndex >= totalPages - 1)" />
+        </div>
+    </div>
 </div>
 
 @code {
-    private int currentPage = 1;
-    private int rowsPerPage = 2;
-    private int totalPages = 1;
-    private string searchString = string.Empty;
-    private List<ProductViewModel> items = new();
+    private RadzenDataGrid<ProductReadModel> grid;
+    private IEnumerable<ProductReadModel> items = new List<ProductReadModel>();
+    private int totalCount = 0;
+    private int pageSize = 10;
+    private int currentPageIndex = 0;
+    private bool showAdvancedFilters = false;
+
+    private readonly List<int> pageSizeOptions = new() { 5, 10, 25, 50, 100 };
+
+    private int currentPage => currentPageIndex + 1;
+    private int totalPages => pageSize == 0 ? 1 : (int)Math.Ceiling((double)totalCount / pageSize);
+
+    // Clase para manejar los filtros avanzados
+    private AdvancedFilters filters = new();
+
+    public class AdvancedFilters
+    {
+        public string? GlobalSearch { get; set; }     // Búsqueda global nueva
+        public string? Code { get; set; }
+        public string? CategoryName { get; set; }
+        public string? SupplierName { get; set; }
+        public string? LocationName { get; set; }
+        public string? State { get; set; }
+        public decimal? MinPrice { get; set; }
+        public decimal? MaxPrice { get; set; }
+        public decimal? MinStock { get; set; }
+        public decimal? MaxStock { get; set; }
+
+        public void Clear()
+        {
+            GlobalSearch = null;
+            Code = null;
+            CategoryName = null;
+            SupplierName = null;
+            LocationName = null;
+            State = null;
+            MinPrice = null;
+            MaxPrice = null;
+            MinStock = null;
+            MaxStock = null;
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadData();
+        await LoadData(new LoadDataArgs { Skip = 0, Top = pageSize });
     }
 
-    private async Task LoadData()
+    private async Task LoadData(LoadDataArgs args)
     {
-        var url = $"api/products?pageNumber={currentPage}&pageSize={rowsPerPage}";
-
-        if (!string.IsNullOrWhiteSpace(searchString))
-            url += $"&Name={Uri.EscapeDataString(searchString)}";
-
-        var response = await HttpClient.GetFromJsonAsync<PagedResult<ProductViewModel>>(url);
-
-        items = response?.Items?.ToList() ?? new List<ProductViewModel>();
-        var totalItems = response?.TotalCount ?? 0;
-        totalPages = (int)Math.Ceiling(totalItems / (double)rowsPerPage);
-    }
-
-    private async Task HandleKeyDown(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter")
+        try
         {
-            currentPage = 1;
-            await LoadData();
+            int top = args.Top ?? pageSize;
+            int skip = args.Skip ?? 0;
+
+            currentPageIndex = skip / top;
+
+            // Construir URL con filtros
+            var url = BuildApiUrl(currentPage, top, args);
+            var response = await Http.GetFromJsonAsync<PagedResult<ProductReadModel>>(url);
+
+            if (response != null)
+            {
+                items = response.Items ?? new List<ProductReadModel>();
+                totalCount = response.TotalCount;
+            }
+            else
+            {
+                items = new List<ProductReadModel>();
+                totalCount = 0;
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"LoadData Error: {ex.Message}");
+            items = new List<ProductReadModel>();
+            totalCount = 0;
+            StateHasChanged();
         }
     }
 
-    private async Task PreviousPage()
+    private string BuildApiUrl(int pageNumber, int pageSize, LoadDataArgs args)
     {
-        if (currentPage > 1)
+        var queryParams = new List<string>
         {
-            currentPage--;
-            await LoadData();
+            $"pageNumber={pageNumber}",
+            $"pageSize={pageSize}"
+        };
+
+        // Filtro global de búsqueda
+        if (!string.IsNullOrWhiteSpace(filters.GlobalSearch))
+        {
+            queryParams.Add($"search={Uri.EscapeDataString(filters.GlobalSearch)}");
+        }
+
+        // Filtros específicos
+        if (!string.IsNullOrWhiteSpace(filters.Code))
+        {
+            queryParams.Add($"code={Uri.EscapeDataString(filters.Code)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(filters.CategoryName))
+        {
+            queryParams.Add($"categoryName={Uri.EscapeDataString(filters.CategoryName)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(filters.SupplierName))
+        {
+            queryParams.Add($"supplierName={Uri.EscapeDataString(filters.SupplierName)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(filters.LocationName))
+        {
+            queryParams.Add($"locationName={Uri.EscapeDataString(filters.LocationName)}");
+        }
+
+        if (!string.IsNullOrWhiteSpace(filters.State))
+        {
+            queryParams.Add($"state={Uri.EscapeDataString(filters.State)}");
+        }
+
+        if (filters.MinPrice.HasValue)
+        {
+            queryParams.Add($"minPrice={filters.MinPrice.Value}");
+        }
+
+        if (filters.MaxPrice.HasValue)
+        {
+            queryParams.Add($"maxPrice={filters.MaxPrice.Value}");
+        }
+
+        if (filters.MinStock.HasValue)
+        {
+            queryParams.Add($"minStock={filters.MinStock.Value}");
+        }
+
+        if (filters.MaxStock.HasValue)
+        {
+            queryParams.Add($"maxStock={filters.MaxStock.Value}");
+        }
+
+        // Ordenamiento
+        if (args.Sorts != null && args.Sorts.Any())
+        {
+            var sort = args.Sorts.First();
+            queryParams.Add($"sortBy={sort.Property}");
+            queryParams.Add($"sortDirection={(sort.SortOrder == SortOrder.Ascending ? "asc" : "desc")}");
+        }
+
+        return $"api/products?{string.Join("&", queryParams)}";
+    }
+
+    private async Task ClearFilters()
+    {
+        grid.Reset(true);
+        await LoadData(new LoadDataArgs { Skip = 0, Top = pageSize });
+    }
+
+    private async Task ClearAllFilters()
+    {
+        // Limpiar filtros avanzados
+        filters.Clear();
+
+        // Limpiar filtro del grid
+        grid.Reset(true);
+
+        // Recargar datos
+        await LoadData(new LoadDataArgs { Skip = 0, Top = pageSize });
+    }
+
+    private async Task ApplyAdvancedFilters()
+    {
+        // Resetear a primera página cuando se aplican filtros
+        currentPageIndex = 0;
+        await LoadData(new LoadDataArgs { Skip = 0, Top = pageSize });
+    }
+
+    // NUEVO: Método para aplicar búsqueda global en tiempo real
+    private async Task OnGlobalSearchChanged(ChangeEventArgs e)
+    {
+        filters.GlobalSearch = e.Value?.ToString();
+
+        // Aplicar filtro automáticamente después de un pequeño delay
+        await Task.Delay(300); // Evita llamadas excesivas mientras el usuario escribe
+
+        if (filters.GlobalSearch == e.Value?.ToString()) // Verificar que no haya cambiado durante el delay
+        {
+            currentPageIndex = 0;
+            await LoadData(new LoadDataArgs { Skip = 0, Top = pageSize });
         }
     }
 
-    private async Task NextPage()
+    private bool HasActiveAdvancedFilters()
     {
-        if (currentPage < totalPages)
+        return !string.IsNullOrWhiteSpace(filters.GlobalSearch) ||
+               !string.IsNullOrWhiteSpace(filters.Code) ||
+               !string.IsNullOrWhiteSpace(filters.CategoryName) ||
+               !string.IsNullOrWhiteSpace(filters.SupplierName) ||
+               !string.IsNullOrWhiteSpace(filters.LocationName) ||
+               !string.IsNullOrWhiteSpace(filters.State) ||
+               filters.MinPrice.HasValue ||
+               filters.MaxPrice.HasValue ||
+               filters.MinStock.HasValue ||
+               filters.MaxStock.HasValue;
+    }
+
+    private string GetActiveFiltersDescription()
+    {
+        var activeFilters = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(filters.GlobalSearch))
+            activeFilters.Add($"Búsqueda: {filters.GlobalSearch}");
+
+        if (!string.IsNullOrWhiteSpace(filters.Code))
+            activeFilters.Add($"Código: {filters.Code}");
+
+        if (!string.IsNullOrWhiteSpace(filters.CategoryName))
+            activeFilters.Add($"Categoría: {filters.CategoryName}");
+
+        if (!string.IsNullOrWhiteSpace(filters.SupplierName))
+            activeFilters.Add($"Proveedor: {filters.SupplierName}");
+
+        if (!string.IsNullOrWhiteSpace(filters.LocationName))
+            activeFilters.Add($"Ubicación: {filters.LocationName}");
+
+        if (!string.IsNullOrWhiteSpace(filters.State))
+            activeFilters.Add($"Estado: {filters.State}");
+
+        if (filters.MinPrice.HasValue)
+            activeFilters.Add($"Precio min: {filters.MinPrice:C}");
+
+        if (filters.MaxPrice.HasValue)
+            activeFilters.Add($"Precio max: {filters.MaxPrice:C}");
+
+        if (filters.MinStock.HasValue)
+            activeFilters.Add($"Stock min: {filters.MinStock}");
+
+        if (filters.MaxStock.HasValue)
+            activeFilters.Add($"Stock max: {filters.MaxStock}");
+
+        return string.Join(" | ", activeFilters);
+    }
+
+    private async Task OnPageSizeChanged(object value)
+    {
+        if (value != null && int.TryParse(value.ToString(), out int newPageSize))
         {
-            currentPage++;
-            await LoadData();
+            pageSize = newPageSize;
+            currentPageIndex = 0;
+            await LoadData(new LoadDataArgs { Top = pageSize, Skip = 0 });
         }
     }
 
-    private bool CanGoPrevious => currentPage > 1;
-    private bool CanGoNext => currentPage < totalPages;
+    private async Task GoToPage(int pageIndex)
+    {
+        if (pageIndex >= 0 && pageIndex < totalPages)
+        {
+            currentPageIndex = pageIndex;
+            await LoadData(new LoadDataArgs { Skip = currentPageIndex * pageSize, Top = pageSize });
+        }
+    }
+
+    // Método para obtener la clase CSS del badge según el estado
+    private string GetStateBadgeClass(string state)
+    {
+        return state?.ToLower() switch
+        {
+            "activo" or "disponible" => "badge-success",
+            "inactivo" or "no disponible" => "badge-danger",
+            "pendiente" => "badge-warning",
+            "en proceso" => "badge-info",
+            _ => "badge-secondary"
+        };
+    }
+
+    // Método para obtener la clase CSS según el nivel de stock
+    private string GetStockLevelClass(decimal currentStock, decimal? minStock, decimal? maxStock)
+    {
+        if (minStock.HasValue && currentStock < minStock)
+            return "text-danger"; // Stock bajo
+
+        if (maxStock.HasValue && currentStock > maxStock * 0.8m)
+            return "text-success"; // Stock alto
+
+        return "text-primary"; // Stock normal
+    }
 }
+
+@* Estilos CSS simplificados para Blazor *@
+<style>
+    .product-grid-container {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .fw-bold {
+        font-weight: bold;
+    }
+
+    .text-primary {
+        color: #0d6efd;
+    }
+
+    .text-success {
+        color: #198754;
+    }
+
+    .text-danger {
+        color: #dc3545;
+    }
+
+    .text-warning {
+        color: #fd7e14;
+    }
+
+    .text-info {
+        color: #0dcaf0;
+    }
+
+    .text-muted {
+        color: #6c757d;
+    }
+
+    .custom-badge {
+        font-size: 0.75em;
+        padding: 0.35em 0.65em;
+        border-radius: 0.375rem;
+        color: white;
+        display: inline-block;
+    }
+
+    .badge-success {
+        background-color: #198754;
+    }
+
+    .badge-danger {
+        background-color: #dc3545;
+    }
+
+    .badge-warning {
+        background-color: #ffc107;
+        color: #000;
+    }
+
+    .badge-info {
+        background-color: #0dcaf0;
+        color: #000;
+    }
+
+    .badge-secondary {
+        background-color: #6c757d;
+    }
+
+    .code-style {
+        font-size: 0.875em;
+        background-color: #f8f9fa;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        border: 1px solid #dee2e6;
+        font-family: monospace;
+    }
+
+    .cell-padding {
+        padding: 12px 8px;
+        vertical-align: middle;
+    }
+
+    .truncate-text {
+        max-width: 240px;
+        word-wrap: break-word;
+        line-height: 1.4;
+    }
+</style>

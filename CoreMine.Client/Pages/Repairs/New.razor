@@ -1,0 +1,676 @@
+﻿@page "/repairs/new"
+@attribute [Authorize]
+@using CoreMine.Client.Models.Forms
+@using CoreMine.Client.Models.ReadModels
+@using CoreMine.Models.Common
+@using CoreMine.Models.ViewModels
+@using System.Globalization
+
+@inject HttpClient HttpClient
+@inject NotificationService NotificationService
+@inject NavigationManager NavManager
+
+<RadzenNotification />
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <RadzenButton ButtonStyle="ButtonStyle.Primary" Click="@(() => NavManager.NavigateTo("/repairs"))">
+        Volver
+    </RadzenButton>
+</div>
+
+<div class="container-fluid" style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <div class="d-flex align-items-center mb-4">
+        <RadzenIcon Icon="build" Style="font-size: 2rem; margin-right: 12px; color: var(--rz-primary);" />
+        <h2 class="mb-0">Registrar Reparación</h2>
+    </div>
+
+    <RadzenTemplateForm TItem="CreateRepairDto" Data="@repairNew" Submit="SaveRepair">
+        <div class="row">
+            <!-- Información Principal -->
+            <div class="col-md-8">
+                <RadzenCard Style="margin-bottom: 20px;">
+                    <div class="card-header mb-3">
+                        <h5 class="mb-0">
+                            <RadzenIcon Icon="info" Style="margin-right: 8px;" />
+                            Información Principal
+                        </h5>
+                    </div>
+
+                    <!-- Descripción -->
+                    <div class="form-group mb-3">
+                        <RadzenLabel Text="Descripción" Style="font-weight: 600; margin-bottom: 8px; display: block;" />
+                        <RadzenTextBox @bind-Value="repairNew.Description"
+                                       Name="Description"
+                                       Placeholder="Ingrese una descripción detallada de la reparación"
+                                       Style="width: 100%" />
+                        <RadzenRequiredValidator Component="Description"
+                                                 Text="La descripción es obligatoria"
+                                                 Style="display:block; margin-top: 4px; color: var(--rz-danger); font-size: 0.875rem;" />
+                    </div>
+
+                    <!-- Maquinaria -->
+                    <div class="form-group mb-3">
+                        <RadzenLabel Text="Maquinaria" Style="font-weight: 600; margin-bottom: 8px; display: block;" />
+                        <RadzenDropDown Data="@Machines"
+                                        TextProperty="Description"
+                                        ValueProperty="Id"
+                                        Name="MachineId"
+                                        AllowClear="true"
+                                        @bind-Value="repairNew.MachineId"
+                                        Style="width: 100%"
+                                        Placeholder="Seleccione la maquinaria a reparar" />
+                        <RadzenRequiredValidator Component="MachineId"
+                                                 DefaultValue="0"
+                                                 Text="Debe seleccionar una maquinaria"
+                                                 Style="display:block; margin-top: 4px; color: var(--rz-danger); font-size: 0.875rem;" />
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="form-group mb-0">
+                        <RadzenLabel Text="Observaciones" Style="font-weight: 600; margin-bottom: 8px; display: block;" />
+                        <RadzenTextArea @bind-Value="repairNew.Observations"
+                                        Name="Observations"
+                                        Rows="3"
+                                        Placeholder="Observaciones adicionales (opcional)"
+                                        Style="width: 100%" />
+                        <RadzenValidator Component="Observations"
+                                         Text="Las observaciones deben tener al menos 10 caracteres"
+                                         Validator="@(new Func<string, bool>(value => string.IsNullOrEmpty(value) || value.Length >= 10))"
+                                         Style="display:block; margin-top: 4px; color: var(--rz-danger); font-size: 0.875rem;" />
+                    </div>
+                </RadzenCard>
+
+                <!-- Productos -->
+                <RadzenCard>
+                    <div class="card-header mb-3">
+                        <h5 class="mb-0">
+                            <RadzenIcon Icon="inventory" Style="margin-right: 8px;" />
+                            Productos Requeridos
+                        </h5>
+                    </div>
+
+                    <!-- Agregar Producto - UI CORREGIDA -->
+                    <div class="add-product-section p-4" style="background: #f8f9fa; border-radius: 12px; margin-bottom: 24px; border: 1px solid #dee2e6;">
+                        <div class="d-flex align-items-center mb-3">
+                            <RadzenIcon Icon="add_shopping_cart" Style="color: #28a745; margin-right: 8px;" />
+                            <h6 class="mb-0" style="color: #495057; font-weight: 600;">Agregar Producto a la Reparación</h6>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <RadzenLabel Text="Seleccionar Producto" Style="font-weight: 500; margin-bottom: 6px; display: block; color: #495057;" />
+                                <RadzenDropDown Data="@Products"
+                                                TextProperty="Name"
+                                                ValueProperty="Id"
+                                                @bind-Value="selectedProductId"
+                                                Change="OnProductSelected"
+                                                Placeholder="Buscar y seleccionar..."
+                                                Style="width: 100%; height: 40px;" />
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <RadzenLabel Text="@GetQuantityLabel()" Style="font-weight: 500; margin-bottom: 6px; display: block; color: #495057;" />
+                                <RadzenNumeric @bind-Value="selectedQuantity"
+                                               Min="@GetMinQuantity()"
+                                               Max="@GetMaxQuantity()"
+                                               Step="@GetQuantityStep().ToString(CultureInfo.InvariantCulture)"
+                                               Placeholder="0"
+                                               Style="width: 100%; height: 40px;" />
+                            </div>
+                            
+                            <div class="col-md-3">
+                                <RadzenLabel Text="&nbsp;" Style="font-weight: 500; margin-bottom: 6px; display: block;" />
+                                <RadzenButton Text="Agregar"
+                                              Icon="add"
+                                              Click="@AddProduct"
+                                              Disabled="@(!CanAddProduct())"
+                                              ButtonStyle="ButtonStyle.Success"
+                                              Style="width: 100%; height: 40px; font-weight: 600;" />
+                            </div>
+                        </div>
+                        
+                        <!-- Fila para mostrar información del producto seleccionado -->
+                        @if (selectedProductId.HasValue)
+                        {
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="product-info-panel">
+                                        @{
+                                            var selectedProduct = Products?.FirstOrDefault(p => p.Id == selectedProductId.Value);
+                                        }
+                                        @if (selectedProduct != null)
+                                        {
+                                            <div class="row g-2">
+                                                <div class="col-md-3">
+                                                    <small class="info-label">Stock Disponible:</small>
+                                                    <span class="info-value stock-value @GetStockColorClass(selectedProduct.Quantity, selectedProduct.MinQuantity)">
+                                                        @(selectedProduct.Quantity?.ToString("N2") ?? "0") @selectedProduct.UnitOfMeasureName
+                                                    </span>
+                                                </div>
+                                                
+                                                @if (selectedProduct.UnitPrice > 0)
+                                                {
+                                                    <div class="col-md-3">
+                                                        <small class="info-label">Precio Unitario:</small>
+                                                        <span class="info-value">@selectedProduct.UnitPrice.ToString("C")</span>
+                                                    </div>
+                                                }
+                                                
+                                                @if (!string.IsNullOrEmpty(selectedProduct.CategoryName))
+                                                {
+                                                    <div class="col-md-3">
+                                                        <small class="info-label">Categoría:</small>
+                                                        <span class="info-value">@selectedProduct.CategoryName</span>
+                                                    </div>
+                                                }
+                                                
+                                                @if (!string.IsNullOrEmpty(selectedProduct.Code))
+                                                {
+                                                    <div class="col-md-3">
+                                                        <small class="info-label">Código:</small>
+                                                        <span class="info-value">@selectedProduct.Code</span>
+                                                    </div>
+                                                }
+                                            </div>
+                                            
+                                            <!-- Alertas de stock -->
+                                            @if (selectedProduct.Quantity.HasValue && selectedProduct.MinQuantity.HasValue && selectedProduct.Quantity < selectedProduct.MinQuantity)
+                                            {
+                                                <div class="alert alert-warning py-2 px-3 mt-2 mb-0" style="border-radius: 6px;">
+                                                    <small class="mb-0 d-flex align-items-center">
+                                                        <RadzenIcon Icon="warning" Style="margin-right: 6px; font-size: 16px;" />
+                                                        ⚠️ Stock bajo: El producto está por debajo del mínimo recomendado
+                                                    </small>
+                                                </div>
+                                            }
+                                            else if (GetStockInfo() != null)
+                                            {
+                                                <div class="alert alert-info py-2 px-3 mt-2 mb-0" style="background-color: #e7f3ff; border: 1px solid #b8daff; border-radius: 6px;">
+                                                    <small class="mb-0 d-flex align-items-center">
+                                                        <RadzenIcon Icon="info" Style="margin-right: 6px; font-size: 16px;" />
+                                                        @GetStockInfo()
+                                                    </small>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Lista de Productos -->
+                    @if (repairNew.Products.Any())
+                    {
+                        <div class="products-list">
+                            <h6 class="mb-3">Productos Agregados (@repairNew.Products.Count)</h6>
+                            @foreach (var prod in repairNew.Products)
+                            {
+                                var product = Products.FirstOrDefault(p => p.Id == prod.ProductId);
+                                <div class="product-item p-3 mb-2" style="border: 1px solid var(--rz-base-300); border-radius: 8px; background-color: var(--rz-base-50);">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center mb-1">
+                                                <RadzenIcon Icon="inventory_2" Style="margin-right: 8px; color: var(--rz-primary);" />
+                                                <strong>@product?.Name</strong>
+                                                @if (!string.IsNullOrEmpty(product?.Code))
+                                                {
+                                                    <span class="badge badge-secondary ms-2" style="background-color: var(--rz-base-200); color: var(--rz-text-secondary); padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">@product.Code</span>
+                                                }
+                                            </div>
+                                            <div class="text-muted small mb-1">
+                                                Cantidad: <strong>@prod.QuantityUsed @product?.UnitOfMeasureName</strong>
+                                                @if (product?.UnitPrice > 0)
+                                                {
+                                                    <span class="ms-3">Precio unitario: <strong>$@product.UnitPrice.ToString("F2")</strong></span>
+                                                    <span class="ms-3">Subtotal: <strong>$@((product.UnitPrice * prod.QuantityUsed).ToString("F2"))</strong></span>
+                                                }
+                                            </div>
+                                            @if (!string.IsNullOrEmpty(product?.CategoryName))
+                                            {
+                                                <div class="text-muted small">
+                                                    Categoría: @product.CategoryName
+                                                </div>
+                                            }
+                                        </div>
+                                        <div class="ms-3">
+                                            <RadzenButton Icon="delete"
+                                                          ButtonStyle="ButtonStyle.Danger"
+                                                          Variant="Variant.Text"
+                                                          Size="ButtonSize.Small"
+                                                          Click="() => RemoveProduct(prod)"
+                                                          title="Eliminar producto" />
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center p-4" style="color: var(--rz-text-secondary);">
+                            <RadzenIcon Icon="inventory" Style="font-size: 3rem; opacity: 0.3; margin-bottom: 12px;" />
+                            <p class="mb-0">No hay productos agregados</p>
+                            <small>Agregue al menos un producto para continuar</small>
+                        </div>
+                    }
+
+                    <!-- Validación de productos -->
+                    <RadzenTextBox @bind-Value="productValidationField"
+                                   Name="ProductsList"
+                                   Style="display: none;" />
+
+                    <RadzenRequiredValidator Component="ProductsList"
+                                             Text="Debe agregar al menos un producto para continuar"
+                                             Style="display:block; margin-top: 12px;" />
+                </RadzenCard>
+            </div>
+
+            <!-- Panel Lateral -->
+            <div class="col-md-4">
+                <RadzenCard Style="position: sticky; top: 20px;">
+                    <div class="card-header mb-3">
+                        <h5 class="mb-0">
+                            <RadzenIcon Icon="summarize" Style="margin-right: 8px;" />
+                            Resumen
+                        </h5>
+                    </div>
+
+                    <div class="summary-item mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Productos:</span>
+                            <strong>@repairNew.Products.Count</strong>
+                        </div>
+                    </div>
+
+                    @if (repairNew.Products.Any())
+                    {
+                        <div class="summary-item mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">Costo estimado:</span>
+                                <strong>$@CalculateEstimatedCost().ToString("F2")</strong>
+                            </div>
+                        </div>
+                    }
+
+                    <hr />
+
+                    <div class="d-grid gap-2">
+                        <RadzenButton Text="Guardar Reparación"
+                                      ButtonType="ButtonType.Submit"
+                                      ButtonStyle="ButtonStyle.Primary"
+                                      Icon="save"
+                                      Size="ButtonSize.Large"
+                                      Style="width: 100%;" />
+
+                        <RadzenButton Text="Cancelar"
+                                      ButtonStyle="ButtonStyle.Light"
+                                      Icon="cancel"
+                                      Click="@(() => { repairNew = new(); })"
+                                      Style="width: 100%;" />
+                    </div>
+                </RadzenCard>
+            </div>
+        </div>
+    </RadzenTemplateForm>
+</div>
+
+<style>
+    /* Estilos específicos para la sección de agregar productos */
+    .add-product-section {
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .add-product-section:hover {
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    /* Panel de información del producto */
+    .product-info-panel {
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    .info-label {
+        display: block;
+        color: #6c757d;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        margin-bottom: 2px;
+    }
+    
+    .info-value {
+        display: block;
+        color: #495057;
+        font-weight: 600;
+        font-size: 0.95rem;
+    }
+    
+    .stock-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+    }
+    
+    .stock-normal {
+        color: #28a745;
+    }
+    
+    .stock-low {
+        color: #dc3545;
+    }
+    
+    .stock-medium {
+        color: #fd7e14;
+    }
+    
+    /* Mejorar la apariencia del dropdown */
+    .add-product-section .rz-dropdown {
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        transition: border-color 0.2s ease-in-out;
+    }
+    
+    .add-product-section .rz-dropdown:focus-within {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    
+    /* Mejorar la apariencia del input numérico */
+    .add-product-section .rz-numeric {
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        transition: border-color 0.2s ease-in-out;
+    }
+    
+    .add-product-section .rz-numeric:focus-within {
+        border-color: #28a745;
+        box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+    }
+    
+    /* Estilo para el botón de agregar */
+    .add-product-section .rz-button-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        transition: all 0.2s ease-in-out;
+    }
+    
+    .add-product-section .rz-button-success:hover:not(:disabled) {
+        background: linear-gradient(135deg, #218838 0%, #1abc9c 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    }
+    
+    .add-product-section .rz-button-success:disabled {
+        background: #6c757d;
+        opacity: 0.6;
+    }
+    
+    /* Estilo para los alerts */
+    .add-product-section .alert-info {
+        background: linear-gradient(135deg, #e7f3ff 0%, #f0f8ff 100%);
+        border-left: 4px solid #0dcaf0;
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    .add-product-section .alert-warning {
+        background: linear-gradient(135deg, #fff3cd 0%, #fef9e7 100%);
+        border-left: 4px solid #fd7e14;
+        animation: slideDown 0.3s ease-out;
+    }
+</style>
+
+@code {
+    private IEnumerable<MachineViewModel> Machines { get; set; } = new List<MachineViewModel>();
+    private IEnumerable<ProductReadModel> Products { get; set; } = new List<ProductReadModel>();
+
+    private CreateRepairDto repairNew = new();
+    private int? selectedProductId;
+    private decimal? selectedQuantity;
+
+    private string _productValidationField = "";
+
+    private string productValidationField
+    {
+        get => repairNew.Products.Any() ? "valid" : "";
+        set => _productValidationField = value;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            var machinesTask = HttpClient.GetFromJsonAsync<PagedResult<MachineViewModel>>("api/machines");
+            var productsTask = HttpClient.GetFromJsonAsync<PagedResult<ProductReadModel>>("api/products?pageSize=0");
+
+            await Task.WhenAll(machinesTask, productsTask);
+
+            var machines = await machinesTask;
+            var products = await productsTask;
+
+            Machines = machines?.Items ?? new List<MachineViewModel>();
+            Products = products?.Items ?? new List<ProductReadModel>();
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Error al cargar los datos: " + ex.Message,
+                Duration = 5000
+            });
+        }
+    }
+
+    private void OnProductSelected()
+    {
+        selectedQuantity = null;
+        StateHasChanged();
+    }
+
+    private string GetQuantityLabel()
+    {
+        var product = GetSelectedProduct();
+        if (product?.UnitOfMeasureName != null)
+        {
+            return $"Cantidad ({product.UnitOfMeasureName})";
+        }
+        return "Cantidad";
+    }
+
+    private decimal GetMinQuantity()
+    {
+        var product = GetSelectedProduct();
+        return GetQuantityStep();
+    }
+
+    private decimal? GetMaxQuantity()
+    {
+        var product = GetSelectedProduct();
+        if (product?.Quantity.HasValue == true && product.Quantity > 0)
+        {
+            return product.Quantity.Value;
+        }
+        return product?.MaxQuantity;
+    }
+
+    private decimal GetQuantityStep()
+    {
+        var product = GetSelectedProduct();
+        if (product?.UnitOfMeasureName != null)
+        {
+            var unitName = product.UnitOfMeasureName.ToLower();
+            if (unitName == "unidad" || unitName == "u")
+                return 1m;
+            else if (unitName == "kilogramo" || unitName == "kg")
+                return 0.1m;
+            else if (unitName == "litro" || unitName == "l")
+                return 0.1m;
+            else if (unitName == "metro" || unitName == "m")
+                return 0.01m;
+            else
+                return 0.01m;
+        }
+        return 0.01m;
+    }
+
+    private ProductReadModel? GetSelectedProduct()
+    {
+        if (!selectedProductId.HasValue) return null;
+        return Products.FirstOrDefault(p => p.Id == selectedProductId.Value);
+    }
+
+    private string? GetStockInfo()
+    {
+        var product = GetSelectedProduct();
+        if (product?.Quantity.HasValue == true)
+        {
+            return $"Stock disponible: {product.Quantity} {product.UnitOfMeasureName}";
+        }
+        if (product?.MaxQuantity.HasValue == true)
+        {
+            return $"Cantidad máxima: {product.MaxQuantity} {product.UnitOfMeasureName}";
+        }
+        return null;
+    }
+
+    // Método para determinar la clase CSS del color del stock
+    private string GetStockColorClass(decimal? currentStock, decimal? minStock)
+    {
+        if (!currentStock.HasValue) return "stock-low";
+        
+        if (minStock.HasValue)
+        {
+            if (currentStock < minStock) return "stock-low";
+            if (currentStock < minStock * 1.5m) return "stock-medium";
+        }
+        
+        return "stock-normal";
+    }
+
+    private bool CanAddProduct()
+    {
+        if (!selectedProductId.HasValue || !selectedQuantity.HasValue || selectedQuantity <= 0)
+            return false;
+
+        // Check if product already exists
+        if (repairNew.Products.Any(p => p.ProductId == selectedProductId.Value))
+            return false;
+
+        // Check stock limits
+        var product = GetSelectedProduct();
+        var maxAllowed = GetMaxQuantity();
+        if (maxAllowed.HasValue && selectedQuantity > maxAllowed)
+            return false;
+
+        return true;
+    }
+
+    private void AddProduct()
+    {
+        if (!CanAddProduct()) return;
+
+        var product = GetSelectedProduct();
+        if (product == null) return;
+
+        repairNew.Products.Add(new RepairProductDto
+        {
+            ProductId = selectedProductId!.Value,
+            QuantityUsed = selectedQuantity!.Value
+        });
+
+        // Reset selection
+        selectedProductId = null;
+        selectedQuantity = null;
+
+        NotificationService.Notify(new NotificationMessage
+        {
+            Severity = NotificationSeverity.Success,
+            Summary = "Producto agregado",
+            Detail = $"{product.Name} agregado correctamente",
+            Duration = 3000
+        });
+    }
+
+    private void RemoveProduct(RepairProductDto product)
+    {
+        var productInfo = Products.FirstOrDefault(p => p.Id == product.ProductId);
+        repairNew.Products.Remove(product);
+
+        NotificationService.Notify(new NotificationMessage
+        {
+            Severity = NotificationSeverity.Info,
+            Summary = "Producto eliminado",
+            Detail = $"{productInfo?.Name} eliminado de la lista",
+            Duration = 3000
+        });
+    }
+
+    private decimal CalculateEstimatedCost()
+    {
+        return repairNew.Products.Sum(p =>
+        {
+            var product = Products.FirstOrDefault(prod => prod.Id == p.ProductId);
+            return (product?.UnitPrice ?? 0) * p.QuantityUsed;
+        });
+    }
+
+    private async Task SaveRepair()
+    {
+        try
+        {
+            var ulr = "api/repairs";
+
+            var result = await HttpClient.PostAsJsonAsync(ulr, repairNew);
+
+            if (result.IsSuccessStatusCode)
+            {
+
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Success,
+                    Summary = "Reparación guardada",
+                    Detail = "La reparación ha sido registrada correctamente",
+                    Duration = 5000
+                });
+
+                repairNew = new CreateRepairDto();
+                selectedProductId = null;
+                selectedQuantity = null;
+                StateHasChanged();
+            }
+            else
+            {
+                NotificationService.Notify(new NotificationMessage
+                {
+                    Severity = NotificationSeverity.Error,
+                    Summary = "Error",
+                    Detail = "Error al guardar la reparación: ",
+                    Duration = 5000
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(new NotificationMessage
+            {
+                Severity = NotificationSeverity.Error,
+                Summary = "Error",
+                Detail = "Error al guardar la reparación: " + ex.Message,
+                Duration = 5000
+            });
+        }
+    }
+}

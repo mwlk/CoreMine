@@ -4,7 +4,7 @@ namespace CoreMine.ApplicationBusiness.Interfaces.ReadOnly
 {
     public interface IReadOnlyProductsRepository
     {
-        Task<(int TotalCount, List<ProductWithCategoryReadModel> Rows)>GetProductsByHierarchyAsync
-            (string? name, string ancestorIdsCsv, int ancestorCount, int skip, int take, CancellationToken cancellationToken);
+        IQueryable<ProductsWithFullCategoryInfoReadModel> GetQueryable();
+        Task<Dictionary<string, int>> GetProductIdsByCodesAsync(IEnumerable<string> codes, CancellationToken cancellationToken);
     }
 }

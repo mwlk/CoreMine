@@ -14,22 +14,33 @@ namespace CoreMine.Infraestructure
             _context = context;
         }
 
-        public async Task BeginTransactionAsync()
+        public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
         {
             if (_currentTransaction != null) return;
 
-            _currentTransaction = await _context.Database.BeginTransactionAsync();
+            _currentTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
         }
 
-        public async Task CommitTransactionAsync()
+        public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
         {
             if (_currentTransaction == null) return;
 
-            await _context.SaveChangesAsync();
-            await _currentTransaction.CommitAsync();
-            await _currentTransaction.DisposeAsync();
-            _currentTransaction = null;
+            try
+            {
+                await _currentTransaction.CommitAsync(cancellationToken);
+            }
+            catch
+            {
+                await _currentTransaction.RollbackAsync(cancellationToken);
+                throw;
+            }
+            finally
+            {
+                await _currentTransaction.DisposeAsync();
+                _currentTransaction = null;
+            }
         }
+
 
         public async Task RollbackTransactionAsync()
         {

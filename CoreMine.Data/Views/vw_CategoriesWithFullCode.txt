@@ -1,0 +1,24 @@
+﻿CREATE OR ALTER VIEW vw_CategoriesWithFullCode AS
+WITH CategoryCTE AS (
+    SELECT
+        pc.Id,
+        pc.Code,
+        pc.ParentId,
+        CAST(pc.Code AS VARCHAR(MAX)) AS FullCategoryCode,
+        pc.Name
+    FROM ProductCategories pc
+    WHERE pc.ParentId IS NULL
+
+    UNION ALL
+
+    SELECT
+        pc.Id,
+        pc.Code,
+        pc.ParentId,
+        CAST(cte.FullCategoryCode + '-' + pc.Code AS VARCHAR(MAX)) AS FullCategoryCode,
+        pc.Name
+    FROM ProductCategories pc
+    INNER JOIN CategoryCTE cte ON pc.ParentId = cte.Id
+)
+SELECT *
+FROM CategoryCTE;

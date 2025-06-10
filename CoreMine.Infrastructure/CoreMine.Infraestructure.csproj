@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Interfaces\**" />
+    <EmbeddedResource Remove="Interfaces\**" />
+    <None Remove="Interfaces\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
   </ItemGroup>
 
@@ -15,10 +21,6 @@
     <ProjectReference Include="..\CoreMine.Data\CoreMine.Data.csproj" />
     <ProjectReference Include="..\CoreMine.Entities\CoreMine.Entities.csproj" />
     <ProjectReference Include="..\CoreMine.Models\CoreMine.Models.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
   </ItemGroup>
 
 </Project>

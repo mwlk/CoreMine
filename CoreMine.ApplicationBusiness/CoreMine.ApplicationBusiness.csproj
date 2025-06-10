@@ -7,17 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="14.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\CoreMine.Data\CoreMine.Data.csproj" />
     <ProjectReference Include="..\CoreMine.Entities\CoreMine.Entities.csproj" />
     <ProjectReference Include="..\CoreMine.Models\CoreMine.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UseCases\Categories\Handlers\Interfaces\" />
+    <Folder Include="UseCases\Stocks\Commands\" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,322 @@
+﻿@page "/suppliers"
+@using CoreMine.Client.Models.ReadModels
+@using CoreMine.Models.Common
+@attribute [Authorize]
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<h3>Listar Proveedores</h3>
+
+<div class="rz-card rz-variant-filled mb-4 p-4">
+    <div class="card-header">
+        <h5 class="card-title mb-0">Filtros de Búsqueda</h5>
+    </div>
+    <div class="card-body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Buscar por Nombre Completo:</label>
+                <RadzenTextBox @bind-Value="searchFullName"
+                               Placeholder="Ingrese nombre o apellido"
+                               class="w-100"
+                               @onkeypress="@(async (e) => { if (e.Key == "Enter") await ApplyFilters(); })" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Buscar por ID:</label>
+                <RadzenNumeric TValue="int?"
+                               @bind-Value="filterById"
+                               Placeholder="Id del proveedor"
+                               class="w-100" />
+            </div>
+            <div class="col-md-5 d-flex align-items-end gap-2">
+                <RadzenButton ButtonStyle="ButtonStyle.Primary"
+                              Icon="search"
+                              Text="Buscar"
+                              Click="@ApplyFilters" />
+                <RadzenButton ButtonStyle="ButtonStyle.Light"
+                              Icon="clear"
+                              Text="Limpiar"
+                              Click="@ClearFilters" />
+                <RadzenButton ButtonStyle="ButtonStyle.Success"
+                              Icon="add"
+                              Text="Nuevo Proveedor"
+                              Click="@CreateSupplier" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<RadzenDataGrid TItem="SupplierReadModel"
+                Data="@items"
+                Count="@totalCount"
+                LoadData="@LoadData"
+                AllowPaging="true"
+                PageSize="@pageSize"
+                AllowSorting="true"
+                AllowColumnResize="true"
+                AllowFiltering="false"
+                FilterMode="FilterMode.Simple"
+                PagerHorizontalAlign="HorizontalAlign.Left"
+                ShowPagingSummary="true"
+                PagingSummaryFormat="Mostrando página {0} de {1} (total {2} registros)"
+                Style="width: 100%; font-size: 14px;"
+                Class="product-grid-container">
+
+    <Columns>
+        <RadzenDataGridColumn TItem="SupplierReadModel"
+                              Property="Id"
+                              Title="ID"
+                              TextAlign="TextAlign.Center"
+                              Frozen="true"
+                              Width="80px">
+            <Template Context="data">
+                <span class="fw-bold">@data.Id</span>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="SupplierReadModel"
+                              Property="Surname"
+                              Title="Nombre Completo"
+                              TextAlign="TextAlign.Left"
+                              Frozen="true"
+                              Width="250px">
+            <Template Context="data">
+                <div class="d-flex flex-column">
+                    <span class="fw-bold">@data.Surname</span>
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="SupplierReadModel"
+                              Property="Phone"
+                              Title="Teléfono"
+                              TextAlign="TextAlign.Center"
+                              Width="150px">
+            <Template Context="data">
+                <span class="fw-bold">@data.Phone</span>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="SupplierReadModel"
+                              Property="Contact"
+                              Title="Contacto"
+                              TextAlign="TextAlign.Center"
+                              Width="180px">
+            <Template Context="data">
+                <span class="fw-bold">
+                    @if (!string.IsNullOrEmpty(data.Contact))
+                    {
+                        @data.Contact
+                    }
+                    else
+                    {
+                        <p>-</p>
+                    }
+                </span>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <!-- Nueva columna de acciones -->
+        <RadzenDataGridColumn TItem="SupplierReadModel"
+                              Title="Acciones"
+                              TextAlign="TextAlign.Center"
+                              Width="350px"
+                              Sortable="false"
+                              Filterable="false">
+            <Template Context="data">
+                <div class="d-flex justify-content-center gap-2">
+                    <!-- Botón para ver facturas existentes -->
+                    <RadzenButton ButtonStyle="ButtonStyle.Info"
+                                  Variant="Variant.Outlined"
+                                  Size="ButtonSize.Small"
+                                  Icon="receipt_long"
+                                  Text="Ver Facturas"
+                                  Click="@(() => ViewInvoices(data.Id))"
+                                  title="Ver facturas del proveedor" />
+
+                    <!-- Botón para cargar nueva factura -->
+                    <RadzenButton ButtonStyle="ButtonStyle.Success"
+                                  Variant="Variant.Filled"
+                                  Size="ButtonSize.Small"
+                                  Icon="add_circle"
+                                  Text="Nueva Factura"
+                                  Click="@(() => CreateInvoice(data.Id))"
+                                  title="Cargar nueva factura" />
+
+                    <!-- Botón para editar proveedor -->
+                    <RadzenButton ButtonStyle="ButtonStyle.Warning"
+                                  Variant="Variant.Outlined"
+                                  Size="ButtonSize.Small"
+                                  Icon="edit"
+                                  Click="@(() => EditSupplier(data.Id))"
+                                  title="Editar proveedor" />
+                </div>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+
+</RadzenDataGrid>
+
+<!-- Controles de paginación personalizados -->
+<div class="d-flex justify-content-between align-items-center mt-3">
+    <div>
+        <span>Mostrando @((currentPageIndex * pageSize) + 1) a @Math.Min((currentPageIndex + 1) * pageSize, totalCount) de @totalCount registros</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <div>
+            <label class="me-2">Registros por página:</label>
+            <RadzenDropDown TValue="int"
+                            Data="@pageSizeOptions"
+                            Value="@pageSize"
+                            Change="@OnPageSizeChanged"
+                            Style="width: 80px" />
+        </div>
+        <div>
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="first_page"
+                          Click="@(() => GoToPage(0))"
+                          Disabled="@(currentPageIndex == 0)" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="chevron_left"
+                          Click="@(() => GoToPage(currentPageIndex - 1))"
+                          Disabled="@(currentPageIndex == 0)" />
+            <span class="mx-2">Página @currentPage de @totalPages</span>
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="chevron_right"
+                          Click="@(() => GoToPage(currentPageIndex + 1))"
+                          Disabled="@(currentPageIndex >= totalPages - 1)" />
+            <RadzenButton ButtonStyle="ButtonStyle.Light"
+                          Icon="last_page"
+                          Click="@(() => GoToPage(totalPages - 1))"
+                          Disabled="@(currentPageIndex >= totalPages - 1)" />
+        </div>
+    </div>
+</div>
+
+@code {
+    private IEnumerable<SupplierReadModel> items = new List<SupplierReadModel>();
+    private int totalCount = 0;
+    private int pageSize = 10;
+    private int currentPageIndex = 0;
+
+    // Filtros
+    private string searchFullName = string.Empty;
+    private int? filterById = null;
+
+    private readonly List<int> pageSizeOptions = new() { 5, 10, 25, 50, 100 };
+
+    private int currentPage => currentPageIndex + 1;
+    private int totalPages => pageSize == 0 ? 1 : (int)Math.Ceiling((double)totalCount / pageSize);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData(new LoadDataArgs { Skip = 0, Top = pageSize });
+    }
+
+    private async Task LoadData(LoadDataArgs args)
+    {
+        try
+        {
+            int top = args.Top ?? pageSize;
+            int skip = args.Skip ?? 0;
+
+            currentPageIndex = skip / top;
+
+            // Construir URL con filtros
+            var queryParams = new List<string>
+            {
+                $"pageNumber={currentPage}",
+                $"pageSize={top}"
+            };
+
+            // Agregar filtros si existen
+            if (!string.IsNullOrWhiteSpace(searchFullName))
+            {
+                queryParams.Add($"fullName={Uri.EscapeDataString(searchFullName)}");
+            }
+
+            if (filterById.HasValue)
+            {
+                queryParams.Add($"id={filterById.Value}");
+            }
+
+            var url = $"api/suppliers?{string.Join("&", queryParams)}";
+            var response = await HttpClient.GetFromJsonAsync<PagedResult<SupplierReadModel>>(url);
+
+            if (response != null)
+            {
+                items = response.Items ?? new List<SupplierReadModel>();
+                totalCount = response.TotalCount;
+            }
+            else
+            {
+                items = new List<SupplierReadModel>();
+                totalCount = 0;
+            }
+
+            StateHasChanged();
+        }
+        catch (Exception)
+        {
+            items = new List<SupplierReadModel>();
+            totalCount = 0;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnPageSizeChanged(object value)
+    {
+        if (value != null && int.TryParse(value.ToString(), out int newPageSize))
+        {
+            pageSize = newPageSize;
+            currentPageIndex = 0; // Resetear a la primera página
+
+            // Cargar datos con el nuevo tamaño de página
+            await LoadData(new LoadDataArgs { Top = pageSize, Skip = 0 });
+        }
+    }
+
+    private async Task GoToPage(int pageIndex)
+    {
+        if (pageIndex >= 0 && pageIndex < totalPages)
+        {
+            currentPageIndex = pageIndex;
+            await LoadData(new LoadDataArgs { Skip = currentPageIndex * pageSize, Top = pageSize });
+        }
+    }
+
+    // Nuevos métodos para las acciones
+    private void ViewInvoices(int supplierId)
+    {
+        NavigationManager.NavigateTo($"/suppliers/{supplierId}/purchase-invoices");
+    }
+
+    private void CreateInvoice(int supplierId)
+    {
+        NavigationManager.NavigateTo($"/invoices/create?supplierId={supplierId}");
+    }
+
+    private void EditSupplier(int supplierId)
+    {
+        NavigationManager.NavigateTo($"/suppliers/edit/{supplierId}");
+    }
+
+    private void CreateSupplier()
+    {
+        NavigationManager.NavigateTo("/suppliers/create");
+    }
+
+    // Métodos para filtros
+    private async Task ApplyFilters()
+    {
+        currentPageIndex = 0; // Resetear a la primera página al aplicar filtros
+        await LoadData(new LoadDataArgs { Skip = 0, Top = pageSize });
+    }
+
+    private async Task ClearFilters()
+    {
+        searchFullName = string.Empty;
+        filterById = null;
+        currentPageIndex = 0;
+        await LoadData(new LoadDataArgs { Skip = 0, Top = pageSize });
+    }
+}

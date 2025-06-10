@@ -1,0 +1,35 @@
+﻿-- dbo.vw_RepairsWithProducts source
+
+ALTER VIEW vw_RepairsWithProducts AS
+SELECT
+    r.Id AS RepairId,
+    r.StartDate,
+    r.EndDate,
+    r.Description,
+    r.Observations,
+
+    m.Id AS MachineId,
+    m.Description AS MachineDescription,
+    m.Code AS MachineCode,
+    m.IsActive AS MachineIsActive,
+
+    rp.ProductId,
+    rp.QuantityUsed,
+    rp.UnitPrice,
+
+    p.Name AS ProductName,
+    p.CategoryId,
+    p.UnitOfMeasureId,
+
+    pc.Code AS CategoryCode,
+    pc.Name AS CategoryName,
+
+    u.Name AS UnitOfMeasureName,
+    u.Symbol AS UnitOfMeasureSymbol
+
+FROM Repairs r
+JOIN Machines m ON r.MachineId = m.Id
+LEFT JOIN RepairProducts rp ON r.Id = rp.RepairId
+LEFT JOIN Products p ON rp.ProductId = p.Id
+LEFT JOIN ProductCategories pc ON p.CategoryId = pc.Id
+LEFT JOIN UnitOfMeasures u ON p.UnitOfMeasureId = u.Id;

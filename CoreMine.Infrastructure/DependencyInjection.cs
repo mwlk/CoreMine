@@ -5,6 +5,8 @@ using CoreMine.Entities;
 using CoreMine.Infraestructure.Repositories.ReadOnly;
 using CoreMine.Infrastructure.Repositories;
 using CoreMine.ApplicationBusiness.Interfaces.Shared;
+using CoreMine.Infraestructure.Repositories;
+using CoreMine.Infraestructure;
 
 namespace CoreMine.Infrastructure
 {
@@ -12,13 +14,41 @@ namespace CoreMine.Infrastructure
     {
         public static IServiceCollection AddInfraestructure(this IServiceCollection services)
         {
-            services.AddTransient<IProductsRepository, ProductsRepository>();
-            services.AddTransient<IRepository<Product>, ProductsRepository>();
-            services.AddTransient<IReadOnlyProductsRepository, ReadOnlyProductsRepository>();
+            services.AddScoped<IProductsRepository, ProductsRepository>();
+            services.AddScoped<IRepository<Product>, ProductsRepository>();
+            services.AddScoped<IReadOnlyProductsRepository, ReadOnlyProductsRepository>();
 
-            services.AddTransient<ICategoriesRepository, CategoriesRepository>();
-            services.AddTransient<IRepository<Category>, CategoriesRepository>();
-            services.AddTransient<IReadOnlyCategoriesRepository, ReadOnlyCategoriesRepository>();
+            services.AddScoped<IProductCategoriesRepository, ProductCategoriesRepository>();
+            services.AddScoped<IRepository<ProductCategory>, ProductCategoriesRepository>();
+            services.AddScoped<IReadOnlyCategoriesRepository, ReadOnlyCategoriesRepository>();
+
+            services.AddScoped<ISuppliersRepository, SuppliersRepository>();
+            services.AddScoped<IRepository<Supplier>, SuppliersRepository>();
+            services.AddScoped<IReadOnlySuppliersRepository, ReadOnlySuppliersRepository>();
+
+            services.AddScoped<IReadOnlyProductStateTypesRepository, ReadOnlyProductStateTypesRepository>();
+            services.AddScoped<IReadOnlyUnitOfMeasuresRepository, ReadOnlyUnitOfMeasuresRepository>();
+            services.AddScoped<IReadOnlyMachinesRepository, ReadOnlyMachinesRepository>();
+            services.AddScoped<IReadOnlyLocationsRepository, ReadOnlyLocationsRepository>();
+
+            services.AddScoped<IMachinesRepository, MachinesRepository>();
+
+            services.AddTransient<IDateTimeProvider, DateTimeProvider>();
+
+            services.AddScoped<IRepairsRepository, RepairsRepository>();
+            services.AddScoped<IReadOnlyRepairsRepository, ReadOnlyRepairsRepository>();
+
+            services.AddScoped<IStockRepository, StockRepository>();
+            services.AddScoped<IReadOnlyStockRepository, ReadOnlyStockRepository>();
+
+            services.AddScoped<IReadOnlyStockMovementTypesRepository, ReadOnlyStockMovementTypesRepository>();
+            services.AddScoped<IStockMovementsRepository, StockMovementsRepository>();
+
+            services.AddScoped<IReadOnlyStockLevelsRepository, ReadOnlyStockLevelsRepository>();
+            services.AddScoped<IStockLevelsRepository, StockLevelsRepository>();
+
+            services.AddScoped<IPurchaseInvoicesRepository, PurchaseInvoicesRepository>();
+            services.AddScoped<IReadOnlyPurchaseInvoicesRepository, ReadOnlyPurchaseInvoicesRepository>();
 
             return services;
         }

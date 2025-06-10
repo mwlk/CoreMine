@@ -74,14 +74,14 @@
         </RadzenDataGridColumn>
 
         <RadzenDataGridColumn TItem="SupplierReadModel"
-                              Property="Surname"
+                              Property="FullName"
                               Title="Nombre Completo"
                               TextAlign="TextAlign.Left"
                               Frozen="true"
                               Width="250px">
             <Template Context="data">
                 <div class="d-flex flex-column">
-                    <span class="fw-bold">@data.Surname</span>
+                    <span class="fw-bold">@data.FullName</span>
                 </div>
             </Template>
         </RadzenDataGridColumn>

@@ -53,7 +53,9 @@ namespace CoreMine.ApplicationBusiness.UseCases.PurchaseInvoices.Handlers
                 Id = p.Id,
                 IngresedAt = p.IngresedAt,
                 SupplierId = p.SupplierId,
-                SupplierName = p.Supplier.Surname,
+                SupplierName = !string.IsNullOrWhiteSpace(p.Supplier.Surname) && !string.IsNullOrWhiteSpace(p.Supplier.Name)
+                                ? $"{p.Supplier.Surname}, {p.Supplier.Name}"
+                                : p.Supplier.TradeName,
 
                 Total = p.PurchaseInvoiceDetails.Sum(d => d.UnitPrice * d.Quantity),
 

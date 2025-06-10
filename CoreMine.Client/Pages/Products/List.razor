@@ -271,7 +271,7 @@
         </RadzenDataGridColumn>
 
         <!-- Ubicación Columns -->
-        <RadzenDataGridColumn TItem="ProductReadModel"
+        @* <RadzenDataGridColumn TItem="ProductReadModel"
                               Property="LocationId"
                               Title="Cód. Ubic."
                               Width="100px"
@@ -281,7 +281,7 @@
                     <span class="code-style">@(data.LocationId?.ToString() ?? "-")</span>
                 </div>
             </Template>
-        </RadzenDataGridColumn>
+        </RadzenDataGridColumn> *@
 
         <RadzenDataGridColumn TItem="ProductReadModel"
                               Property="LocationName"

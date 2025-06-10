@@ -49,8 +49,9 @@ namespace CoreMine.ApplicationBusiness.UseCases.Suppliers.Handlers
             return await baseQuery.Select(p => new SupplierViewModel
             {
                 Id = p.Id,
-                Name = p.Name,
-                Surname = p.Surname,
+                FullName = !string.IsNullOrWhiteSpace(p.Surname) && !string.IsNullOrWhiteSpace(p.Name)
+                                ? $"{p.Surname}, {p.Name}" 
+                                : p.TradeName,
                 Phone = p.Phone,
                 Contact = p.Contact,
                 CreatedAt = p.CreatedAt

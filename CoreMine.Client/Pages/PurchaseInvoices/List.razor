@@ -19,7 +19,7 @@
                 <RadzenLabel Text="Proveedor" />
                 <RadzenDropDown @bind-Value="selectedSupplierId"
                                 Data="suppliers"
-                                TextProperty="Surname"
+                                TextProperty="FullName"
                                 ValueProperty="Id"
                                 Placeholder="Seleccionar proveedor"
                                 AllowClear="true" 
@@ -46,7 +46,7 @@
 {
     <RadzenAlert AlertStyle="AlertStyle.Info" class="rz-my-4">
         <RadzenText>
-            Mostrando facturas del proveedor: <strong>@currentSupplier.Surname</strong>
+            Mostrando facturas del proveedor: <strong>@currentSupplier.FullName</strong>
         </RadzenText>
         <RadzenButton Text="Ver todas las facturas"
                       Icon="list"

@@ -80,10 +80,8 @@
                                     Style="width: 100%"
                                     Placeholder="Seleccione un proveedor"
                                     Disabled="@isLoading"
-                                    Name="SupplierId">
-                        <Template Context="supplier">
-                            @($"{supplier.Surname}, {supplier.Name}")
-                        </Template>
+                                    Name="SupplierId"
+                                    TextProperty="FullName">                        
                     </RadzenDropDown>
                     <RadzenRequiredValidator Component="SupplierId"
                                              Text="Proveedor es requerido"
@@ -131,7 +129,7 @@
                                       Disabled="@isLoading"
                                       Style="padding: 12px 24px;" />
 
-                        <RadzenButton Text="Guardar Repuesto"
+                        <RadzenButton Text="Guardar"
                                       ButtonType="ButtonType.Submit"
                                       ButtonStyle="ButtonStyle.Primary"
                                       Icon="save"

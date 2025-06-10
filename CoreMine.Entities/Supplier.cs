@@ -2,14 +2,15 @@
 
 namespace CoreMine.Entities
 {
-    public class Supplier : NameableEntity
+    public class Supplier : IdentifiableEntity
     {
-        public string Surname { get; set; } = null!;
+        public string? Name { get; set; }
+        public string? Surname { get; set; }
         public string? Contact { get; set; } = null!;
         public string Phone { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
-        public string? BusinessName { get; set; } = null!;
-        public string? TradeName { get; set; } = null!;
+        public string? BusinessName { get; set; }
+        public string? TradeName { get; set; }
         public virtual ICollection<Product> Products { get; set; }
         public virtual ICollection<PurchaseInvoice> PurchaseInvoices { get; set; }
 

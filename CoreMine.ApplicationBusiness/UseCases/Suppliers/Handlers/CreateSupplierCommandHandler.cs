@@ -32,6 +32,8 @@ namespace CoreMine.ApplicationBusiness.UseCases.Suppliers.Handlers
                 {
                     Name = command.Name,
                     Surname = command.Surname,
+                    BusinessName = command.BusinessName,
+                    TradeName = command.TradeName,
                     Contact = command.Contact,
                     Phone = command.Phone,
                     CreatedAt = _dateTimeProvider.UtcNow
